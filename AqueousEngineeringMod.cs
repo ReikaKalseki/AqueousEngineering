@@ -74,12 +74,12 @@ namespace ReikaKalseki.AqueousEngineering
         poo = new MiniPoo(locale.getEntry("MiniPoop"));
 	    poo.Patch();
 	    
-	    sonarBlock = createMachine<BaseSonarPinger>("SeabaseSonar");
-	    repellentBlock = createMachine<BaseCreatureRepellent>("SeabaseRepellent");
-	    beaconBlock = createMachine<BaseBeacon>("SeabaseBeacon");
-	    ampeelAntennaBlock = createMachine<AmpeelAntenna>("SeabaseAmpeelAntenna");
-	    farmerBlock = createMachine<Autofarmer>("SeabaseFarmer");
-	    acuCleanerBlock = createMachine<ACUCleaner>("SeabaseACUCleaner");
+	    sonarBlock = createMachine<BaseSonarPinger, BaseSonarPingerLogic>("SeabaseSonar");
+	    repellentBlock = createMachine<BaseCreatureRepellent, BaseCreatureRepellentLogic>("SeabaseRepellent");
+	    beaconBlock = createMachine<BaseBeacon, BaseBeaconLogic>("SeabaseBeacon");
+	    ampeelAntennaBlock = createMachine<AmpeelAntenna, AmpeelAntennaLogic>("SeabaseAmpeelAntenna");
+	    farmerBlock = createMachine<Autofarmer, AutofarmerLogic>("SeabaseFarmer");
+	    acuCleanerBlock = createMachine<ACUCleaner, ACUCleanerLogic>("SeabaseACUCleaner");
         
         outdoorBasicPot = new OutdoorPot(TechType.PlanterPot);
         outdoorCompositePot = new OutdoorPot(TechType.PlanterPot2);
@@ -91,7 +91,7 @@ namespace ReikaKalseki.AqueousEngineering
         new WorldgenDatabase().load();
     }
     
-    private static M createMachine<M>(string lck, TechnologyFragment[] frags = null) where M : CustomMachine<CustomMachineLogic> {
+    private static M createMachine<M, N>(string lck, TechnologyFragment[] frags = null) where N : CustomMachineLogic where M : CustomMachine<N> {
     	Type mt = typeof(M);
     	Type lgc = mt.GetGenericArguments()[0];
     	M m = (M)Activator.CreateInstance(mt.MakeGenericType(lgc), locale.getEntry(lck));
