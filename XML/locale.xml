@@ -1,0 +1,90 @@
+<Root>
+	<MiniPoop>
+		<name>
+			Alien Feces (Small)
+		</name>
+		<desc>
+			A small quantity of fecal matter from alien fauna.
+		</desc>
+		<pda>
+			
+		</pda>
+	</MiniPoop>
+	<SeabaseSonar>
+		<name>
+			Seabase Sonar Antenna
+		</name>
+		<desc>
+			Continuously fires sonar pulses from a seabase.
+		</desc>
+		<pda>
+			
+		</pda>
+	</SeabaseSonar>
+	<SeabaseRepellent>
+		<name>
+			Seabase Creature Repellant Antenna
+		</name>
+		<desc>
+			Discourages close approach of creatures to the seabase.
+		</desc>
+		<pda>
+			
+		</pda>
+	</SeabaseRepellent>
+	<SpineEelDesc>
+		<name>
+			
+		</name>
+		<desc>
+			An aggressive and poison-resistant eel-like predator found exclusively in the Lost River.
+		</desc>
+		<pda>
+			
+		</pda>
+	</SpineEelDesc>
+	<GhostRayDesc>
+		<name>
+			
+		</name>
+		<desc>
+			A large passive herbivore with unusual biology adapted to its native environment.
+		</desc>
+		<pda>
+			
+		</pda>
+	</GhostRayDesc>
+	<CrimsonRayDesc>
+		<name>
+			
+		</name>
+		<desc>
+			A highly heat-resistant ray species closely related to ghost rays.
+		</desc>
+		<pda>
+			
+		</pda>
+	</CrimsonRayDesc>
+	<BiterDesc>
+		<name>
+			
+		</name>
+		<desc>
+			A small fast predator, most dangerous in swarms.
+		</desc>
+		<pda>
+			
+		</pda>
+	</BiterDesc>
+	<BlighterDesc>
+		<name>
+			
+		</name>
+		<desc>
+			A deep-sea and nearly-blind variant of the biter. Prefers carrion to live prey.
+		</desc>
+		<pda>
+			
+		</pda>
+	</BlighterDesc>
+</Root>
