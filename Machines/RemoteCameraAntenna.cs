@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Collections.Generic;
 
@@ -14,14 +15,15 @@ using ReikaKalseki.DIAlterra;
 
 namespace ReikaKalseki.AqueousEngineering {
 	
-	public class ACUCleaner : CustomMachine<ACUCleanerLogic> {
+	public class RemoteCameraAntenna : CustomMachine<RemoteCameraAntennaLogic> {
 		
-		internal static readonly float POWER_COST = 0.15F;
+		internal static readonly float POWER_COST = 0.05F; //per second
+		internal static readonly float POWER_COST_ACTIVE = 1.0F; //per second
 		
-		public ACUCleaner(XMLLocale.LocaleEntry e) : base("baseacucleaner", e.name, e.desc, "8949b0da-5173-431f-a989-e621af02f942") {
-			addIngredient(TechType.Titanium, 5);
-			addIngredient(TechType.ExosuitPropulsionArmModule, 1);
-			addIngredient(TechType.MapRoomCamera, 1);
+		public RemoteCameraAntenna(XMLLocale.LocaleEntry e) : base("baseremotecam", e.name, e.desc, "8949b0da-5173-431f-a989-e621af02f942") {
+			addIngredient(TechType.Gold, 4);
+			addIngredient(TechType.Beacon, 1);
+			addIngredient(TechType.CopperWire, 3);
 		}
 
 		public override bool UnlockedAtStart {
@@ -31,14 +33,14 @@ namespace ReikaKalseki.AqueousEngineering {
 		}
 		
 		public override bool isOutdoors() {
-			return false;
+			return true;
 		}
 		
 		public override void initializeMachine(GameObject go) {
 			base.initializeMachine(go);
 			ObjectUtil.removeComponent<PowerRelay>(go);
 						
-			ACUCleanerLogic lgc = go.GetComponent<ACUCleanerLogic>();
+			RemoteCameraAntennaLogic lgc = go.GetComponent<RemoteCameraAntennaLogic>();
 			
 			Renderer r = go.GetComponentInChildren<Renderer>();/*
 			//SNUtil.dumpTextures(r);
@@ -55,22 +57,28 @@ namespace ReikaKalseki.AqueousEngineering {
 		
 	}
 		
-	public class ACUCleanerLogic : CustomMachineLogic {
+	public class RemoteCameraAntennaLogic : CustomMachineLogic {
 		
-		private WaterPark connectedACU;
-				
+		private MapRoomFunctionality scanner;
+		
+		private bool ready;
+		
 		void Start() {
-			SNUtil.log("Reinitializing acu cleaner");
-			AqueousEngineeringMod.acuCleanerBlock.initializeMachine(gameObject);
+			SNUtil.log("Reinitializing base camera antenna");
+			AqueousEngineeringMod.cameraAntennaBlock.initializeMachine(gameObject);
 		}
 		
 		protected override void updateEntity(float seconds) {
-			if (!connectedACU) {
-				connectedACU = tryFindACU();
+			if (!scanner) {
+			SubRoot sub = getSub();
+				scanner = sub ? sub.gameObject.GetComponentInChildren<MapRoomFunctionality>() : null;
 			}
-			if (false && consumePower(ACUCleaner.POWER_COST, seconds)) {
-				
-			}
-		}	
+			if (seconds > 0)
+				ready = scanner && consumePower(RemoteCameraAntenna.POWER_COST, seconds);
+		}
+		
+		public bool isReady() {
+			return ready;
+		}
 	}
 }

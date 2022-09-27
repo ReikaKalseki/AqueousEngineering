@@ -31,6 +31,7 @@ namespace ReikaKalseki.AqueousEngineering
     public static AmpeelAntenna ampeelAntennaBlock;
     public static ACUCleaner acuCleanerBlock;
     public static Autofarmer farmerBlock;
+    public static RemoteCameraAntenna cameraAntennaBlock;
     
     public static OutdoorPot outdoorBasicPot;
     public static OutdoorPot outdoorChicPot;
@@ -80,6 +81,7 @@ namespace ReikaKalseki.AqueousEngineering
 	    ampeelAntennaBlock = createMachine<AmpeelAntenna, AmpeelAntennaLogic>("SeabaseAmpeelAntenna");
 	    farmerBlock = createMachine<Autofarmer, AutofarmerLogic>("SeabaseFarmer");
 	    acuCleanerBlock = createMachine<ACUCleaner, ACUCleanerLogic>("SeabaseACUCleaner");
+	    cameraAntennaBlock = createMachine<RemoteCameraAntenna, RemoteCameraAntennaLogic>("SeabaseRemoteCamera");
         
         outdoorBasicPot = new OutdoorPot(TechType.PlanterPot);
         outdoorCompositePot = new OutdoorPot(TechType.PlanterPot2);

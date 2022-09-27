@@ -40,7 +40,6 @@ namespace ReikaKalseki.AqueousEngineering {
 		public override void initializeMachine(GameObject go) {
 			base.initializeMachine(go);
 			ObjectUtil.removeComponent<PowerRelay>(go);
-			ObjectUtil.removeChildObject(go, "Bubbles");
 						
 			BaseCreatureRepellentLogic lgc = go.GetComponent<BaseCreatureRepellentLogic>();
 			

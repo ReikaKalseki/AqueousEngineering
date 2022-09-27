@@ -43,30 +43,23 @@ namespace ReikaKalseki.AqueousEngineering {
 			return !lv || lv.IsAlive();
 	   	}
 	   
-	   public static void onChunkGenGrass(IVoxelandChunk2 chunk) {
-	   	foreach (Renderer r in chunk.grassRenders) {
-	   		ACUTheming.cacheGrassMaterial(r.materials[0]);
-	   	}
-	   }
-	}
-	
-	class ContainmentFacilityDragonRepellent : MonoBehaviour {
-		
-		void Update() {
-			float r = 80;
-			if (Player.main.transform.position.y <= 1350 && Vector3.Distance(transform.position, Player.main.transform.position) <= 100) {
-				RaycastHit[] hit = Physics.SphereCastAll(gameObject.transform.position, r, new Vector3(1, 1, 1), r);
-				foreach (RaycastHit rh in hit) {
-					if (rh.transform != null && rh.transform.gameObject) {
-						SeaDragon c = rh.transform.gameObject.GetComponent<SeaDragon>();
-						if (c) {
-							Vector3 vec = transform.position+((c.transform.position-transform.position).normalized*120);
-							c.GetComponent<SwimBehaviour>().SwimTo(vec, 20);
-						}
-					}
-				}
+		public static void onChunkGenGrass(IVoxelandChunk2 chunk) {
+		 	foreach (Renderer r in chunk.grassRenders) {
+		   		ACUTheming.cacheGrassMaterial(r.materials[0]);
 			}
-		}
+	   	}
 		
+		public static float getCameraDistanceForRenderFX(MapRoomCamera cam, MapRoomScreen scr = null) {
+			SubRoot sub = cam.dockingPoint ? cam.dockingPoint.gameObject.GetComponentInParent<SubRoot>() : null;
+			if (!sub) {
+				sub = WorldUtil.getClosest<SubRoot>(cam.gameObject);
+			}
+			if (sub && Vector3.Distance(sub.transform.position, cam.transform.position) <= 400) {
+				RemoteCameraAntennaLogic lgc = sub.GetComponentInChildren<RemoteCameraAntennaLogic>();
+				if (lgc && lgc.isReady())
+					return 0;
+			}
+			return cam.GetScreenDistance(scr);
+		}
 	}
 }
