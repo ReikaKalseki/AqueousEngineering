@@ -45,7 +45,7 @@ namespace ReikaKalseki.AqueousEngineering {
 	   
 	   public static void onChunkGenGrass(IVoxelandChunk2 chunk) {
 	   	foreach (Renderer r in chunk.grassRenders) {
-	   		ACUCallbackSystem.instance.cacheGrassMaterial(r.materials[0]);
+	   		ACUTheming.cacheGrassMaterial(r.materials[0]);
 	   	}
 	   }
 	}

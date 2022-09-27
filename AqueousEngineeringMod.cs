@@ -92,9 +92,7 @@ namespace ReikaKalseki.AqueousEngineering
     }
     
     private static M createMachine<M, N>(string lck, TechnologyFragment[] frags = null) where N : CustomMachineLogic where M : CustomMachine<N> {
-    	Type mt = typeof(M);
-    	Type lgc = mt.GetGenericArguments()[0];
-    	M m = (M)Activator.CreateInstance(mt.MakeGenericType(lgc), locale.getEntry(lck));
+    	M m = (M)Activator.CreateInstance(typeof(M), locale.getEntry(lck));
         m.Patch();
         if (frags != null)
         	m.addFragments(frags.Length, 4F, frags);
