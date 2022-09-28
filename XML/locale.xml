@@ -23,7 +23,7 @@
 	</SeabaseSonar>
 	<SeabaseRepellent>
 		<name>
-			Seabase Creature Repellant Antenna
+			Creature Repellant Pylon
 		</name>
 		<desc>
 			Discourages close approach of creatures to the seabase.
@@ -32,6 +32,116 @@
 			
 		</pda>
 	</SeabaseRepellent>
+	<SeabaseBeacon>
+		<name>
+			Seabase Beacon
+		</name>
+		<desc>
+			A beacon affixed to the seabase that broadcasts location and status information.
+		</desc>
+		<pda>
+			
+		</pda>
+	</SeabaseBeacon>
+	<SeabaseAmpeelAntenna>
+		<name>
+			Ampeel Antenna
+		</name>
+		<desc>
+			Draws small amounts of power from passing ampeels to maintain power in a seabase. Most effective at short range. Not capable of sustaining high power loads.
+		</desc>
+		<pda>
+			
+		</pda>
+	</SeabaseAmpeelAntenna>
+	<SeabaseFarmer>
+		<name>
+			Autofarming Unit
+		</name>
+		<desc>
+			Automatically harvests from mature plants in nearby growbeds. Will not completely kill the plant.
+		</desc>
+		<pda>
+			
+		</pda>
+	</SeabaseFarmer>
+	<SeabaseACUCleaner>
+		<name>
+			ACU Cleaning System
+		</name>
+		<desc>
+			Keeps the ACU clean of debris, including excreted waste from the contained animals.
+		</desc>
+		<pda>
+			
+		</pda>
+	</SeabaseACUCleaner>
+	<SeabaseRemoteCamera>
+		<name>
+			Scanner Camera Relay Antenna
+		</name>
+		<desc>
+			Eliminates the distance attenuation from scanner room camera signals for the attached seabase.
+		</desc>
+		<pda>
+			
+		</pda>
+	</SeabaseRemoteCamera>
+	<Name>
+		<name>
+			
+		</name>
+		<desc>
+			
+		</desc>
+		<pda>
+			
+		</pda>
+	</Name>
+	<Name>
+		<name>
+			
+		</name>
+		<desc>
+			
+		</desc>
+		<pda>
+			
+		</pda>
+	</Name>
+	<Name>
+		<name>
+			
+		</name>
+		<desc>
+			
+		</desc>
+		<pda>
+			
+		</pda>
+	</Name>
+	<Name>
+		<name>
+			
+		</name>
+		<desc>
+			
+		</desc>
+		<pda>
+			
+		</pda>
+	</Name>
+	<Name>
+		<name>
+			
+		</name>
+		<desc>
+			
+		</desc>
+		<pda>
+			
+		</pda>
+	</Name>
 	<SpineEelDesc>
 		<name>
 			

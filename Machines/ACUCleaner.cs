@@ -18,7 +18,7 @@ namespace ReikaKalseki.AqueousEngineering {
 		
 		internal static readonly float POWER_COST = 0.15F;
 		
-		public ACUCleaner(XMLLocale.LocaleEntry e) : base("baseacucleaner", e.name, e.desc, "8949b0da-5173-431f-a989-e621af02f942") {
+		public ACUCleaner(XMLLocale.LocaleEntry e) : base("baseacucleaner", e.name, e.desc, "f1cde32e-101a-4dd5-8084-8c950b9c2432") {
 			addIngredient(TechType.Titanium, 5);
 			addIngredient(TechType.ExosuitPropulsionArmModule, 1);
 			addIngredient(TechType.MapRoomCamera, 1);
@@ -36,7 +36,10 @@ namespace ReikaKalseki.AqueousEngineering {
 		
 		public override void initializeMachine(GameObject go) {
 			base.initializeMachine(go);
-			ObjectUtil.removeComponent<PowerRelay>(go);
+			ObjectUtil.removeComponent<Trashcan>(go);
+			
+			StorageContainer con = go.GetComponentInChildren<StorageContainer>();
+			initializeStorageContainer(con, 3, 5);
 						
 			ACUCleanerLogic lgc = go.GetComponent<ACUCleanerLogic>();
 			
@@ -58,7 +61,6 @@ namespace ReikaKalseki.AqueousEngineering {
 	public class ACUCleanerLogic : CustomMachineLogic {
 		
 		private WaterPark connectedACU;
-		private StorageContainer closestLocker;
 		
 		private float lastRunTime;
 				
@@ -96,9 +98,8 @@ namespace ReikaKalseki.AqueousEngineering {
 		protected override void updateEntity(float seconds) {
 			if (!connectedACU) {
 				connectedACU = tryFindACU();
-				closestLocker = tryFindStorage();
 			}
-			if (connectedACU && closestLocker && consumePower(ACUCleaner.POWER_COST, seconds)) {
+			if (connectedACU && consumePower(ACUCleaner.POWER_COST, seconds)) {
 				float time = DayNightCycle.main.timePassedAsFloat;
 				if (time-lastRunTime >= 2) {
 					lastRunTime = time;
@@ -107,7 +108,7 @@ namespace ReikaKalseki.AqueousEngineering {
 							Pickupable pp = wp.GetComponent<Pickupable>();
 							TechType tt = pp.GetTechType();
 							if (tt == TechType.SeaTreaderPoop || tt == AqueousEngineeringMod.poo.TechType) {
-								InventoryItem ii = closestLocker.container.AddItem(pp);
+								InventoryItem ii = getStorage().container.AddItem(pp);
 								if (ii != null) {
 									connectedACU.RemoveItem(pp);
 									pp.gameObject.SetActive(false);

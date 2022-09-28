@@ -111,9 +111,12 @@ namespace ReikaKalseki.AqueousEngineering {
 		}
 		
 		private string generateBeaconLabel(SubRoot sub) {
-			string loc = WaterBiomeManager.main.GetBiome(transform.position, false)+" ("+Ocean.main.GetDepthOf(gameObject)+")";
-			string pw = sub.powerRelay.GetPower()+"/"+sub.powerRelay.GetMaxPower()+" ("+sub.powerRelay.powerStatus+")";
-			return loc+"\n"+pw+"\n"+vehicleString;
+			string loc = "Location: "+WorldUtil.getBiomeFriendlyName(WaterBiomeManager.main.GetBiome(transform.position, false))+" ("+(int)Ocean.main.GetDepthOf(gameObject)+"m)";
+			string pw = "Power: "+sub.powerRelay.GetPower()+"/"+sub.powerRelay.GetMaxPower()+" ("+sub.powerRelay.powerStatus+")";
+			string ret = loc+"\n"+pw;
+			if (!string.IsNullOrEmpty(vehicleString))
+				ret = ret+"\n"+vehicleString;
+			return ret;
 		}
 	}
 }

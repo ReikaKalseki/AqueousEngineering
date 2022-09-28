@@ -18,7 +18,7 @@ namespace ReikaKalseki.AqueousEngineering {
 		
 		internal static readonly float POWER_COST = 1F;
 		
-		public Autofarmer(XMLLocale.LocaleEntry e) : base("basefarmer", e.name, e.desc, "8949b0da-5173-431f-a989-e621af02f942") {
+		public Autofarmer(XMLLocale.LocaleEntry e) : base("basefarmer", e.name, e.desc, "f1cde32e-101a-4dd5-8084-8c950b9c2432") {
 			addIngredient(TechType.TitaniumIngot, 1);
 			addIngredient(TechType.AdvancedWiringKit, 1);
 			addIngredient(TechType.VehicleStorageModule, 1);
@@ -37,7 +37,11 @@ namespace ReikaKalseki.AqueousEngineering {
 		
 		public override void initializeMachine(GameObject go) {
 			base.initializeMachine(go);
-			ObjectUtil.removeComponent<PowerRelay>(go);
+			ObjectUtil.removeComponent<Trashcan>(go);
+			
+			StorageContainer con = go.GetComponentInChildren<StorageContainer>();
+			initializeStorageContainer(con, 8, 8);
+			con.errorSound = null;
 						
 			AutofarmerLogic lgc = go.GetComponent<AutofarmerLogic>();
 			
@@ -86,18 +90,85 @@ namespace ReikaKalseki.AqueousEngineering {
 		}
 		
 		private void tryHarvestFrom(Planter p) {
-			Planter.PlantSlot[] arr = UnityEngine.Random.Range(0, 1) == 0 ? p.bigPlantSlots : p.smallPlantSlots;
+			Planter.PlantSlot[] arr = UnityEngine.Random.Range(0, 2) == 0 ? p.bigPlantSlots : p.smallPlantSlots;
 			Planter.PlantSlot slot = arr[UnityEngine.Random.Range(0, arr.Length)];
 			if (slot != null && slot.isOccupied) {
 				Plantable pt = slot.plantable;
-				if (pt && pt.plantAge >= 1) {
-					tryHarvestPlant(pt);
+				SNUtil.writeToChat(pt+" > "+pt.plantAge);
+				if (pt && pt.linkedGrownPlant) {
+					tryHarvestPlant(p, pt);
 				}
 			}
 		}
 		
-		private void tryHarvestPlant(Plantable p) {
-			SNUtil.writeToChat("Try harvest "+p);
+		private void tryHarvestPlant(Planter pl, Plantable pt) {
+			GrownPlant p = pt.linkedGrownPlant;
+			TechType tt = CraftData.GetTechType(p.gameObject);
+			//SNUtil.writeToChat("Try harvest "+p+" : "+tt);
+			if (tt != TechType.None) {
+				FruitPlant fp = p.GetComponent<FruitPlant>();
+				GameObject drop = getHarvest(p, tt, fp);
+				//SNUtil.writeToChat("drops "+drop);
+				if (drop) {
+					drop = UnityEngine.Object.Instantiate(drop);
+					TechType td = CraftData.GetTechType(drop);
+					if (fp) {
+						PickPrefab pp = drop.GetComponent<PickPrefab>();
+						td = pp.pickTech;
+						drop = CraftData.GetPrefabForTechType(td);
+					}
+					else if (td == TechType.JellyPlantSeed || td == TechType.WhiteMushroomSpore || td == TechType.AcidMushroomSpore) {
+						td = tt;
+						drop = UnityEngine.Object.Instantiate(CraftData.GetPrefabForTechType(tt));
+					}
+					//SNUtil.writeToChat("DT "+td);
+					drop.SetActive(false);
+					if (getStorage().container.AddItem(drop.GetComponent<Pickupable>()) != null) {
+						FMODAsset ass = SNUtil.getSound(CraftData.pickupSoundList.ContainsKey(td) ? CraftData.pickupSoundList[td] : CraftData.defaultPickupSound);
+						if (ass != null) {
+							SNUtil.playSoundAt(ass, gameObject.transform.position);
+						}
+						if (fp) {
+							PickPrefab pp = drop.GetComponent<PickPrefab>();
+							pp.SetPickedUp();
+						}
+						else if (td == TechType.JellyPlantSeed || td == TechType.WhiteMushroomSpore || td == TechType.AcidMushroomSpore) {
+							pl.ReplaceItem(pt, drop.GetComponent<Plantable>());
+						}
+					}
+				}
+			}
+		}
+		
+		private GameObject getHarvest(GrownPlant p, TechType tt, FruitPlant fp) {
+			if (fp) {
+				PickPrefab pp = fp.fruits[UnityEngine.Random.Range(0, fp.fruits.Length)];
+				if (pp && pp.isActiveAndEnabled) {
+					return pp.gameObject;
+				}
+				else {
+					return null;
+				}
+			}
+			switch (tt) {/*
+				case TechType.BloodVine:
+					return TechType.BloodOil;
+				case TechType.Creepvine:
+					return  ? TechType.CreepvineSeedCluster : TechType.CreepvinePiece;*/
+				default:
+					return CraftData.harvestOutputList.ContainsKey(tt) ? CraftData.GetPrefabForTechType(CraftData.harvestOutputList[tt]) : null;
+			}
 		}
 	}
+	/*
+	class HarvestData {
+		
+		private readonly TechType plant;
+		private readonly TechType drop;
+		
+		private GameObject createDroppedItem(GrownPlant p, TechType tt) {
+			
+		}
+		
+	}*/
 }
