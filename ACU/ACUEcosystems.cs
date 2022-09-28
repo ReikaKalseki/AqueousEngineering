@@ -94,7 +94,7 @@ namespace ReikaKalseki.AqueousEngineering {
 			}
 		}
 		
-		internal static Creature handleCreature(ACUCallbackSystem.ACUCallback acu, float dT, WaterParkItem wp, TechType tt, List<WaterParkCreature> foodFish, PrefabIdentifier[] plants, HashSet<BiomeRegions.RegionType> possibleBiomes) {
+		internal static Creature handleCreature(ACUCallbackSystem.ACUCallback acu, float dT, WaterParkItem wp, TechType tt, List<WaterParkCreature> foodFish, PrefabIdentifier[] plants, ref HashSet<BiomeRegions.RegionType> possibleBiomes) {
 			if (edibleFish.ContainsKey(tt)) {
 				if (tt == TechType.Peeper && wp.gameObject.GetComponent<Peeper>().isHero)
 					acu.sparkleCount++;
@@ -129,7 +129,7 @@ namespace ReikaKalseki.AqueousEngineering {
 			return null;
 		}
 		
-		internal static HashSet<VanillaFlora> collectPlants(ACUCallbackSystem.ACUCallback acu, PrefabIdentifier[] plants, HashSet<BiomeRegions.RegionType> possibleBiomes) {
+		internal static HashSet<VanillaFlora> collectPlants(ACUCallbackSystem.ACUCallback acu, PrefabIdentifier[] plants, ref HashSet<BiomeRegions.RegionType> possibleBiomes) {
 			HashSet<VanillaFlora> set = new HashSet<VanillaFlora>();
 			foreach (PrefabIdentifier pi in plants) {
 				if (pi) {
@@ -171,7 +171,7 @@ namespace ReikaKalseki.AqueousEngineering {
 					if (edibleFish.ContainsKey(tt)) {
 						eaten = pp.gameObject;
 						amt = edibleFish[tt];
-						//SNUtil.writeToChat(c+" ate a "+tt+" and got "+amt);
+						SNUtil.writeToChat(c+" ate a "+tt+" and got "+amt+", is now "+c.Hunger.Value);
 						return true;
 					}
 				}
@@ -304,7 +304,7 @@ namespace ReikaKalseki.AqueousEngineering {
 			
 			internal ACUMetabolism(float mf, float pp, bool isc, BiomeRegions.RegionType r, params BiomeRegions.RegionType[] rr) {
 				normalizedPoopChance = pp*2;
-				metabolismPerSecond = mf*0.033F;
+				metabolismPerSecond = mf*0.006F;
 				isCarnivore = isc;
 				primaryRegion = r;
 				additionalRegions.AddRange(rr.ToList());

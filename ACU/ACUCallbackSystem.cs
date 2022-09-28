@@ -122,13 +122,13 @@ namespace ReikaKalseki.AqueousEngineering {
 						teeth++;
 					}
 					else if (wp is WaterParkCreature) {
-						Creature c = ACUEcosystems.handleCreature(this, dT, wp, tt, foodFish, plants, possibleBiomes);
+						Creature c = ACUEcosystems.handleCreature(this, dT, wp, tt, foodFish, plants, ref possibleBiomes);
 						if (tt == TechType.Stalker) {
 							stalkers.Add((Stalker)c);
 						}
 					}
 		   	 	}
-				HashSet<VanillaFlora> plantTypes = ACUEcosystems.collectPlants(this, plants, possibleBiomes);
+				HashSet<VanillaFlora> plantTypes = ACUEcosystems.collectPlants(this, plants, ref possibleBiomes);
 				consistent = possibleBiomes.Count > 0 && plantCount > 0;
 				healthy = plantCount > 0 && plantTypes.Count > (possibleBiomes.Count == 1 && possibleBiomes.First<BiomeRegions.RegionType>() == BiomeRegions.RegionType.LavaZone ? 0 : 1) && herbivoreCount > 0 && carnivoreCount > 0 && carnivoreCount <= Math.Max(1, herbivoreCount/Mathf.Max(1, 6-sparkleCount*0.5F)) && carnivoreCount <= acu.height*1.5F && herbivoreCount > 0 && herbivoreCount <= plantCount*(4+sparkleCount*0.5F);
 				float boost = 0;
@@ -174,13 +174,13 @@ namespace ReikaKalseki.AqueousEngineering {
 						}
 					}
 				}
+				//SNUtil.writeToChat(string.Join(", ", possibleBiomes));
 				if (possibleBiomes.Count == 1) {
 					BiomeRegions.RegionType theme = possibleBiomes.First<BiomeRegions.RegionType>();
 					if (theme == BiomeRegions.RegionType.Other)
 						theme = BiomeRegions.RegionType.Shallows;
 					bool changed = theme != currentTheme;
 					currentTheme = theme;
-					SNUtil.writeToChat(""+theme);
 					ACUTheming.updateACUTheming(this, theme, changed);
 				}
 			}

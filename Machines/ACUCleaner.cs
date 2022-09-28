@@ -98,7 +98,7 @@ namespace ReikaKalseki.AqueousEngineering {
 				connectedACU = tryFindACU();
 				closestLocker = tryFindStorage();
 			}
-			if (connectedACU && consumePower(ACUCleaner.POWER_COST, seconds)) {
+			if (connectedACU && closestLocker && consumePower(ACUCleaner.POWER_COST, seconds)) {
 				float time = DayNightCycle.main.timePassedAsFloat;
 				if (time-lastRunTime >= 2) {
 					lastRunTime = time;
@@ -107,8 +107,11 @@ namespace ReikaKalseki.AqueousEngineering {
 							Pickupable pp = wp.GetComponent<Pickupable>();
 							TechType tt = pp.GetTechType();
 							if (tt == TechType.SeaTreaderPoop || tt == AqueousEngineeringMod.poo.TechType) {
-								connectedACU.RemoveItem(pp);
-								pp.transform.position = pp.transform.position+Vector3.up*20;
+								InventoryItem ii = closestLocker.container.AddItem(pp);
+								if (ii != null) {
+									connectedACU.RemoveItem(pp);
+									pp.gameObject.SetActive(false);
+								}
 							}
 						}
 					}
