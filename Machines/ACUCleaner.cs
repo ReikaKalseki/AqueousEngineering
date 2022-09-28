@@ -58,18 +58,61 @@ namespace ReikaKalseki.AqueousEngineering {
 	public class ACUCleanerLogic : CustomMachineLogic {
 		
 		private WaterPark connectedACU;
+		private StorageContainer closestLocker;
+		
+		private float lastRunTime;
 				
 		void Start() {
 			SNUtil.log("Reinitializing acu cleaner");
 			AqueousEngineeringMod.acuCleanerBlock.initializeMachine(gameObject);
 		}
 		
+		private WaterPark tryFindACU() {
+			SubRoot sub = getSub();
+			if (!sub) {
+				return null;
+			}
+			foreach (WaterPark wp in sub.GetComponentsInChildren<WaterPark>()) {
+				if (Vector3.Distance(wp.transform.position, transform.position) <= 6) {
+					return wp;
+				}
+			}
+			return null;
+		}
+		
+		private StorageContainer tryFindStorage() {
+			SubRoot sub = getSub();
+			if (!sub) {
+				return null;
+			}
+			foreach (StorageContainer wp in sub.GetComponentsInChildren<StorageContainer>()) {
+				if (Vector3.Distance(wp.transform.position, transform.position) <= 3 && !wp.GetComponent<WaterPark>() && wp.container.GetContainerType() == ItemsContainerType.Default) {
+					return wp;
+				}
+			}
+			return null;
+		}
+		
 		protected override void updateEntity(float seconds) {
 			if (!connectedACU) {
 				connectedACU = tryFindACU();
+				closestLocker = tryFindStorage();
 			}
-			if (false && consumePower(ACUCleaner.POWER_COST, seconds)) {
-				
+			if (connectedACU && consumePower(ACUCleaner.POWER_COST, seconds)) {
+				float time = DayNightCycle.main.timePassedAsFloat;
+				if (time-lastRunTime >= 2) {
+					lastRunTime = time;
+					foreach (WaterParkItem wp in connectedACU.items) {
+						if (wp) {
+							Pickupable pp = wp.GetComponent<Pickupable>();
+							TechType tt = pp.GetTechType();
+							if (tt == TechType.SeaTreaderPoop || tt == AqueousEngineeringMod.poo.TechType) {
+								connectedACU.RemoveItem(pp);
+								pp.transform.position = pp.transform.position+Vector3.up*20;
+							}
+						}
+					}
+				}
 			}
 		}	
 	}

@@ -49,7 +49,7 @@ namespace ReikaKalseki.AqueousEngineering {
 			}
 	   	}
 		
-		public static float getCameraDistanceForRenderFX(MapRoomCamera cam, MapRoomScreen scr = null) {
+		public static float getCameraDistanceForRenderFX(MapRoomCamera cam, MapRoomScreen scr) {
 			SubRoot sub = cam.dockingPoint ? cam.dockingPoint.gameObject.GetComponentInParent<SubRoot>() : null;
 			if (!sub) {
 				sub = WorldUtil.getClosest<SubRoot>(cam.gameObject);

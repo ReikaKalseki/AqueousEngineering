@@ -53,6 +53,13 @@ namespace ReikaKalseki.AqueousEngineering {
 			
 			Beacon b = go.EnsureComponent<Beacon>();
 			b.beaconActiveState = true;
+			
+			PingInstance ping = go.EnsureComponent<PingInstance>();
+			ping.pingType = PingType.Beacon;
+			ping.colorIndex = 0;
+			ping.origin = go.transform;
+			ping.minDist = 18f;
+			ping.maxDist = 4000;
 		}
 		
 	}
@@ -60,6 +67,7 @@ namespace ReikaKalseki.AqueousEngineering {
 	public class BaseBeaconLogic : CustomMachineLogic {
 		
 		private Beacon beacon;
+		private PingInstance ping;
 		
 		private string vehicleString = "";
 		
@@ -74,6 +82,7 @@ namespace ReikaKalseki.AqueousEngineering {
 		protected override void updateEntity(float seconds) {
 			if (!beacon) {
 				beacon = gameObject.GetComponent<Beacon>();
+				ping = gameObject.GetComponent<PingInstance>();
 			}
 			if (seconds > 0 && beacon) {
 				SubRoot sub = getSub();
@@ -96,6 +105,7 @@ namespace ReikaKalseki.AqueousEngineering {
 						lastVehicleCalcTime = time;
 					}
 					beacon.label = generateBeaconLabel(sub);
+					ping.SetLabel(beacon.label);
 				}
 			}
 		}

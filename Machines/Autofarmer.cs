@@ -58,13 +58,46 @@ namespace ReikaKalseki.AqueousEngineering {
 		
 	public class AutofarmerLogic : CustomMachineLogic {
 		
+		private List<Planter> growbeds = new List<Planter>();
+		
 		void Start() {
 			SNUtil.log("Reinitializing base farmer");
 			AqueousEngineeringMod.farmerBlock.initializeMachine(gameObject);
 		}
 		
 		protected override void updateEntity(float seconds) {
-			
-		}	
+			if (growbeds.Count == 0) {
+				SubRoot sub = getSub();
+				if (sub) {
+					Planter[] all = sub.GetComponentsInChildren<Planter>();
+					foreach (Planter p in all) {
+						if (p && p.GetContainerType() == ItemsContainerType.WaterPlants && Vector3.Distance(p.transform.position, transform.position) <= 8) {
+							growbeds.Add(p);
+						}
+					}
+				}
+			}
+			if (growbeds.Count > 0 && consumePower(Autofarmer.POWER_COST, seconds)) {
+				Planter p = growbeds[UnityEngine.Random.Range(0, growbeds.Count)];
+				if (p) {
+					tryHarvestFrom(p);
+				}
+			}
+		}
+		
+		private void tryHarvestFrom(Planter p) {
+			Planter.PlantSlot[] arr = UnityEngine.Random.Range(0, 1) == 0 ? p.bigPlantSlots : p.smallPlantSlots;
+			Planter.PlantSlot slot = arr[UnityEngine.Random.Range(0, arr.Length)];
+			if (slot != null && slot.isOccupied) {
+				Plantable pt = slot.plantable;
+				if (pt && pt.plantAge >= 1) {
+					tryHarvestPlant(pt);
+				}
+			}
+		}
+		
+		private void tryHarvestPlant(Plantable p) {
+			SNUtil.writeToChat("Try harvest "+p);
+		}
 	}
 }

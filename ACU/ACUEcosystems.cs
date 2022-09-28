@@ -227,6 +227,7 @@ namespace ReikaKalseki.AqueousEngineering {
 					GameObject poo = ObjectUtil.createWorldObject(AqueousEngineeringMod.poo.ClassID);
 					poo.transform.position = c.transform.position+Vector3.down*0.05F;
 					poo.transform.rotation = UnityEngine.Random.rotationUniform;
+					acu.acu.AddItem(poo.GetComponent<Pickupable>());
 					//SNUtil.writeToChat("Poo spawned");
 				}
 			}

@@ -73,7 +73,7 @@ namespace ReikaKalseki.AqueousEngineering {
 		}
 	}
 	
-	[HarmonyPatch(typeof(MapRoomFunctionality))]
+	[HarmonyPatch(typeof(uGUI_CameraDrone))]
 	[HarmonyPatch("LateUpdate")]
 	public static class CameraFuzzHook {
 		
@@ -85,7 +85,7 @@ namespace ReikaKalseki.AqueousEngineering {
 					if (ci.opcode == OpCodes.Callvirt) {
 						MethodInfo mi = (MethodInfo)ci.operand;
 						if (mi.Name == "GetScreenDistance") {
-							ci.operand = InstructionHandlers.convertMethodOperand("ReikaKalseki.AqueousEngineering.AEHooks", "getCameraDistanceForRenderFX", false, typeof(IVoxelandChunk2));
+							ci.operand = InstructionHandlers.convertMethodOperand("ReikaKalseki.AqueousEngineering.AEHooks", "getCameraDistanceForRenderFX", false, typeof(MapRoomCamera), typeof(MapRoomScreen));
 						}
 					}
 				}

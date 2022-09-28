@@ -180,6 +180,7 @@ namespace ReikaKalseki.AqueousEngineering {
 						theme = BiomeRegions.RegionType.Shallows;
 					bool changed = theme != currentTheme;
 					currentTheme = theme;
+					SNUtil.writeToChat(""+theme);
 					ACUTheming.updateACUTheming(this, theme, changed);
 				}
 			}

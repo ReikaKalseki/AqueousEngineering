@@ -90,6 +90,7 @@ namespace ReikaKalseki.AqueousEngineering {
 				c.allowedOnGround = true;
 				Planter p = world.EnsureComponent<Planter>();
 				p.environment = Planter.PlantEnvironment.Dynamic;
+				p.isIndoor = false;
 				world.SetActive(true);
 				return world;
 			}
