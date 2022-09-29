@@ -61,33 +61,28 @@ namespace ReikaKalseki.AqueousEngineering {
 		
 	public class AmpeelAntennaLogic : CustomMachineLogic {
 		
-		float lastTime = -1;
-		
 		void Start() {
 			SNUtil.log("Reinitializing base ampeel antenna");
 			AqueousEngineeringMod.ampeelAntennaBlock.initializeMachine(gameObject);
 		}
 		
+		protected override float getTickRate() {
+			return AmpeelAntenna.INTERVAL;
+		}
+		
 		protected override void updateEntity(float seconds) {
-			if (seconds > 0) {
-				float time = DayNightCycle.main.timePassedAsFloat;
-				if (time-lastTime < AmpeelAntenna.INTERVAL)
-					return;
-				lastTime = time;
-				seconds = time-lastTime;
-				SubRoot sub = getSub();
-				if (sub && sub.powerRelay.GetPower() < sub.powerRelay.GetMaxPower()) {
-					RaycastHit[] hit = Physics.SphereCastAll(gameObject.transform.position, AmpeelAntenna.RANGE, new Vector3(1, 1, 1), AmpeelAntenna.RANGE);
-					foreach (RaycastHit rh in hit) {
-						if (rh.transform != null && rh.transform.gameObject) {
-							Shocker c = rh.transform.gameObject.GetComponent<Shocker>();
-							if (c && c.liveMixin.IsAlive() && !c.gameObject.GetComponent<WaterParkCreature>()) {
-								float dd = Vector3.Distance(c.transform.position, transform.position);
-								if (dd >= AmpeelAntenna.RANGE)
-									continue;
-								float trash;
-								sub.powerRelay.AddEnergy(seconds*(AmpeelAntenna.POWER_GEN-AmpeelAntenna.POWER_FALLOFF*dd), out trash);
-							}
+			SubRoot sub = getSub();
+			if (sub && sub.powerRelay.GetPower() < sub.powerRelay.GetMaxPower()) {
+				RaycastHit[] hit = Physics.SphereCastAll(gameObject.transform.position, AmpeelAntenna.RANGE, new Vector3(1, 1, 1), AmpeelAntenna.RANGE);
+				foreach (RaycastHit rh in hit) {
+					if (rh.transform != null && rh.transform.gameObject) {
+						Shocker c = rh.transform.gameObject.GetComponent<Shocker>();
+						if (c && c.liveMixin.IsAlive() && !c.gameObject.GetComponent<WaterParkCreature>()) {
+							float dd = Vector3.Distance(c.transform.position, transform.position);
+							if (dd >= AmpeelAntenna.RANGE)
+								continue;
+							float trash;
+							sub.powerRelay.AddEnergy(seconds*(AmpeelAntenna.POWER_GEN-AmpeelAntenna.POWER_FALLOFF*dd), out trash);
 						}
 					}
 				}

@@ -18,7 +18,7 @@ namespace ReikaKalseki.AqueousEngineering {
 		
 		internal static readonly float POWER_COST = 0.15F;
 		
-		public ACUCleaner(XMLLocale.LocaleEntry e) : base("baseacucleaner", e.name, e.desc, "f1cde32e-101a-4dd5-8084-8c950b9c2432") {
+		public ACUCleaner(XMLLocale.LocaleEntry e) : base("baseacucleaner", e.name, e.desc, "bedc40fb-bd97-4b4d-a943-d39360c9c7bd") {
 			addIngredient(TechType.Titanium, 5);
 			addIngredient(TechType.ExosuitPropulsionArmModule, 1);
 			addIngredient(TechType.MapRoomCamera, 1);
@@ -43,6 +43,11 @@ namespace ReikaKalseki.AqueousEngineering {
 						
 			ACUCleanerLogic lgc = go.GetComponent<ACUCleanerLogic>();
 			
+			//GameObject air = ObjectUtil.lookupPrefab("7b4b90b8-6294-4354-9ebb-3e5aa49ae453");
+			//GameObject mdl = RenderUtil.setModel(go, "discovery_trashcan_01_d", ObjectUtil.getChildObject(air, "model"));
+			//lgc.rotator = UnityEngine.Object.Instantiate(ObjectUtil.getChildObject(ObjectUtil.getChildObject(air, "model"), "_pipes_floating_air_intake_turbine_geo"));
+			//lgc.rotator.transform.parent = go.transform;
+			
 			Renderer r = go.GetComponentInChildren<Renderer>();/*
 			//SNUtil.dumpTextures(r);
 			RenderUtil.swapToModdedTextures(r, this);
@@ -62,11 +67,15 @@ namespace ReikaKalseki.AqueousEngineering {
 		
 		private WaterPark connectedACU;
 		
-		private float lastRunTime;
+		//internal GameObject rotator;
 				
 		void Start() {
 			SNUtil.log("Reinitializing acu cleaner");
 			AqueousEngineeringMod.acuCleanerBlock.initializeMachine(gameObject);
+		}
+		
+		protected override float getTickRate() {
+			return 2;
 		}
 		
 		private WaterPark tryFindACU() {
@@ -100,19 +109,18 @@ namespace ReikaKalseki.AqueousEngineering {
 				connectedACU = tryFindACU();
 			}
 			if (connectedACU && consumePower(ACUCleaner.POWER_COST, seconds)) {
-				float time = DayNightCycle.main.timePassedAsFloat;
-				if (time-lastRunTime >= 2) {
-					lastRunTime = time;
-					foreach (WaterParkItem wp in connectedACU.items) {
-						if (wp) {
-							Pickupable pp = wp.GetComponent<Pickupable>();
-							TechType tt = pp.GetTechType();
-							if (tt == TechType.SeaTreaderPoop || tt == AqueousEngineeringMod.poo.TechType) {
-								InventoryItem ii = getStorage().container.AddItem(pp);
-								if (ii != null) {
-									connectedACU.RemoveItem(pp);
-									pp.gameObject.SetActive(false);
-								}
+				//rotator.transform.position = connectedACU.transform.position+Vector3.down*1.45F;
+				//rotator.transform.localScale = new Vector3(13.8F, 1, 13.8F);
+				foreach (WaterParkItem wp in connectedACU.items) {
+					if (wp) {
+						Pickupable pp = wp.GetComponent<Pickupable>();
+						TechType tt = pp.GetTechType();
+						if (tt == TechType.SeaTreaderPoop || tt == AqueousEngineeringMod.poo.TechType) {
+							InventoryItem ii = getStorage().container.AddItem(pp);
+							if (ii != null) {
+								connectedACU.RemoveItem(pp);
+								pp.gameObject.SetActive(false);
+								break;
 							}
 						}
 					}

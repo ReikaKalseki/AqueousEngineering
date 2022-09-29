@@ -59,7 +59,7 @@ namespace ReikaKalseki.AqueousEngineering {
 			ping.colorIndex = 0;
 			ping.origin = go.transform;
 			ping.minDist = 18f;
-			ping.maxDist = 4000;
+			ping.maxDist = 1;
 		}
 		
 	}
@@ -71,12 +71,13 @@ namespace ReikaKalseki.AqueousEngineering {
 		
 		private string vehicleString = "";
 		
-		private float lastVehicleCalcTime = -1;
-		private float lastInventoryCalcTime = -1;
-		
 		void Start() {
 			SNUtil.log("Reinitializing base beacon");
 			AqueousEngineeringMod.beaconBlock.initializeMachine(gameObject);
+		}
+		
+		protected override float getTickRate() {
+			return 0.5F;
 		}
 		
 		protected override void updateEntity(float seconds) {
@@ -84,25 +85,21 @@ namespace ReikaKalseki.AqueousEngineering {
 				beacon = gameObject.GetComponent<Beacon>();
 				ping = gameObject.GetComponent<PingInstance>();
 			}
-			if (seconds > 0 && beacon) {
+			if (beacon) {
 				SubRoot sub = getSub();
 				if (sub) {
-					float time = DayNightCycle.main.timePassedAsFloat;
-					if (time-lastVehicleCalcTime >= 0.5) {
-						List<Vehicle> docked = new List<Vehicle>();
-						VehicleDockingBay[] docks = sub.gameObject.GetComponentsInChildren<VehicleDockingBay>();
-						if (docks.Length == 0) {
-							vehicleString = "";
+					List<Vehicle> docked = new List<Vehicle>();
+					VehicleDockingBay[] docks = sub.gameObject.GetComponentsInChildren<VehicleDockingBay>();
+					if (docks.Length == 0) {
+						vehicleString = "";
+					}
+					else {
+						foreach (VehicleDockingBay dock in docks) {
+							Vehicle v = dock.dockedVehicle;
+							if (v)
+								docked.Add(v);
 						}
-						else {
-							foreach (VehicleDockingBay dock in docks) {
-								Vehicle v = dock.dockedVehicle;
-								if (v)
-									docked.Add(v);
-							}
-							vehicleString = docked.Count == 0 ? "No docked vehicles" : "Docked Vehicles: "+string.Join(", ", docked.Select<Vehicle, string>(v => v.GetName()));
-						}
-						lastVehicleCalcTime = time;
+						vehicleString = docked.Count == 0 ? "No docked vehicles" : "Docked Vehicles: "+string.Join(", ", docked.Select<Vehicle, string>(v => v.GetName()));
 					}
 					beacon.label = generateBeaconLabel(sub);
 					ping.SetLabel(beacon.label);

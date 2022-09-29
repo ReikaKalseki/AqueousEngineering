@@ -78,7 +78,7 @@ namespace ReikaKalseki.AqueousEngineering {
 				cooldown -= seconds;
 				return;
 			}
-			if (seconds > 0 && consumePower(BaseCreatureRepellent.POWER_COST, seconds)) {
+			if (consumePower(BaseCreatureRepellent.POWER_COST, seconds)) {
 				float r0 = BaseCreatureRepellent.RANGE*2;
 				float r = BaseCreatureRepellent.RANGE;
 				bool flag = false;

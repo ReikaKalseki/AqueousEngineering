@@ -73,8 +73,7 @@ namespace ReikaKalseki.AqueousEngineering {
 			SubRoot sub = getSub();
 				scanner = sub ? sub.gameObject.GetComponentInChildren<MapRoomFunctionality>() : null;
 			}
-			if (seconds > 0)
-				ready = scanner && consumePower(RemoteCameraAntenna.POWER_COST, seconds);
+			ready = scanner && consumePower(RemoteCameraAntenna.POWER_COST, seconds);
 		}
 		
 		public bool isReady() {

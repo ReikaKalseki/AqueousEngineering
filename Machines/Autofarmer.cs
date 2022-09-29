@@ -69,6 +69,10 @@ namespace ReikaKalseki.AqueousEngineering {
 			AqueousEngineeringMod.farmerBlock.initializeMachine(gameObject);
 		}
 		
+		protected override float getTickRate() {
+			return 5;
+		}
+		
 		protected override void updateEntity(float seconds) {
 			if (growbeds.Count == 0) {
 				SubRoot sub = getSub();
@@ -94,7 +98,6 @@ namespace ReikaKalseki.AqueousEngineering {
 			Planter.PlantSlot slot = arr[UnityEngine.Random.Range(0, arr.Length)];
 			if (slot != null && slot.isOccupied) {
 				Plantable pt = slot.plantable;
-				SNUtil.writeToChat(pt+" > "+pt.plantAge);
 				if (pt && pt.linkedGrownPlant) {
 					tryHarvestPlant(p, pt);
 				}
@@ -121,7 +124,7 @@ namespace ReikaKalseki.AqueousEngineering {
 						td = tt;
 						drop = UnityEngine.Object.Instantiate(CraftData.GetPrefabForTechType(tt));
 					}
-					//SNUtil.writeToChat("DT "+td);
+					SNUtil.writeToChat("DT "+td);
 					drop.SetActive(false);
 					if (getStorage().container.AddItem(drop.GetComponent<Pickupable>()) != null) {
 						FMODAsset ass = SNUtil.getSound(CraftData.pickupSoundList.ContainsKey(td) ? CraftData.pickupSoundList[td] : CraftData.defaultPickupSound);
@@ -132,7 +135,7 @@ namespace ReikaKalseki.AqueousEngineering {
 							PickPrefab pp = drop.GetComponent<PickPrefab>();
 							pp.SetPickedUp();
 						}
-						else if (td == TechType.JellyPlantSeed || td == TechType.WhiteMushroomSpore || td == TechType.AcidMushroomSpore) {
+						else if (td == TechType.JellyPlant || td == TechType.WhiteMushroom || td == TechType.AcidMushroom) {
 							pl.ReplaceItem(pt, drop.GetComponent<Plantable>());
 						}
 					}
