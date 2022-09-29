@@ -43,10 +43,13 @@ namespace ReikaKalseki.AqueousEngineering
     
     private static readonly Dictionary<TechType, CustomEgg> eggs = new Dictionary<TechType, CustomEgg>();
 
-    [QModPatch]
-    public static void Load() {
+    [QModPrePatch]
+    public static void PreLoad() {
         config.load();
-        
+    }
+
+    [QModPatch]
+    public static void Load() {        
         Harmony harmony = new Harmony(MOD_KEY);
         Harmony.DEBUG = true;
         FileLog.logPath = Path.Combine(Path.GetDirectoryName(modDLL.Location), "harmony-log.txt");
