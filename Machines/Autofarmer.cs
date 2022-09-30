@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Reflection;
+using System.Linq;
 using System.Collections.Generic;
 
 using UnityEngine;
@@ -23,6 +24,8 @@ namespace ReikaKalseki.AqueousEngineering {
 			addIngredient(TechType.AdvancedWiringKit, 1);
 			addIngredient(TechType.VehicleStorageModule, 1);
 			addIngredient(TechType.Knife, 1);
+			
+			glowIntensity = 2;
 		}
 
 		public override bool UnlockedAtStart {
@@ -42,15 +45,22 @@ namespace ReikaKalseki.AqueousEngineering {
 			StorageContainer con = go.GetComponentInChildren<StorageContainer>();
 			initializeStorageContainer(con, 8, 8);
 			con.errorSound = null;
+			
+			ObjectUtil.removeChildObject(go, "descent_trashcan_01/descent_trash_01");
+			ObjectUtil.removeChildObject(go, "descent_trashcan_01/descent_trash_02");
+			ObjectUtil.removeChildObject(go, "descent_trashcan_01/descent_trashcan_interior_01");
+			ObjectUtil.removeChildObject(go, "descent_trashcan_01/descent_trashcan_interior_02");
 						
 			AutofarmerLogic lgc = go.GetComponent<AutofarmerLogic>();
 			
-			Renderer r = go.GetComponentInChildren<Renderer>();/*
-			//SNUtil.dumpTextures(r);
+			Renderer r = go.GetComponentInChildren<Renderer>();
 			RenderUtil.swapToModdedTextures(r, this);
+			r.materials[0].SetColor("_Color", Color.white);
+			r.materials[0].SetFloat("_Fresnel", 0.8F);
+			r.materials[0].SetFloat("_SpecInt", 12F);
+			/*
+			//SNUtil.dumpTextures(r);
 			r.materials[0].SetFloat("_Shininess", 7.5F);
-			r.materials[0].SetFloat("_Fresnel", 1F);
-			r.materials[0].SetFloat("_SpecInt", 15F);
 			lgc.mainRenderer = r;*/
 			
 			//go.GetComponent<Constructable>().model = go;
@@ -59,10 +69,26 @@ namespace ReikaKalseki.AqueousEngineering {
 		}
 		
 	}
+	
+	class HarvestLine {
+		
+		internal VFXElectricLine effect;
+		internal GameObject obj;
+		
+		internal float activationTime;
+		
+		internal HarvestLine(VFXElectricLine f) {
+			effect = f;
+			obj = f.gameObject;
+		}
+		
+	}
 		
 	public class AutofarmerLogic : CustomMachineLogic {
 		
 		private List<Planter> growbeds = new List<Planter>();
+		
+		private HarvestLine[] effects = null;
 		
 		void Start() {
 			SNUtil.log("Reinitializing base farmer");
@@ -70,10 +96,16 @@ namespace ReikaKalseki.AqueousEngineering {
 		}
 		
 		protected override float getTickRate() {
-			return 5;
+			return 5*0.2F;
 		}
 		
 		protected override void updateEntity(float seconds) {
+			if (effects == null) {
+				GameObject go = ObjectUtil.createWorldObject("d11dfcc3-bce7-4870-a112-65a5dab5141b", true, false);
+				go.SetActive(false);
+				go.transform.parent = transform;
+				effects = go.GetComponent<Gravsphere>().effects.Values.Select<VFXElectricLine, HarvestLine>(f => new HarvestLine(f)).ToArray();
+			}
 			if (growbeds.Count == 0) {
 				SubRoot sub = getSub();
 				if (sub) {
@@ -90,6 +122,32 @@ namespace ReikaKalseki.AqueousEngineering {
 				if (p) {
 					tryHarvestFrom(p);
 				}
+			}
+			tickFX();
+		}
+		
+		private void tickFX() {
+			float time = DayNightCycle.main.timePassedAsFloat;
+			foreach (HarvestLine vfx in effects) {
+				if (vfx.obj.activeSelf) {
+					if (time-vfx.activationTime >= 5)
+						vfx.obj.SetActive(false);
+					else
+						vfx.effect.Update();
+				}
+			}
+		}
+		
+		private void tryAllocateFX(GameObject go) {
+			foreach (HarvestLine vfx in effects) {
+				if (vfx.obj.activeSelf)
+					continue;
+				vfx.obj.SetActive(true);
+				vfx.effect.enabled = true;
+				vfx.effect.origin = transform.position;
+				vfx.effect.target = go.transform.position;
+				vfx.activationTime = DayNightCycle.main.timePassedAsFloat;
+				return;
 			}
 		}
 		
@@ -124,7 +182,7 @@ namespace ReikaKalseki.AqueousEngineering {
 						td = tt;
 						drop = UnityEngine.Object.Instantiate(CraftData.GetPrefabForTechType(tt));
 					}
-					SNUtil.writeToChat("DT "+td);
+					SNUtil.writeToChat("DT "+td+" > "+drop);
 					drop.SetActive(false);
 					if (getStorage().container.AddItem(drop.GetComponent<Pickupable>()) != null) {
 						FMODAsset ass = SNUtil.getSound(CraftData.pickupSoundList.ContainsKey(td) ? CraftData.pickupSoundList[td] : CraftData.defaultPickupSound);
@@ -136,8 +194,9 @@ namespace ReikaKalseki.AqueousEngineering {
 							pp.SetPickedUp();
 						}
 						else if (td == TechType.JellyPlant || td == TechType.WhiteMushroom || td == TechType.AcidMushroom) {
-							pl.ReplaceItem(pt, drop.GetComponent<Plantable>());
+							//pl.ReplaceItem(pt, drop.GetComponent<Plantable>());
 						}
+						tryAllocateFX(p.gameObject);
 					}
 				}
 			}

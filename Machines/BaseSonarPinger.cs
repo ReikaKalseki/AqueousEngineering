@@ -61,6 +61,8 @@ namespace ReikaKalseki.AqueousEngineering {
 		
 		private float lastPing;
 		
+		private GameObject rotator;
+		
 		void Start() {
 			SNUtil.log("Reinitializing base sonar");
 			AqueousEngineeringMod.sonarBlock.initializeMachine(gameObject);
@@ -86,7 +88,14 @@ namespace ReikaKalseki.AqueousEngineering {
 			//	mainRenderer = ObjectUtil.getChildObject(gameObject, "model").GetComponent<Renderer>();
 			
 			//SNUtil.writeToChat("I am ticking @ "+go.transform.position);
+			if (!rotator)
+				rotator = ObjectUtil.getChildObject(gameObject, "Power_Transmitter");
 			float time = DayNightCycle.main.timePassedAsFloat;
+			if (rotator) {
+				Vector3 angs = rotator.transform.localEulerAngles;
+				angs.y += 90*seconds;
+				rotator.transform.localEulerAngles = angs;
+			}
 			if (time-lastPing >= BaseSonarPinger.FIRE_RATE && isInAppropriateLocation()) {
 				ping(time);
 			}
