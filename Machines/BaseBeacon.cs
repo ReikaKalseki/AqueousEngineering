@@ -39,9 +39,9 @@ namespace ReikaKalseki.AqueousEngineering {
 						
 			BaseBeaconLogic lgc = go.GetComponent<BaseBeaconLogic>();
 			
-			Renderer r = go.GetComponentInChildren<Renderer>();/*
+			Renderer r = go.GetComponentInChildren<Renderer>();
 			//SNUtil.dumpTextures(r);
-			RenderUtil.swapToModdedTextures(r, this);
+			RenderUtil.swapToModdedTextures(r, this);/*
 			r.materials[0].SetFloat("_Shininess", 7.5F);
 			r.materials[0].SetFloat("_Fresnel", 1F);
 			r.materials[0].SetFloat("_SpecInt", 15F);
@@ -71,6 +71,8 @@ namespace ReikaKalseki.AqueousEngineering {
 		
 		private string vehicleString = "";
 		
+		private Renderer effect;
+		
 		void Start() {
 			SNUtil.log("Reinitializing base beacon");
 			AqueousEngineeringMod.beaconBlock.initializeMachine(gameObject);
@@ -81,6 +83,14 @@ namespace ReikaKalseki.AqueousEngineering {
 		}
 		
 		protected override void updateEntity(float seconds) {
+			if (!effect) {
+				GameObject go = ObjectUtil.createWorldObject("d11dfcc3-bce7-4870-a112-65a5dab5141b", true, false);
+				go.SetActive(false);
+				effect = UnityEngine.Object.Instantiate(go.GetComponent<Gravsphere>().pads[0].vfxHaloRenderer);
+				effect.transform.parent = transform;
+				effect.GetComponent<FollowTransform>().parent = transform;
+				effect.gameObject.SetActive(true);
+			}
 			if (!beacon) {
 				beacon = gameObject.GetComponent<Beacon>();
 				ping = gameObject.GetComponent<PingInstance>();

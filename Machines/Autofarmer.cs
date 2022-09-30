@@ -69,42 +69,35 @@ namespace ReikaKalseki.AqueousEngineering {
 		}
 		
 	}
-	
-	class HarvestLine {
-		
-		internal VFXElectricLine effect;
-		internal GameObject obj;
-		
-		internal float activationTime;
-		
-		internal HarvestLine(VFXElectricLine f) {
-			effect = f;
-			obj = f.gameObject;
-		}
-		
-	}
 		
 	public class AutofarmerLogic : CustomMachineLogic {
 		
 		private List<Planter> growbeds = new List<Planter>();
 		
-		private HarvestLine[] effects = null;
+		private VFXElectricLine effect;
+		private float harvestTime;
 		
 		void Start() {
 			SNUtil.log("Reinitializing base farmer");
 			AqueousEngineeringMod.farmerBlock.initializeMachine(gameObject);
 		}
 		
+		private void OnDisable() {
+			UnityEngine.Object.DestroyImmediate(effect);
+		}
+		
 		protected override float getTickRate() {
-			return 5*0.2F;
+			return 5;
 		}
 		
 		protected override void updateEntity(float seconds) {
-			if (effects == null) {
+			if (!effect) {
 				GameObject go = ObjectUtil.createWorldObject("d11dfcc3-bce7-4870-a112-65a5dab5141b", true, false);
 				go.SetActive(false);
-				go.transform.parent = transform;
-				effects = go.GetComponent<Gravsphere>().effects.Values.Select<VFXElectricLine, HarvestLine>(f => new HarvestLine(f)).ToArray();
+				go = go.GetComponent<Gravsphere>().vfxPrefab;
+				go = UnityEngine.Object.Instantiate(go);
+				effect = go.GetComponent<VFXElectricLine>();
+				effect.transform.parent = transform;
 			}
 			if (growbeds.Count == 0) {
 				SubRoot sub = getSub();
@@ -128,27 +121,17 @@ namespace ReikaKalseki.AqueousEngineering {
 		
 		private void tickFX() {
 			float time = DayNightCycle.main.timePassedAsFloat;
-			foreach (HarvestLine vfx in effects) {
-				if (vfx.obj.activeSelf) {
-					if (time-vfx.activationTime >= 5)
-						vfx.obj.SetActive(false);
-					else
-						vfx.effect.Update();
-				}
+			if (time-harvestTime > 5) {
+				effect.gameObject.SetActive(false);
 			}
 		}
 		
 		private void tryAllocateFX(GameObject go) {
-			foreach (HarvestLine vfx in effects) {
-				if (vfx.obj.activeSelf)
-					continue;
-				vfx.obj.SetActive(true);
-				vfx.effect.enabled = true;
-				vfx.effect.origin = transform.position;
-				vfx.effect.target = go.transform.position;
-				vfx.activationTime = DayNightCycle.main.timePassedAsFloat;
-				return;
-			}
+			effect.gameObject.SetActive(true);
+			effect.enabled = true;
+			effect.origin = transform.position+Vector3.up*0.75F;
+			effect.target = go.transform.position+Vector3.up*0.125F;
+			harvestTime = DayNightCycle.main.timePassedAsFloat;
 		}
 		
 		private void tryHarvestFrom(Planter p) {
@@ -182,7 +165,7 @@ namespace ReikaKalseki.AqueousEngineering {
 						td = tt;
 						drop = UnityEngine.Object.Instantiate(CraftData.GetPrefabForTechType(tt));
 					}
-					SNUtil.writeToChat("DT "+td+" > "+drop);
+					//SNUtil.writeToChat("DT "+td+" > "+drop);
 					drop.SetActive(false);
 					if (getStorage().container.AddItem(drop.GetComponent<Pickupable>()) != null) {
 						FMODAsset ass = SNUtil.getSound(CraftData.pickupSoundList.ContainsKey(td) ? CraftData.pickupSoundList[td] : CraftData.defaultPickupSound);

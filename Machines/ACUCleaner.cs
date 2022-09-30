@@ -48,9 +48,9 @@ namespace ReikaKalseki.AqueousEngineering {
 			//lgc.rotator = UnityEngine.Object.Instantiate(ObjectUtil.getChildObject(ObjectUtil.getChildObject(air, "model"), "_pipes_floating_air_intake_turbine_geo"));
 			//lgc.rotator.transform.parent = go.transform;
 			
-			Renderer r = go.GetComponentInChildren<Renderer>();/*
+			Renderer r = go.GetComponentInChildren<Renderer>();
 			//SNUtil.dumpTextures(r);
-			RenderUtil.swapToModdedTextures(r, this);
+			RenderUtil.swapToModdedTextures(r, this);/*
 			r.materials[0].SetFloat("_Shininess", 7.5F);
 			r.materials[0].SetFloat("_Fresnel", 1F);
 			r.materials[0].SetFloat("_SpecInt", 15F);

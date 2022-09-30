@@ -42,9 +42,9 @@ namespace ReikaKalseki.AqueousEngineering {
 						
 			BaseSonarPingerLogic lgc = go.GetComponent<BaseSonarPingerLogic>();
 			
-			Renderer r = go.GetComponentInChildren<Renderer>();/*
+			Renderer r = go.GetComponentInChildren<Renderer>();
 			//SNUtil.dumpTextures(r);
-			RenderUtil.swapToModdedTextures(r, this);
+			RenderUtil.swapToModdedTextures(r, this);/*
 			r.materials[0].SetFloat("_Shininess", 7.5F);
 			r.materials[0].SetFloat("_Fresnel", 1F);
 			r.materials[0].SetFloat("_SpecInt", 15F);
@@ -91,7 +91,7 @@ namespace ReikaKalseki.AqueousEngineering {
 			if (!rotator)
 				rotator = ObjectUtil.getChildObject(gameObject, "Power_Transmitter");
 			float time = DayNightCycle.main.timePassedAsFloat;
-			if (rotator) {
+			if (rotator && getSub().powerRelay.GetPower() > 0.1F) {
 				Vector3 angs = rotator.transform.localEulerAngles;
 				angs.y += 90*seconds;
 				rotator.transform.localEulerAngles = angs;

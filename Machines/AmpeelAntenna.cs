@@ -44,9 +44,9 @@ namespace ReikaKalseki.AqueousEngineering {
 						
 			AmpeelAntennaLogic lgc = go.GetComponent<AmpeelAntennaLogic>();
 			
-			Renderer r = go.GetComponentInChildren<Renderer>();/*
+			Renderer r = go.GetComponentInChildren<Renderer>();
 			//SNUtil.dumpTextures(r);
-			RenderUtil.swapToModdedTextures(r, this);
+			RenderUtil.swapToModdedTextures(r, this);/*
 			r.materials[0].SetFloat("_Shininess", 7.5F);
 			r.materials[0].SetFloat("_Fresnel", 1F);
 			r.materials[0].SetFloat("_SpecInt", 15F);
@@ -60,6 +60,8 @@ namespace ReikaKalseki.AqueousEngineering {
 	}
 		
 	public class AmpeelAntennaLogic : CustomMachineLogic {
+		
+		private GameObject wireObject;
 		
 		void Start() {
 			SNUtil.log("Reinitializing base ampeel antenna");

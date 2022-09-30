@@ -43,9 +43,20 @@ namespace ReikaKalseki.AqueousEngineering {
 						
 			BaseCreatureRepellentLogic lgc = go.GetComponent<BaseCreatureRepellentLogic>();
 			
-			Renderer r = go.GetComponentInChildren<Renderer>();/*
+			Renderer r = go.GetComponentInChildren<Renderer>();
 			//SNUtil.dumpTextures(r);
 			RenderUtil.swapToModdedTextures(r, this);
+			foreach (Material m in r.materials) {
+				m.EnableKeyword("FX_BUILDING");
+				//material2.SetTexture(ShaderPropertyID._EmissiveTex, this._EmissiveTex);
+				//m.SetFloat(ShaderPropertyID._Cutoff, 0.5F);
+				m.SetColor(ShaderPropertyID._BorderColor, new Color(0.2f, 1f, 1f, 1f));
+				m.SetVector(ShaderPropertyID._BuildParams, new Vector4(1f, 1f, 1.25f, -0.85f)); //last arg is speed, +ve is down
+				m.SetFloat(ShaderPropertyID._NoiseStr, 0.08f);
+				m.SetFloat(ShaderPropertyID._NoiseThickness, 0.05f);
+				m.SetFloat(ShaderPropertyID._BuildLinear, 0.25f);
+				m.SetFloat(ShaderPropertyID._MyCullVariable, 0f);
+			}/*
 			r.materials[0].SetFloat("_Shininess", 7.5F);
 			r.materials[0].SetFloat("_Fresnel", 1F);
 			r.materials[0].SetFloat("_SpecInt", 15F);
