@@ -91,7 +91,7 @@ namespace ReikaKalseki.AqueousEngineering {
 			if (!rotator)
 				rotator = ObjectUtil.getChildObject(gameObject, "Power_Transmitter");
 			float time = DayNightCycle.main.timePassedAsFloat;
-			if (rotator && getSub().powerRelay.GetPower() > 0.1F) {
+			if (rotator && getSub() && getSub().powerRelay.GetPower() > 0.1F) {
 				Vector3 angs = rotator.transform.localEulerAngles;
 				angs.y += 90*seconds;
 				rotator.transform.localEulerAngles = angs;
