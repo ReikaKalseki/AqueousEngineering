@@ -174,7 +174,7 @@ namespace ReikaKalseki.AqueousEngineering {
 						}
 					}
 				}
-				//SNUtil.writeToChat(string.Join(", ", possibleBiomes));
+				//SNUtil.writeToChat("["+string.Join(", ", possibleBiomes)+"]");
 				if (possibleBiomes.Count == 1) {
 					BiomeRegions.RegionType theme = possibleBiomes.First<BiomeRegions.RegionType>();
 					if (theme == BiomeRegions.RegionType.Other)

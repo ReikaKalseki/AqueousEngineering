@@ -26,21 +26,21 @@ namespace ReikaKalseki.AqueousEngineering {
 		private static readonly Dictionary<VanillaFlora, PlantFood> ediblePlants = new Dictionary<VanillaFlora, PlantFood>();
 		
 		 private static readonly Dictionary<TechType, ACUMetabolism> metabolisms = new Dictionary<TechType, ACUMetabolism>() {
-			{TechType.RabbitRay, new ACUMetabolism(0.01F, 0.1F, false, BiomeRegions.RegionType.Shallows)},
-			{TechType.Biter, new ACUMetabolism(0.01F, 0.2F, true, BiomeRegions.RegionType.RedGrass, BiomeRegions.RegionType.Other)},
-			{TechType.Blighter, new ACUMetabolism(0.005F, 0.1F, true, BiomeRegions.RegionType.BloodKelp)},
-			{TechType.Gasopod, new ACUMetabolism(0.05F, 0.4F, false, BiomeRegions.RegionType.Shallows, BiomeRegions.RegionType.Other)},
-			{TechType.Jellyray, new ACUMetabolism(0.04F, 0.3F, false, BiomeRegions.RegionType.Mushroom)},
-	    	{TechType.Stalker, new ACUMetabolism(0.05F, 0.5F, true, BiomeRegions.RegionType.Kelp)},
-	    	{TechType.Sandshark, new ACUMetabolism(0.03F, 0.6F, true, BiomeRegions.RegionType.RedGrass)},
-	    	{TechType.BoneShark, new ACUMetabolism(0.03F, 0.8F, true, BiomeRegions.RegionType.Koosh, BiomeRegions.RegionType.Mushroom, BiomeRegions.RegionType.Other)},
-	    	{TechType.Shocker, new ACUMetabolism(0.1F, 0.5F, true, BiomeRegions.RegionType.Koosh, BiomeRegions.RegionType.BloodKelp)},
-	    	{TechType.Crabsnake, new ACUMetabolism(0.08F, 1F, true, BiomeRegions.RegionType.Jellyshroom)},
-	    	{TechType.CrabSquid, new ACUMetabolism(0.15F, 1F, true, BiomeRegions.RegionType.BloodKelp, BiomeRegions.RegionType.LostRiver, BiomeRegions.RegionType.GrandReef)},
-	    	{TechType.LavaLizard, new ACUMetabolism(0.05F, 0.5F, true, BiomeRegions.RegionType.LavaZone)},
-	    	{TechType.SpineEel, new ACUMetabolism(0.03F, 1.5F, true, BiomeRegions.RegionType.LostRiver)},
-			{TechType.GhostRayBlue, new ACUMetabolism(0.033F, 0.3F, false, BiomeRegions.RegionType.LostRiver)},
-			{TechType.GhostRayRed, new ACUMetabolism(0.06F, 0.3F, false, BiomeRegions.RegionType.LavaZone)},
+			{TechType.RabbitRay, new ACUMetabolism(0.2F, 0.2F, false, BiomeRegions.RegionType.Shallows)},
+			{TechType.Biter, new ACUMetabolism(0.2F, 0.4F, true, BiomeRegions.RegionType.RedGrass, BiomeRegions.RegionType.Other)},
+			{TechType.Blighter, new ACUMetabolism(0.1F, 0.2F, true, BiomeRegions.RegionType.BloodKelp)},
+			{TechType.Gasopod, new ACUMetabolism(1F, 0.8F, false, BiomeRegions.RegionType.Shallows, BiomeRegions.RegionType.Other)},
+			{TechType.Jellyray, new ACUMetabolism(0.8F, 0.6F, false, BiomeRegions.RegionType.Mushroom)},
+	    	{TechType.Stalker, new ACUMetabolism(1F, 1F, true, BiomeRegions.RegionType.Kelp)},
+	    	{TechType.Sandshark, new ACUMetabolism(0.6F, 1.2F, true, BiomeRegions.RegionType.RedGrass)},
+	    	{TechType.BoneShark, new ACUMetabolism(0.6F, 1.6F, true, BiomeRegions.RegionType.Koosh, BiomeRegions.RegionType.Mushroom, BiomeRegions.RegionType.Other)},
+	    	{TechType.Shocker, new ACUMetabolism(2F, 1F, true, BiomeRegions.RegionType.Koosh, BiomeRegions.RegionType.BloodKelp)},
+	    	{TechType.Crabsnake, new ACUMetabolism(1.6F, 2F, true, BiomeRegions.RegionType.Jellyshroom)},
+	    	{TechType.CrabSquid, new ACUMetabolism(3F, 2F, true, BiomeRegions.RegionType.BloodKelp, BiomeRegions.RegionType.LostRiver, BiomeRegions.RegionType.GrandReef)},
+	    	{TechType.LavaLizard, new ACUMetabolism(1F, 1F, true, BiomeRegions.RegionType.LavaZone)},
+	    	{TechType.SpineEel, new ACUMetabolism(0.6F, 3F, true, BiomeRegions.RegionType.LostRiver)},
+			{TechType.GhostRayBlue, new ACUMetabolism(0.67F, 0.6F, false, BiomeRegions.RegionType.LostRiver)},
+			{TechType.GhostRayRed, new ACUMetabolism(1.25F, 0.6F, false, BiomeRegions.RegionType.LavaZone)},
 	    };
 		
 		static ACUEcosystems() {
@@ -85,7 +85,14 @@ namespace ReikaKalseki.AqueousEngineering {
 			addFood(new PlantFood(VanillaFlora.DEEP_MUSHROOM, 0.1F, BiomeRegions.RegionType.LostRiver, BiomeRegions.RegionType.LavaZone));
 		}
 		
-		private static void addFood(Food f) {
+		public static void addPredatorType(TechType tt, float metaRate, float pooChance, bool carn, params BiomeRegions.RegionType[] rr) {
+			List<BiomeRegions.RegionType> li = rr.ToList();
+			li.RemoveAt(0);
+			ACUMetabolism am = new ACUMetabolism(metaRate, pooChance, carn, rr[0], li);
+			metabolisms[tt] = am;
+		}
+		
+		public static void addFood(Food f) {
 			if (f is AnimalFood) {
 				edibleFish[((AnimalFood)f).item] = (AnimalFood)f;
 			}
@@ -233,7 +240,7 @@ namespace ReikaKalseki.AqueousEngineering {
 			}
 		}
 		
-		abstract class Food {
+		public abstract class Food {
 			
 			internal readonly float foodValue;
 			internal readonly HashSet<BiomeRegions.RegionType> regionType = new HashSet<BiomeRegions.RegionType>();
@@ -255,7 +262,7 @@ namespace ReikaKalseki.AqueousEngineering {
 			internal abstract void consume(Creature c, WaterPark acu, StorageContainer sc, GameObject go);
 		}
 		
-		class AnimalFood : Food {
+		public class AnimalFood : Food {
 			
 			internal readonly TechType item;
 			
@@ -276,7 +283,7 @@ namespace ReikaKalseki.AqueousEngineering {
 			
 		}
 		
-		class PlantFood : Food {
+		public class PlantFood : Food {
 			
 			internal readonly VanillaFlora plant;
 			
@@ -294,7 +301,7 @@ namespace ReikaKalseki.AqueousEngineering {
 			
 		}
 		
-		class ACUMetabolism {
+		private class ACUMetabolism {
 			
 			internal readonly bool isCarnivore;
 			internal readonly float metabolismPerSecond;
@@ -302,12 +309,16 @@ namespace ReikaKalseki.AqueousEngineering {
 			internal readonly BiomeRegions.RegionType primaryRegion;
 			internal readonly HashSet<BiomeRegions.RegionType> additionalRegions = new HashSet<BiomeRegions.RegionType>();
 			
-			internal ACUMetabolism(float mf, float pp, bool isc, BiomeRegions.RegionType r, params BiomeRegions.RegionType[] rr) {
-				normalizedPoopChance = pp*2;
-				metabolismPerSecond = mf*0.006F;
+			internal ACUMetabolism(float mf, float pp, bool isc, BiomeRegions.RegionType r, params BiomeRegions.RegionType[] rr) : this(mf, pp, isc, r, rr.ToList()) {
+				
+			}
+			
+			internal ACUMetabolism(float mf, float pp, bool isc, BiomeRegions.RegionType r, List<BiomeRegions.RegionType> rr) {
+				normalizedPoopChance = pp;
+				metabolismPerSecond = mf*0.0003F;
 				isCarnivore = isc;
 				primaryRegion = r;
-				additionalRegions.AddRange(rr.ToList());
+				additionalRegions.AddRange(rr);
 			}
 			
 			public override string ToString()

@@ -40,8 +40,6 @@ namespace ReikaKalseki.AqueousEngineering
     public static MiniPoo poo;
     
     public static readonly XMLLocale locale = new XMLLocale("XML/locale.xml");
-    
-    private static readonly Dictionary<TechType, CustomEgg> eggs = new Dictionary<TechType, CustomEgg>();
 
     [QModPrePatch]
     public static void PreLoad() {
@@ -69,11 +67,11 @@ namespace ReikaKalseki.AqueousEngineering
         
         locale.load();
         
-        createEgg(TechType.SpineEel, TechType.BonesharkEgg, 1, "SpineEelDesc", true, BiomeType.BonesField_Ground, BiomeType.LostRiverJunction_Ground);
-        createEgg(TechType.GhostRayBlue, TechType.JumperEgg, 1.75F, "GhostRayDesc", true, BiomeType.TreeCove_LakeFloor);
-        createEgg(TechType.GhostRayRed, TechType.CrabsnakeEgg, 1.25F, "CrimsonRayDesc", true, BiomeType.InactiveLavaZone_Chamber_Floor_Far);
-        createEgg(TechType.Biter, TechType.RabbitrayEgg, 1F, "BiterDesc", false, BiomeType.GrassyPlateaus_CaveFloor, BiomeType.Mountains_CaveFloor);
-        createEgg(TechType.Blighter, TechType.RabbitrayEgg, 1F, "BlighterDesc", false, BiomeType.BloodKelp_CaveFloor);
+        createEgg(TechType.SpineEel, TechType.BonesharkEgg, 1, "SpineEelDesc", true, 0.5F, BiomeType.BonesField_Ground, BiomeType.LostRiverJunction_Ground);
+        createEgg(TechType.GhostRayBlue, TechType.JumperEgg, 1.75F, "GhostRayDesc", true, 1, BiomeType.TreeCove_LakeFloor);
+        createEgg(TechType.GhostRayRed, TechType.CrabsnakeEgg, 1.25F, "CrimsonRayDesc", true, 1, BiomeType.InactiveLavaZone_Chamber_Floor_Far);
+        createEgg(TechType.Biter, TechType.RabbitrayEgg, 1F, "BiterDesc", false, 1, BiomeType.GrassyPlateaus_CaveFloor, BiomeType.Mountains_CaveFloor);
+        createEgg(TechType.Blighter, TechType.RabbitrayEgg, 1F, "BlighterDesc", false, 1, BiomeType.BloodKelp_CaveFloor);
         
         poo = new MiniPoo(locale.getEntry("MiniPoop"));
 	    poo.Patch();
@@ -143,19 +141,8 @@ namespace ReikaKalseki.AqueousEngineering
 			RecipeUtil.addIngredient(ampeelAntennaBlock.TechType, TechType.Silicone, 3);
     }
     
-    private static void createEgg(TechType creature, TechType basis, float scale, string locKey, bool isBig, params BiomeType[] spawn) {
-    	CustomEgg egg = new CustomEgg(creature,  basis);
-    	egg.setTexture("Textures/Eggs/");
-    	eggs[creature] = egg;
-    	egg.creatureHeldDesc = locale.getEntry(locKey).desc;
-    	egg.eggScale = scale;
-    	if (!isBig) {
-    		egg.creatureSize = 2;
-    		egg.eggSize = 1;
-    	}
-    	egg.Patch();
-    	foreach (BiomeType b in spawn)
-    		GenUtil.registerSlotWorldgen(egg.ClassID, egg.PrefabFileName, egg.TechType, false, b, 1, 0.2F);
+    private static void createEgg(TechType creature, TechType basis, float scale, string locKey, bool isBig, float rate, params BiomeType[] spawn) {
+    	CustomEgg.createAndRegisterEgg(creature, basis, scale, locale.getEntry(locKey).desc, isBig, rate, spawn);
     }
 
   }

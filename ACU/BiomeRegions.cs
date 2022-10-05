@@ -20,7 +20,7 @@ namespace ReikaKalseki.AqueousEngineering {
 	
 	public static class BiomeRegions {
 		
-		internal enum RegionType {
+		public enum RegionType {
 			[Biome("SafeShallows", 1F, 1F, 1F, 0.3F)]Shallows,
 			[Biome("KelpForest", 0.3F, 0.6F, 0.3F, 0.67F)]Kelp,
 			[Biome("GrassyPlateaus", 1F, 1F, 1F, 0.3F)]RedGrass,
