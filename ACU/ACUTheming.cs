@@ -156,7 +156,9 @@ namespace ReikaKalseki.AqueousEngineering {
 			return propTypes.ContainsKey(r) ? propTypes[r].getRandomEntry() : null;
 		}
 		
-		internal static void updateACUTheming(ACUCallbackSystem.ACUCallback acu, BiomeRegions.RegionType theme, bool changed) {		
+		internal static void updateACUTheming(ACUCallbackSystem.ACUCallback acu, BiomeRegions.RegionType theme, bool changed) {
+			if (!acu.lowestSegment)
+				return;
 			//SNUtil.writeToChat(""+li.Count);
 			//SNUtil.writeToChat("##"+theme+" > "+floor+" & "+glass+" & "+decoHolders.Count);
 			foreach (Transform t in acu.lowestSegment.transform) {
@@ -189,6 +191,8 @@ namespace ReikaKalseki.AqueousEngineering {
 				}
 			}
 			foreach (GameObject slot in acu.decoHolders) {
+				if (!slot)
+					continue;
 				bool found = false;
 				foreach (Transform bt in slot.transform) {
 					GameObject biomeSlot = bt.gameObject;

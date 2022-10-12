@@ -31,6 +31,22 @@ namespace ReikaKalseki.AqueousEngineering {
 				acu.gameObject.EnsureComponent<ACUCallback>().setACU(acu);
 		}
 		
+		public void debugACU() {
+			WaterPark wp = Player.main.currentWaterPark;
+			if (wp) {
+				SNUtil.writeToChat("ACU @ "+wp.transform.position+": ");
+				ACUCallback call = wp.GetComponent<ACUCallback>();
+				if (!call)
+					SNUtil.writeToChat("No hook");
+				SNUtil.writeToChat("Biome set: ["+string.Join(", ", call.potentialBiomes)+"]");
+				SNUtil.writeToChat("Plant count: "+call.plantCount);
+				SNUtil.writeToChat("Prey count: "+call.herbivoreCount);
+				SNUtil.writeToChat("Predator count: "+call.carnivoreCount);
+				SNUtil.writeToChat("Sparkle count: "+call.sparkleCount);
+				call.nextIsDebug = true;
+			}
+		}
+		
 		internal class ACUCallback : MonoBehaviour {
 			
 			internal WaterPark acu;
@@ -42,12 +58,16 @@ namespace ReikaKalseki.AqueousEngineering {
 			internal GameObject floor;
 			internal List<GameObject> decoHolders;
 			
+			internal HashSet<BiomeRegions.RegionType> potentialBiomes = new HashSet<BiomeRegions.RegionType>();
 			internal BiomeRegions.RegionType currentTheme = BiomeRegions.RegionType.Shallows;
 			internal int plantCount;
 			internal int herbivoreCount;
 			internal int carnivoreCount;
 			internal int sparkleCount;
+			internal int cuddleCount;
 			internal float stalkerToyValue;
+			
+			internal bool nextIsDebug = false;
 			
 			internal void setACU(WaterPark w) {
 				if (acu != w) {
@@ -83,14 +103,15 @@ namespace ReikaKalseki.AqueousEngineering {
 				//SNUtil.writeToChat(dT+" s");
 				bool healthy = false;
 				bool consistent = true;
-				HashSet<BiomeRegions.RegionType> possibleBiomes = new HashSet<BiomeRegions.RegionType>();
-				possibleBiomes.AddRange((IEnumerable<BiomeRegions.RegionType>)Enum.GetValues(typeof(BiomeRegions.RegionType)));
+				potentialBiomes.Clear();
+				potentialBiomes.AddRange((IEnumerable<BiomeRegions.RegionType>)Enum.GetValues(typeof(BiomeRegions.RegionType)));
 				//SNUtil.writeToChat("SC:"+sc);
 				PrefabIdentifier[] plants = sc.GetComponentsInChildren<PrefabIdentifier>();
 				plantCount = 0;
 				herbivoreCount = 0;
 				carnivoreCount = 0;
 				int teeth = 0;
+				cuddleCount = 0;
 				sparkleCount = 0;
 				//SNUtil.writeToChat("@@"+string.Join(",", possibleBiomes));
 				List<WaterParkCreature> foodFish = new List<WaterParkCreature>();
@@ -122,15 +143,15 @@ namespace ReikaKalseki.AqueousEngineering {
 						teeth++;
 					}
 					else if (wp is WaterParkCreature) {
-						Creature c = ACUEcosystems.handleCreature(this, dT, wp, tt, foodFish, plants, ref possibleBiomes);
+						Creature c = ACUEcosystems.handleCreature(this, dT, wp, tt, foodFish, plants, ref potentialBiomes);
 						if (tt == TechType.Stalker) {
 							stalkers.Add((Stalker)c);
 						}
 					}
 		   	 	}
-				HashSet<VanillaFlora> plantTypes = ACUEcosystems.collectPlants(this, plants, ref possibleBiomes);
-				consistent = possibleBiomes.Count > 0 && plantCount > 0;
-				healthy = plantCount > 0 && plantTypes.Count > (possibleBiomes.Count == 1 && possibleBiomes.First<BiomeRegions.RegionType>() == BiomeRegions.RegionType.LavaZone ? 0 : 1) && herbivoreCount > 0 && carnivoreCount > 0 && carnivoreCount <= Math.Max(1, herbivoreCount/Mathf.Max(1, 6-sparkleCount*0.5F)) && carnivoreCount <= acu.height*1.5F && herbivoreCount > 0 && herbivoreCount <= plantCount*(4+sparkleCount*0.5F);
+				HashSet<VanillaFlora> plantTypes = ACUEcosystems.collectPlants(this, plants, ref potentialBiomes);
+				consistent = potentialBiomes.Count > 0 && plantCount > 0;
+				healthy = plantCount > 0 && plantTypes.Count > (potentialBiomes.Count == 1 && potentialBiomes.First<BiomeRegions.RegionType>() == BiomeRegions.RegionType.LavaZone ? 0 : 1) && herbivoreCount > 0 && carnivoreCount > 0 && carnivoreCount <= Math.Max(1, herbivoreCount/Mathf.Max(1, 6-sparkleCount*0.5F)) && carnivoreCount <= acu.height*1.5F && herbivoreCount > 0 && herbivoreCount <= plantCount*(4+sparkleCount*0.5F);
 				float boost = 0;
 				if (consistent)
 					boost += 1F;
@@ -138,7 +159,8 @@ namespace ReikaKalseki.AqueousEngineering {
 					boost += 2F;
 				if (sparkleCount > 0)
 					boost *= 1+sparkleCount*0.5F;
-				//SNUtil.writeToChat(plant+"/"+herb+"/"+carn+"$"+hero+" & "+string.Join(", ", possibleBiomes)+" > "+healthy+" & "+consistent+" > "+boost);
+				if (nextIsDebug)
+					SNUtil.writeToChat(plantCount+"/"+herbivoreCount+"/"+carnivoreCount+"$"+sparkleCount+" & "+string.Join(", ", potentialBiomes)+" > "+healthy+" & "+consistent+" > "+boost);
 				if (boost > 0) {
 					boost *= dT;
 					foreach (WaterParkCreature wp in foodFish) {
@@ -154,7 +176,7 @@ namespace ReikaKalseki.AqueousEngineering {
 						}
 					}
 				}
-				if (teeth < 10 && consistent && healthy && possibleBiomes.Contains(BiomeRegions.RegionType.Kelp)) {
+				if (teeth < 10 && consistent && healthy && potentialBiomes.Contains(BiomeRegions.RegionType.Kelp)) {
 					foreach (Stalker s in stalkers) {
 						float f = dT*stalkerToyValue*0.001F*s.Happy.Value;
 						//SNUtil.writeToChat(s.Happy.Value+" x "+stalkerToys.Count+" > "+f);
@@ -174,15 +196,17 @@ namespace ReikaKalseki.AqueousEngineering {
 						}
 					}
 				}
-				//SNUtil.writeToChat("["+string.Join(", ", possibleBiomes)+"]");
-				if (possibleBiomes.Count == 1) {
-					BiomeRegions.RegionType theme = possibleBiomes.First<BiomeRegions.RegionType>();
+				if (nextIsDebug)
+					SNUtil.writeToChat("Final biome set: ["+string.Join(", ", potentialBiomes)+"]");
+				if (potentialBiomes.Count == 1) {
+					BiomeRegions.RegionType theme = potentialBiomes.First<BiomeRegions.RegionType>();
 					if (theme == BiomeRegions.RegionType.Other)
 						theme = BiomeRegions.RegionType.Shallows;
 					bool changed = theme != currentTheme;
 					currentTheme = theme;
 					ACUTheming.updateACUTheming(this, theme, changed);
 				}
+				nextIsDebug = false;
 			}
 		}
 		

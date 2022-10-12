@@ -20,6 +20,8 @@ namespace ReikaKalseki.AqueousEngineering {
 		internal static readonly float FIRE_RATE = 4F; //interval in seconds
 		internal static readonly float MAX_RANGE = 300F; //m
 		
+		public static event Action<GameObject> onBaseSonarPingedEvent;
+		
 		public BaseSonarPinger(XMLLocale.LocaleEntry e) : base("basesonarping", e.name, e.desc, "8949b0da-5173-431f-a989-e621af02f942") {
 			addIngredient(TechType.Magnetite, 3);
 			addIngredient(TechType.Gold, 2);
@@ -55,6 +57,11 @@ namespace ReikaKalseki.AqueousEngineering {
 			//go.GetComponent<ConstructableBounds>().bounds.position = new Vector3(1, 1.0F, 0);
 		}
 		
+		internal static void pingEvent(GameObject go) {
+			if (onBaseSonarPingedEvent != null)
+				onBaseSonarPingedEvent.Invoke(go);
+		}
+		
 	}
 		
 	public class BaseSonarPingerLogic : CustomMachineLogic {
@@ -71,9 +78,10 @@ namespace ReikaKalseki.AqueousEngineering {
 		private void ping(float time) {
 			if (consumePower(BaseSonarPinger.POWER_COST, 1)) {
 				lastPing = time;
+				BaseSonarPinger.pingEvent(gameObject);
 				if (Inventory.main.equipment.GetCount(TechType.MapRoomHUDChip) > 0)
 					SNCameraRoot.main.SonarPing();
-				SNUtil.playSoundAt(SNUtil.getSound("event:/sub/cyclops/sonar"), Player.main.transform.position, false, BaseSonarPinger.MAX_RANGE, 4);
+				SoundManager.playSoundAt(SoundManager.buildSound("event:/sub/cyclops/sonar"), Player.main.transform.position, false, BaseSonarPinger.MAX_RANGE, 4);
 			}
 		}
 		

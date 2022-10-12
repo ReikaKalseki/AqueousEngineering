@@ -19,7 +19,7 @@ namespace ReikaKalseki.AqueousEngineering {
 			sprite = SpriteManager.Get(TechType.SeaTreaderPoop);
 		}
 		
-		public override void prepareGameObject(GameObject go, Renderer r) {
+		public override void prepareGameObject(GameObject go, Renderer[] r) {
 			base.prepareGameObject(go, r);
 			
 			go.transform.localScale = Vector3.one*0.2F;

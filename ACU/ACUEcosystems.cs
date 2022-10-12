@@ -105,11 +105,14 @@ namespace ReikaKalseki.AqueousEngineering {
 			if (edibleFish.ContainsKey(tt)) {
 				if (tt == TechType.Peeper && wp.gameObject.GetComponent<Peeper>().isHero)
 					acu.sparkleCount++;
-				else //sparkle peepers are always valid
+				else if (tt == TechType.Cutefish)
+					acu.cuddleCount++;
+				else //sparkle peepers and cuddlefish are always valid
 					possibleBiomes = new HashSet<BiomeRegions.RegionType>(possibleBiomes.Intersect(edibleFish[tt].regionType));
 				//if (possibleBiomes.Count <= 0)
 				//	SNUtil.writeToChat("Biome list empty after "+tt+" > "+edibleFish[tt]);
-				//SNUtil.writeToChat(tt+" > "+edibleFish[tt]+" > "+string.Join(",", possibleBiomes));
+				if (acu.nextIsDebug)
+					SNUtil.writeToChat(tt+" > "+edibleFish[tt]+" > "+string.Join(",", possibleBiomes));
 				foodFish.Add((WaterParkCreature)wp);
 				acu.herbivoreCount++;
 			}
@@ -122,14 +125,17 @@ namespace ReikaKalseki.AqueousEngineering {
 				List<BiomeRegions.RegionType> li = new List<BiomeRegions.RegionType>(am.additionalRegions);
 				li.Add(am.primaryRegion);
 				possibleBiomes = new HashSet<BiomeRegions.RegionType>(possibleBiomes.Intersect(li));
-				//SNUtil.writeToChat(tt+" > "+am+" > "+string.Join(",", possibleBiomes));
+				if (acu.nextIsDebug)
+					SNUtil.writeToChat(tt+" > "+am+" > "+string.Join(",", possibleBiomes));
 				//if (possibleBiomes.Count <= 0)
 				//	SNUtil.writeToChat("Biome list empty after "+tt+" > "+am);
 				Creature c = wp.gameObject.GetComponentInChildren<Creature>();
-				c.Hunger.Add(dT*am.metabolismPerSecond*FOOD_SCALAR);
-				c.Hunger.Falloff = 0;
-				if (c.Hunger.Value >= 0.5F) {
-					eat(acu, wp, c, am, plants);
+				if (((WaterParkCreature)wp).isMature) {
+					c.Hunger.Add(dT*am.metabolismPerSecond*FOOD_SCALAR);
+					c.Hunger.Falloff = 0;
+					if (c.Hunger.Value >= 0.5F) {
+						eat(acu, wp, c, am, plants);
+					}
 				}
 				return c;
 			}
@@ -146,7 +152,8 @@ namespace ReikaKalseki.AqueousEngineering {
 						possibleBiomes = new HashSet<BiomeRegions.RegionType>(possibleBiomes.Intersect(pf.regionType));
 						//if (possibleBiomes.Count <= 0)
 						//	SNUtil.writeToChat("Biome list empty after "+vf+" > "+pf);
-						//SNUtil.writeToChat(vf+" > "+pf+" > "+string.Join(",", possibleBiomes));
+						if (acu.nextIsDebug)
+							SNUtil.writeToChat(vf+" > "+pf+" & "+string.Join(",", pf.regionType)+" > "+string.Join(",", possibleBiomes));
 						set.Add(vf);
 						acu.plantCount++;
 					}

@@ -168,9 +168,9 @@ namespace ReikaKalseki.AqueousEngineering {
 					//SNUtil.writeToChat("DT "+td+" > "+drop);
 					drop.SetActive(false);
 					if (getStorage().container.AddItem(drop.GetComponent<Pickupable>()) != null) {
-						FMODAsset ass = SNUtil.getSound(CraftData.pickupSoundList.ContainsKey(td) ? CraftData.pickupSoundList[td] : CraftData.defaultPickupSound);
+						FMODAsset ass = SoundManager.buildSound(CraftData.pickupSoundList.ContainsKey(td) ? CraftData.pickupSoundList[td] : CraftData.defaultPickupSound);
 						if (ass != null) {
-							SNUtil.playSoundAt(ass, gameObject.transform.position);
+							SoundManager.playSoundAt(ass, gameObject.transform.position);
 						}
 						if (fp) {
 							PickPrefab pp = drop.GetComponent<PickPrefab>();
