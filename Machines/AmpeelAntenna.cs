@@ -75,17 +75,14 @@ namespace ReikaKalseki.AqueousEngineering {
 		protected override void updateEntity(float seconds) {
 			SubRoot sub = getSub();
 			if (sub && sub.powerRelay.GetPower() < sub.powerRelay.GetMaxPower()) {
-				RaycastHit[] hit = Physics.SphereCastAll(gameObject.transform.position, AmpeelAntenna.RANGE, new Vector3(1, 1, 1), AmpeelAntenna.RANGE);
-				foreach (RaycastHit rh in hit) {
-					if (rh.transform != null && rh.transform.gameObject) {
-						Shocker c = rh.transform.gameObject.GetComponent<Shocker>();
-						if (c && c.liveMixin.IsAlive() && !c.gameObject.GetComponent<WaterParkCreature>()) {
-							float dd = Vector3.Distance(c.transform.position, transform.position);
-							if (dd >= AmpeelAntenna.RANGE)
-								continue;
-							float trash;
-							sub.powerRelay.AddEnergy(seconds*(AmpeelAntenna.POWER_GEN-AmpeelAntenna.POWER_FALLOFF*dd), out trash);
-						}
+				HashSet<Shocker> set = WorldUtil.getObjectsNearWithComponent<Shocker>(gameObject.transform.position, AmpeelAntenna.RANGE);
+				foreach (Shocker c in set) {
+					if (c.liveMixin.IsAlive() && !c.gameObject.GetComponent<WaterParkCreature>()) {
+						float dd = Vector3.Distance(c.transform.position, transform.position);
+						if (dd >= AmpeelAntenna.RANGE)
+							continue;
+						float trash;
+						sub.powerRelay.AddEnergy(seconds*(AmpeelAntenna.POWER_GEN-AmpeelAntenna.POWER_FALLOFF*dd), out trash);
 					}
 				}
 			}
