@@ -87,28 +87,28 @@
 			
 		</pda>
 	</SeabaseRemoteCamera>
-	<Name>
+	<SeabaseACUBooster>
 		<name>
-			
+			ACU Feeding System
 		</name>
 		<desc>
-			
+			Periodically adds small amounts of plankton to the ACU to top up food supplies for herbivorous fish, increasing their fertility.
 		</desc>
 		<pda>
 			
 		</pda>
-	</Name>
-	<Name>
+	</SeabaseACUBooster>
+	<SeabasePlanktonFeeder>
 		<name>
-			
+			Plankton Feeder
 		</name>
 		<desc>
-			
+			Disperses plankton into the water to attract filter feeders and help encourage their reproduction in a wild setting.
 		</desc>
 		<pda>
 			
 		</pda>
-	</Name>
+	</SeabasePlanktonFeeder>
 	<Name>
 		<name>
 			

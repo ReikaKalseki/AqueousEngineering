@@ -69,6 +69,8 @@ namespace ReikaKalseki.AqueousEngineering {
 			
 			internal bool nextIsDebug = false;
 			
+			private float lastPlanktonBoost;
+			
 			internal void setACU(WaterPark w) {
 				if (acu != w) {
 					
@@ -92,6 +94,15 @@ namespace ReikaKalseki.AqueousEngineering {
 						decoHolders = ObjectUtil.getChildObjects(lowestSegment, ACUTheming.ACU_DECO_SLOT_NAME);
 					}
 				}
+			}
+			
+			public float getBoostStrength(float time) {
+				float dt = time-lastPlanktonBoost;
+				return dt <= 15 ? 1-dt/15F : 0;
+			}
+			
+			public void boost() {
+				lastPlanktonBoost = DayNightCycle.main.timePassedAsFloat;
 			}
 		
 			public void tick() {
@@ -161,6 +172,7 @@ namespace ReikaKalseki.AqueousEngineering {
 					boost *= 1+sparkleCount*0.5F;
 				if (nextIsDebug)
 					SNUtil.writeToChat(plantCount+"/"+herbivoreCount+"/"+carnivoreCount+"$"+sparkleCount+" & "+string.Join(", ", potentialBiomes)+" > "+healthy+" & "+consistent+" > "+boost);
+				boost += 5F*getBoostStrength(time);
 				if (boost > 0) {
 					boost *= dT;
 					foreach (WaterParkCreature wp in foodFish) {

@@ -21,7 +21,7 @@ namespace ReikaKalseki.AqueousEngineering {
 		internal static readonly float RANGE = POWER_GEN/POWER_FALLOFF;
 		internal static readonly float INTERVAL = 0.25F;
 		
-		public AmpeelAntenna(XMLLocale.LocaleEntry e) : base("baseampeelantenna", e.name, e.desc, "8949b0da-5173-431f-a989-e621af02f942") {
+		public AmpeelAntenna(XMLLocale.LocaleEntry e) : base("baseampeelantenna", e.name, e.desc, "4cb154ef-bdb6-4ff4-9107-f378ce21a9b7") {
 			addIngredient(TechType.CopperWire, 6);
 			addIngredient(TechType.WiringKit, 2);
 			addIngredient(TechType.PowerTransmitter, 1);
@@ -39,8 +39,28 @@ namespace ReikaKalseki.AqueousEngineering {
 		
 		public override void initializeMachine(GameObject go) {
 			base.initializeMachine(go);
-			ObjectUtil.removeComponent<PowerRelay>(go);
+			ObjectUtil.removeComponent<Bench>(go);
 			ObjectUtil.removeChildObject(go, "Bubbles");
+			
+			go.transform.localScale = new Vector3(0.4F, 0.2F, 1);
+			
+			string name = "CoilHolder";
+			GameObject child = ObjectUtil.getChildObject(go, name);
+			if (child == null) {
+				child = new GameObject(name);
+				child.transform.SetParent(go.transform);
+			}
+			PrefabIdentifier[] pi = child.GetComponentsInChildren<PrefabIdentifier>();
+			int n = 15;
+			for (int i = pi.Length; i < n; i++) {
+				GameObject fin = ObjectUtil.createWorldObject("cf522a95-3038-4759-a53c-8dad1242c8ed");
+				fin.EnsureComponent<AmpeelCoil>();
+				fin.transform.SetParent(child.transform);
+				fin.transform.localScale = new Vector3(0.09F, 0.13F, 0.05F);
+				fin.transform.localRotation = Quaternion.Euler(0, 0, 0);
+				fin.transform.localPosition = new Vector3(-0.015F, 0, -0.75F+1.5F*i/n);//Vector3.zero+i*go.transform.right*0.25F;
+				RenderUtil.swapTextures(AqueousEngineeringMod.modDLL, fin.GetComponentInChildren<Renderer>(), "Textures/Machines/AmpeelCoil");
+			}
 						
 			AmpeelAntennaLogic lgc = go.GetComponent<AmpeelAntennaLogic>();
 			
@@ -56,6 +76,10 @@ namespace ReikaKalseki.AqueousEngineering {
 			//go.GetComponent<ConstructableBounds>().bounds.extents = new Vector3(1.5F, 0.5F, 1.5F);
 			//go.GetComponent<ConstructableBounds>().bounds.position = new Vector3(1, 1.0F, 0);
 		}
+		
+	}
+	
+	class AmpeelCoil : MonoBehaviour {
 		
 	}
 		

@@ -32,6 +32,8 @@ namespace ReikaKalseki.AqueousEngineering
     public static ACUCleaner acuCleanerBlock;
     public static Autofarmer farmerBlock;
     public static RemoteCameraAntenna cameraAntennaBlock;
+    public static ACUBooster acuBoosterBlock;
+    public static PlanktonFeeder planktonFeederBlock;
     
     public static OutdoorPot outdoorBasicPot;
     public static OutdoorPot outdoorChicPot;
@@ -141,6 +143,21 @@ namespace ReikaKalseki.AqueousEngineering
 			RecipeUtil.addIngredient(ampeelAntennaBlock.TechType, sealf.TechType, 2);
 		else
 			RecipeUtil.addIngredient(ampeelAntennaBlock.TechType, TechType.Silicone, 3);
+		
+		Spawnable plankton = ItemRegistry.instance.getItem("planktonItem");
+		if (plankton != null) {
+		    PlanktonFeeder.fuel = (BasicCraftingItem)plankton;
+		    ACUBooster.fuel = PlanktonFeeder.fuel;
+	    	acuBoosterBlock = createMachine<ACUBooster, ACUBoosterLogic>("SeabaseACUBooster");
+		    planktonFeederBlock = createMachine<PlanktonFeeder, PlanktonFeederLogic>("SeabasePlanktonFeeder");
+		    if (motor != null)
+				RecipeUtil.addIngredient(planktonFeederBlock.TechType, motor.TechType, 1);
+	        TechType tt = TechType.None;
+	        if (TechTypeHandler.TryGetModdedTechType("plankton", out tt))
+	        	TechnologyUnlockSystem.instance.addDirectUnlock(tt, planktonFeederBlock.TechType);
+        	TechnologyUnlockSystem.instance.addDirectUnlock(TechType.BaseWaterPark, acuBoosterBlock.TechType);
+	        TechnologyUnlockSystem.instance.addDirectUnlock(plankton.TechType, planktonFeederBlock.TechType);
+		}
     }
     
     private static void createEgg(TechType creature, TechType basis, float scale, string locKey, bool isBig, float rate, params BiomeType[] spawn) {

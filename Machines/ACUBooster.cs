@@ -14,14 +14,17 @@ using ReikaKalseki.DIAlterra;
 
 namespace ReikaKalseki.AqueousEngineering {
 	
-	public class ACUCleaner : CustomMachine<ACUCleanerLogic> {
+	public class ACUBooster : CustomMachine<ACUBoosterLogic> {
 		
-		internal static readonly float POWER_COST = 0.15F;
+		internal static readonly float POWER_COST = 0.125F;
+		internal static readonly float CONSUMPTION_RATE = 15*60; //s
 		
-		public ACUCleaner(XMLLocale.LocaleEntry e) : base("baseacucleaner", e.name, e.desc, "c0175cf7-0b6a-4a1d-938f-dad0dbb6fa06") {
-			addIngredient(TechType.Titanium, 5);
-			addIngredient(TechType.ExosuitPropulsionArmModule, 1);
-			addIngredient(TechType.MapRoomCamera, 1);
+		internal static BasicCraftingItem fuel;
+		
+		public ACUBooster(XMLLocale.LocaleEntry e) : base("baseacubooster", e.name, e.desc, "cdade216-3d4d-4adf-901c-3a91fb3b88c4") {
+			addIngredient(TechType.Titanium, 1);
+			addIngredient(TechType.Pipe, 8);
+			addIngredient(TechType.FiberMesh, 2);
 		}
 
 		public override bool UnlockedAtStart {
@@ -36,12 +39,12 @@ namespace ReikaKalseki.AqueousEngineering {
 		
 		public override void initializeMachine(GameObject go) {
 			base.initializeMachine(go);
-			ObjectUtil.removeComponent<MedicalCabinet>(go);
+			ObjectUtil.removeComponent<Centrifuge>(go);
 			
 			StorageContainer con = go.GetComponentInChildren<StorageContainer>();
 			initializeStorageContainer(con, 3, 5);
 						
-			ACUCleanerLogic lgc = go.GetComponent<ACUCleanerLogic>();
+			ACUBoosterLogic lgc = go.GetComponent<ACUBoosterLogic>();
 			
 			//GameObject air = ObjectUtil.lookupPrefab("7b4b90b8-6294-4354-9ebb-3e5aa49ae453");
 			//GameObject mdl = RenderUtil.setModel(go, "discovery_trashcan_01_d", ObjectUtil.getChildObject(air, "model"));
@@ -63,15 +66,17 @@ namespace ReikaKalseki.AqueousEngineering {
 		
 	}
 		
-	public class ACUCleanerLogic : CustomMachineLogic {
+	public class ACUBoosterLogic : CustomMachineLogic {
 		
 		private WaterPark connectedACU;
+		
+		private float lastFeedTime;
 		
 		//internal GameObject rotator;
 				
 		void Start() {
-			SNUtil.log("Reinitializing acu cleaner");
-			AqueousEngineeringMod.acuCleanerBlock.initializeMachine(gameObject);
+			SNUtil.log("Reinitializing acu booster");
+			AqueousEngineeringMod.acuBoosterBlock.initializeMachine(gameObject);
 		}
 		
 		protected override float getTickRate() {
@@ -90,39 +95,27 @@ namespace ReikaKalseki.AqueousEngineering {
 			}
 			return null;
 		}
-		/*
-		private StorageContainer tryFindStorage() {
-			SubRoot sub = getSub();
-			if (!sub) {
-				return null;
-			}
-			foreach (StorageContainer wp in sub.GetComponentsInChildren<StorageContainer>()) {
-				if (Vector3.Distance(wp.transform.position, transform.position) <= 3 && !wp.GetComponent<WaterPark>() && wp.container.GetContainerType() == ItemsContainerType.Default) {
-					return wp;
-				}
-			}
-			return null;
-		}
-		*/
+		
 		protected override void updateEntity(float seconds) {
 			if (!connectedACU) {
 				connectedACU = tryFindACU();
 			}
-			if (connectedACU && consumePower(ACUCleaner.POWER_COST, seconds)) {
+			if (connectedACU && consumePower(ACUBooster.POWER_COST, seconds) && getStorage().container.GetCount(ACUBooster.fuel.TechType) > 0) {
 				//rotator.transform.position = connectedACU.transform.position+Vector3.down*1.45F;
 				//rotator.transform.localScale = new Vector3(13.8F, 1, 13.8F);
+				/*
 				foreach (WaterParkItem wp in connectedACU.items) {
-					if (wp) {
-						Pickupable pp = wp.GetComponent<Pickupable>();
-						TechType tt = pp.GetTechType();
-						if (tt == TechType.SeaTreaderPoop || tt == AqueousEngineeringMod.poo.TechType) {
-							InventoryItem ii = getStorage().container.AddItem(pp);
-							if (ii != null) {
-								connectedACU.RemoveItem(pp);
-								pp.gameObject.SetActive(false);
-								break;
-							}
-						}
+					if (wp && wp is WaterParkCreature) {
+						
+					}
+				}*/
+				ACUCallbackSystem.ACUCallback hook = connectedACU.GetComponent<ACUCallbackSystem.ACUCallback>();
+				if (hook) {
+					hook.boost();
+					float time = DayNightCycle.main.timePassedAsFloat;
+					if (time-lastFeedTime >= ACUBooster.CONSUMPTION_RATE) {
+						lastFeedTime = time;
+						getStorage().container.DestroyItem(ACUBooster.fuel.TechType);
 					}
 				}
 			}
