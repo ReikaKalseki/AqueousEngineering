@@ -44,6 +44,8 @@ namespace ReikaKalseki.AqueousEngineering {
 			
 			go.transform.localScale = new Vector3(0.4F, 0.2F, 1);
 			
+			go.GetComponent<Constructable>().model = ObjectUtil.getChildObject(go, "bench");
+			
 			string name = "CoilHolder";
 			GameObject child = ObjectUtil.getChildObject(go, name);
 			if (child == null) {

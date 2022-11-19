@@ -57,6 +57,8 @@ namespace ReikaKalseki.AqueousEngineering {
 						
 			BaseCreatureRepellentLogic lgc = go.GetComponent<BaseCreatureRepellentLogic>();
 			
+			go.GetComponent<Constructable>().model = ObjectUtil.getChildObject(go, "bench");
+			
 			go.transform.localScale = new Vector3(0.4F, 0.5F, 2);
 			
 			string name = "FinHolder";

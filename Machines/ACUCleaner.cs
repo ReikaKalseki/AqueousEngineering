@@ -18,7 +18,7 @@ namespace ReikaKalseki.AqueousEngineering {
 		
 		internal static readonly float POWER_COST = 0.15F;
 		
-		public ACUCleaner(XMLLocale.LocaleEntry e) : base("baseacucleaner", e.name, e.desc, "c0175cf7-0b6a-4a1d-938f-dad0dbb6fa06") {
+		public ACUCleaner(XMLLocale.LocaleEntry e) : base("baseacucleaner", e.name, e.desc, "5fc7744b-5a2c-4572-8e53-eebf990de434") {
 			addIngredient(TechType.Titanium, 5);
 			addIngredient(TechType.ExosuitPropulsionArmModule, 1);
 			addIngredient(TechType.MapRoomCamera, 1);
@@ -36,7 +36,9 @@ namespace ReikaKalseki.AqueousEngineering {
 		
 		public override void initializeMachine(GameObject go) {
 			base.initializeMachine(go);
-			ObjectUtil.removeComponent<MedicalCabinet>(go);
+			ObjectUtil.removeChildObject(go, "Label");
+			
+			GameObject mdl = RenderUtil.setModel(go, "model", ObjectUtil.lookupPrefab("c0175cf7-0b6a-4a1d-938f-dad0dbb6fa06"));
 			
 			StorageContainer con = go.GetComponentInChildren<StorageContainer>();
 			initializeStorageContainer(con, 3, 5);
@@ -47,6 +49,14 @@ namespace ReikaKalseki.AqueousEngineering {
 			//GameObject mdl = RenderUtil.setModel(go, "discovery_trashcan_01_d", ObjectUtil.getChildObject(air, "model"));
 			//lgc.rotator = UnityEngine.Object.Instantiate(ObjectUtil.getChildObject(ObjectUtil.getChildObject(air, "model"), "_pipes_floating_air_intake_turbine_geo"));
 			//lgc.rotator.transform.parent = go.transform;
+			
+			Constructable c = go.GetComponent<Constructable>();
+			c.model = mdl;
+			c.allowedOnCeiling = false;
+			c.allowedOnGround = false;
+			c.allowedOnWall = true;
+			c.allowedOnConstructables = true;
+			c.allowedOutside = false;
 			
 			Renderer r = go.GetComponentInChildren<Renderer>();
 			//SNUtil.dumpTextures(r);

@@ -119,7 +119,7 @@ namespace ReikaKalseki.AqueousEngineering {
 		
 		private string generateBeaconLabel(SubRoot sub) {
 			string loc = "Location: "+WorldUtil.getBiomeFriendlyName(WaterBiomeManager.main.GetBiome(transform.position, false))+" ("+(int)Ocean.main.GetDepthOf(gameObject)+"m)";
-			string pw = "Power: "+sub.powerRelay.GetPower()+"/"+sub.powerRelay.GetMaxPower()+" ("+sub.powerRelay.powerStatus+")";
+			string pw = "Power: "+sub.powerRelay.GetPower().ToString("##.0")+"/"+sub.powerRelay.GetMaxPower()+" ("+sub.powerRelay.powerStatus+")";
 			string ret = loc+"\n"+pw;
 			if (!string.IsNullOrEmpty(vehicleString))
 				ret = ret+"\n"+vehicleString;

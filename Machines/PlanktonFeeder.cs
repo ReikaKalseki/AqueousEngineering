@@ -36,7 +36,7 @@ namespace ReikaKalseki.AqueousEngineering {
 			behaviors[TechType.GhostLeviathan] = new WildFeedingBehavior(300, 0, 20, 0F, 40);
 		}
 		
-		public PlanktonFeeder(XMLLocale.LocaleEntry e) : base("baseplanktonfeed", e.name, e.desc, "8fb8a082-d40a-4473-99ec-1ded36cc6813") {
+		public PlanktonFeeder(XMLLocale.LocaleEntry e) : base("baseplanktonfeed", e.name, e.desc, "bedc40fb-bd97-4b4d-a943-d39360c9c7bd") {
 			addIngredient(TechType.FiberMesh, 1);
 			addIngredient(TechType.Pipe, 2);
 			addIngredient(TechType.Titanium, 3);
@@ -54,12 +54,21 @@ namespace ReikaKalseki.AqueousEngineering {
 		
 		public override void initializeMachine(GameObject go) {
 			base.initializeMachine(go);
-			//ObjectUtil.removeComponent<>(go);
+			ObjectUtil.removeComponent<Trashcan>(go);
 						
 			PlanktonFeederLogic lgc = go.GetComponent<PlanktonFeederLogic>();
 			
 			Renderer r = go.GetComponentInChildren<Renderer>();
 			RenderUtil.swapToModdedTextures(r, this);
+			RenderUtil.setEmissivity(r, 1, "GlowStrength");
+			
+			GameObject mdl = RenderUtil.setModel(go, "model", ObjectUtil.getChildObject(ObjectUtil.lookupPrefab("8fb8a082-d40a-4473-99ec-1ded36cc6813"), "Starship_cargo"));
+			Constructable c = go.GetComponent<Constructable>();
+			c.model = mdl;
+			c.allowedOnCeiling = true;
+			c.allowedOnGround = true;
+			c.allowedOnWall = true;
+			c.allowedOnConstructables = true;
 		}
 		
 	}

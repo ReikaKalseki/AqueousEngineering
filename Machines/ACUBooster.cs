@@ -21,7 +21,7 @@ namespace ReikaKalseki.AqueousEngineering {
 		
 		internal static BasicCraftingItem fuel;
 		
-		public ACUBooster(XMLLocale.LocaleEntry e) : base("baseacubooster", e.name, e.desc, "cdade216-3d4d-4adf-901c-3a91fb3b88c4") {
+		public ACUBooster(XMLLocale.LocaleEntry e) : base("baseacubooster", e.name, e.desc, "5fc7744b-5a2c-4572-8e53-eebf990de434") {
 			addIngredient(TechType.Titanium, 1);
 			addIngredient(TechType.Pipe, 8);
 			addIngredient(TechType.FiberMesh, 2);
@@ -39,10 +39,12 @@ namespace ReikaKalseki.AqueousEngineering {
 		
 		public override void initializeMachine(GameObject go) {
 			base.initializeMachine(go);
-			ObjectUtil.removeComponent<Centrifuge>(go);
+			ObjectUtil.removeChildObject(go, "Label");
+			
+			GameObject mdl = RenderUtil.setModel(go, "model", ObjectUtil.getChildObject(ObjectUtil.lookupPrefab("cdade216-3d4d-4adf-901c-3a91fb3b88c4"), "model/submarine_centrifuge_base"));
 			
 			StorageContainer con = go.GetComponentInChildren<StorageContainer>();
-			initializeStorageContainer(con, 3, 5);
+			initializeStorageContainer(con, 6, 5);
 						
 			ACUBoosterLogic lgc = go.GetComponent<ACUBoosterLogic>();
 			
@@ -59,9 +61,16 @@ namespace ReikaKalseki.AqueousEngineering {
 			r.materials[0].SetFloat("_SpecInt", 15F);
 			lgc.mainRenderer = r;*/
 			
-			//go.GetComponent<Constructable>().model = go;
+			Constructable c = go.GetComponent<Constructable>();
+			c.model = mdl;
 			//go.GetComponent<ConstructableBounds>().bounds.extents = new Vector3(1.5F, 0.5F, 1.5F);
 			//go.GetComponent<ConstructableBounds>().bounds.position = new Vector3(1, 1.0F, 0);
+			
+			c.allowedOnCeiling = false;
+			c.allowedOnGround = false;
+			c.allowedOnWall = true;
+			c.allowedOnConstructables = true;
+			c.allowedOutside = false;
 		}
 		
 	}

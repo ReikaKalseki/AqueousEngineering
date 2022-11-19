@@ -146,6 +146,7 @@ namespace ReikaKalseki.AqueousEngineering
 		
 		Spawnable plankton = ItemRegistry.instance.getItem("planktonItem");
 		if (plankton != null) {
+			SNUtil.log("Found plankton item. Adding compat machinery.");
 		    PlanktonFeeder.fuel = (BasicCraftingItem)plankton;
 		    ACUBooster.fuel = PlanktonFeeder.fuel;
 	    	acuBoosterBlock = createMachine<ACUBooster, ACUBoosterLogic>("SeabaseACUBooster");
@@ -157,6 +158,9 @@ namespace ReikaKalseki.AqueousEngineering
 	        	TechnologyUnlockSystem.instance.addDirectUnlock(tt, planktonFeederBlock.TechType);
         	TechnologyUnlockSystem.instance.addDirectUnlock(TechType.BaseWaterPark, acuBoosterBlock.TechType);
 	        TechnologyUnlockSystem.instance.addDirectUnlock(plankton.TechType, planktonFeederBlock.TechType);
+		}
+		else {
+			SNUtil.log("Plankton item not found.");
 		}
     }
     
