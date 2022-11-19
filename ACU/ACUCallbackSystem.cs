@@ -71,6 +71,9 @@ namespace ReikaKalseki.AqueousEngineering {
 			
 			private float lastPlanktonBoost;
 			
+			private GameObject bubbleVents;
+			private ParticleSystem[] ventBubbleEmitters;
+			
 			internal void setACU(WaterPark w) {
 				if (acu != w) {
 					
@@ -92,6 +95,8 @@ namespace ReikaKalseki.AqueousEngineering {
 						lowestSegment = ACUCallbackSystem.instance.getACUFloor(column);
 						floor = ObjectUtil.getChildObject(lowestSegment, "Large_Aquarium_Room_generic_ground");
 						decoHolders = ObjectUtil.getChildObjects(lowestSegment, ACUTheming.ACU_DECO_SLOT_NAME);
+						bubbleVents = ObjectUtil.getChildObject(lowestSegment, "Bubbles");
+						ventBubbleEmitters = bubbleVents.GetComponentsInChildren<ParticleSystem>();
 					}
 				}
 			}
@@ -172,7 +177,16 @@ namespace ReikaKalseki.AqueousEngineering {
 					boost *= 1+sparkleCount*0.5F;
 				if (nextIsDebug)
 					SNUtil.writeToChat(plantCount+"/"+herbivoreCount+"/"+carnivoreCount+"$"+sparkleCount+" & "+string.Join(", ", potentialBiomes)+" > "+healthy+" & "+consistent+" > "+boost);
-				boost += 5F*getBoostStrength(time);
+				float f0 = getBoostStrength(time);
+				foreach (ParticleSystem p in ventBubbleEmitters) {
+					if (p.gameObject.name == "xBubbleColumn") {
+						ParticleSystem.MainModule main = p.main;
+						main.startColor = Color.Lerp(Color.white, new Color(0.2F, 1F, 0.4F), f0);
+						main.startSizeMultiplier = 0.5F+1.5F*f0;
+						main.startLifetimeMultiplier = 1.7F+2.3F*f0;
+					}					
+				}
+				boost += 5F*f0;
 				if (boost > 0) {
 					boost *= dT;
 					foreach (WaterParkCreature wp in foodFish) {

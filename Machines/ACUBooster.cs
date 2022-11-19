@@ -42,6 +42,8 @@ namespace ReikaKalseki.AqueousEngineering {
 			ObjectUtil.removeChildObject(go, "Label");
 			
 			GameObject mdl = RenderUtil.setModel(go, "model", ObjectUtil.getChildObject(ObjectUtil.lookupPrefab("cdade216-3d4d-4adf-901c-3a91fb3b88c4"), "model/submarine_centrifuge_base"));
+			mdl.transform.localScale = Vector3.one*50;
+			mdl.transform.localRotation = Quaternion.Euler(-90, 0, 0);
 			
 			StorageContainer con = go.GetComponentInChildren<StorageContainer>();
 			initializeStorageContainer(con, 6, 5);
@@ -53,7 +55,7 @@ namespace ReikaKalseki.AqueousEngineering {
 			//lgc.rotator = UnityEngine.Object.Instantiate(ObjectUtil.getChildObject(ObjectUtil.getChildObject(air, "model"), "_pipes_floating_air_intake_turbine_geo"));
 			//lgc.rotator.transform.parent = go.transform;
 			
-			Renderer r = go.GetComponentInChildren<Renderer>();
+			Renderer[] r = go.GetComponentsInChildren<Renderer>();
 			//SNUtil.dumpTextures(r);
 			RenderUtil.swapToModdedTextures(r, this);/*
 			r.materials[0].SetFloat("_Shininess", 7.5F);

@@ -40,6 +40,8 @@ namespace ReikaKalseki.AqueousEngineering {
 			addIngredient(TechType.FiberMesh, 1);
 			addIngredient(TechType.Pipe, 2);
 			addIngredient(TechType.Titanium, 3);
+			
+			glowIntensity = 1;
 		}
 
 		public override bool UnlockedAtStart {
@@ -58,22 +60,49 @@ namespace ReikaKalseki.AqueousEngineering {
 						
 			PlanktonFeederLogic lgc = go.GetComponent<PlanktonFeederLogic>();
 			
-			Renderer r = go.GetComponentInChildren<Renderer>();
-			RenderUtil.swapToModdedTextures(r, this);
-			RenderUtil.setEmissivity(r, 1, "GlowStrength");
+			StorageContainer con = go.GetComponentInChildren<StorageContainer>();
+			initializeStorageContainer(con, 6, 4);
 			
-			GameObject mdl = RenderUtil.setModel(go, "model", ObjectUtil.getChildObject(ObjectUtil.lookupPrefab("8fb8a082-d40a-4473-99ec-1ded36cc6813"), "Starship_cargo"));
+			GameObject mdl = RenderUtil.setModel(go, "discovery_trashcan_01_d", ObjectUtil.getChildObject(ObjectUtil.lookupPrefab("8fb8a082-d40a-4473-99ec-1ded36cc6813"), "Starship_cargo"));
+			mdl.transform.localRotation = Quaternion.Euler(-90, 180, 0);
+			mdl.transform.localPosition = new Vector3(0, -0.05F, 0);
+			mdl.transform.localScale = new Vector3(1.5F, 0.5F, 0.5F);
 			Constructable c = go.GetComponent<Constructable>();
 			c.model = mdl;
 			c.allowedOnCeiling = true;
 			c.allowedOnGround = true;
 			c.allowedOnWall = true;
 			c.allowedOnConstructables = true;
+			
+			Renderer r = go.GetComponentInChildren<Renderer>();
+			RenderUtil.swapToModdedTextures(r, this);
+			r.materials[0].SetColor("_GlowColor", Color.white);
+			r.materials[1].color = Color.clear;
+			
+			string name = "BubbleRoot";
+			GameObject child = ObjectUtil.getChildObject(go, name);
+			if (child == null) {
+				child = new GameObject(name);
+				child.transform.SetParent(go.transform);
+				child.transform.localRotation = Quaternion.Euler(0, -15, 0);
+				child.transform.localPosition = new Vector3(0, 0, 0.25F);
+			}
+			PrefabIdentifier[] pi = child.GetComponentsInChildren<PrefabIdentifier>();
+			for (int i = pi.Length; i < 3; i++) {
+				GameObject bubbles = ObjectUtil.createWorldObject("0dbd3431-62cc-4dd2-82d5-7d60c71a9edf");
+				bubbles.transform.SetParent(child.transform);
+				bubbles.transform.localPosition = new Vector3((i-1)*0.5F, 0, 0.25F);
+				bubbles.transform.localRotation = Quaternion.Euler(0, 90, 0);
+			}
 		}
 		
 	}
 		
 	public class PlanktonFeederLogic : CustomMachineLogic {
+		
+		private ParticleSystem[] bubbles;
+		
+		private bool enabled = false;
 		
 		void Start() {
 			SNUtil.log("Reinitializing base plankton feeder");
@@ -85,6 +114,20 @@ namespace ReikaKalseki.AqueousEngineering {
 		}
 		
 		protected override void updateEntity(float seconds) {
+			if (bubbles == null || bubbles.Length == 0) {
+				bubbles = GetComponentsInChildren<ParticleSystem>();
+				foreach (ParticleSystem p in bubbles) {
+					ParticleSystem.MainModule main = p.main;
+					main.startColor = new Color(0.2F, 1F, 0.4F);
+					main.gravityModifierMultiplier = -0.05F;
+					ParticleSystem.ForceOverLifetimeModule force = p.forceOverLifetime;
+					force.enabled = true;
+					force.xMultiplier = -0.25F;
+					force.yMultiplier = -0.5F;
+					force.zMultiplier = 0;
+				}
+				setState(false);
+			}
 			//if (mainRenderer == null)
 			//	mainRenderer = ObjectUtil.getChildObject(gameObject, "model").GetComponent<Renderer>();
 			
@@ -92,6 +135,7 @@ namespace ReikaKalseki.AqueousEngineering {
 			if (Vector3.Distance(Player.main.transform.position, transform.position) >= PlanktonFeeder.RANGE)
 				return;
 			if (consumePower(PlanktonFeeder.POWER_COST, seconds) && getStorage().container.GetCount(PlanktonFeeder.fuel.TechType) > 0) {
+				setState(true);
 				float r = PlanktonFeeder.RANGE;
 				HashSet<Creature> set = WorldUtil.getObjectsNearWithComponent<Creature>(gameObject.transform.position, r);
 				foreach (Creature c in set) {
@@ -112,7 +156,7 @@ namespace ReikaKalseki.AqueousEngineering {
 							c.Aggression.Add(-0.005F*seconds);
 						}
 						c.Hunger.Add(-0.04F*seconds);
-						if (dd <= feed.maxBreedRange && UnityEngine.Random.Range(0F, 1F) <= feed.breedChance*seconds) {
+						if (dd <= feed.maxBreedRange && UnityEngine.Random.Range(0F, 1F) <= feed.breedChance*seconds*0.005F) {
 							tryBreed(c);
 						}
 					}
@@ -120,6 +164,21 @@ namespace ReikaKalseki.AqueousEngineering {
 				if (set.Count > 0 && UnityEngine.Random.Range(0F, 1F) <= PlanktonFeeder.CONSUMPTION_RATE*seconds) {
 					getStorage().container.DestroyItem(PlanktonFeeder.fuel.TechType);
 				}
+			}
+			else {
+				setState(false);
+			}
+		}
+		
+		private void setState(bool enable) {
+			if (enable == enabled && getAge() >= 1)
+				return;
+			enabled = enable;
+			foreach (ParticleSystem p in bubbles) {
+				if (enable)
+					p.Play();
+				else
+					p.Stop(true, ParticleSystemStopBehavior.StopEmitting);
 			}
 		}
 		
