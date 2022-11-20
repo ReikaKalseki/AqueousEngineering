@@ -77,7 +77,7 @@ namespace ReikaKalseki.AqueousEngineering {
 			Renderer r = mdl.GetComponentInChildren<Renderer>();
 			RenderUtil.swapToModdedTextures(r, this);
 			r.materials[0].SetColor("_GlowColor", Color.white);
-			r.materials[1].color = Color.clear;
+			//r.materials[1].color = Color.clear;
 			
 			string name = "BubbleRoot";
 			GameObject child = ObjectUtil.getChildObject(go, name);
