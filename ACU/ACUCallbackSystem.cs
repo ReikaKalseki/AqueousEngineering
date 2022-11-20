@@ -178,13 +178,15 @@ namespace ReikaKalseki.AqueousEngineering {
 				if (nextIsDebug)
 					SNUtil.writeToChat(plantCount+"/"+herbivoreCount+"/"+carnivoreCount+"$"+sparkleCount+" & "+string.Join(", ", potentialBiomes)+" > "+healthy+" & "+consistent+" > "+boost);
 				float f0 = getBoostStrength(time);
-				foreach (ParticleSystem p in ventBubbleEmitters) {
-					if (p.gameObject.name == "xBubbleColumn") {
-						ParticleSystem.MainModule main = p.main;
-						main.startColor = Color.Lerp(Color.white, new Color(0.2F, 1F, 0.4F), f0);
-						main.startSizeMultiplier = 0.5F+1.5F*f0;
-						main.startLifetimeMultiplier = 1.7F+2.3F*f0;
-					}					
+				if (ventBubbleEmitters != null) {
+					foreach (ParticleSystem p in ventBubbleEmitters) {
+						if (p && p.gameObject.name == "xBubbleColumn") {
+							ParticleSystem.MainModule main = p.main;
+							main.startColor = Color.Lerp(Color.white, new Color(0.2F, 1F, 0.4F), f0);
+							main.startSizeMultiplier = 0.5F+1.5F*f0;
+							main.startLifetimeMultiplier = 1.7F+2.3F*f0;
+						}					
+					}
 				}
 				boost += 5F*f0;
 				if (boost > 0) {

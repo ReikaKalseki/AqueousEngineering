@@ -74,7 +74,7 @@ namespace ReikaKalseki.AqueousEngineering {
 			c.allowedOnWall = true;
 			c.allowedOnConstructables = true;
 			
-			Renderer r = go.GetComponentInChildren<Renderer>();
+			Renderer r = mdl.GetComponentInChildren<Renderer>();
 			RenderUtil.swapToModdedTextures(r, this);
 			r.materials[0].SetColor("_GlowColor", Color.white);
 			r.materials[1].color = Color.clear;
