@@ -39,6 +39,8 @@ namespace ReikaKalseki.AqueousEngineering {
 			addIngredient(TechType.Polyaniline, 1);
 			addIngredient(TechType.AdvancedWiringKit, 1);
 			addIngredient(TechType.PowerCell, 2);
+			
+			glowIntensity = 1;
 		}
 
 		public override bool UnlockedAtStart {

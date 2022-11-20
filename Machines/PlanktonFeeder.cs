@@ -14,7 +14,7 @@ using ReikaKalseki.DIAlterra;
 
 namespace ReikaKalseki.AqueousEngineering {
 	
-	public class PlanktonFeeder : CustomMachine<PlanktonFeederLogic> {
+	public class PlanktonFeeder : CustomMachine<PlanktonFeederLogic>, MultiTexturePrefab<StringPrefabContainer> {
 		
 		internal static readonly float POWER_COST = 0.5F; //per second
 		internal static readonly float CONSUMPTION_RATE = 1F/240F; //per second
@@ -54,6 +54,10 @@ namespace ReikaKalseki.AqueousEngineering {
 			return true;
 		}
 		
+		public Dictionary<int, string> getTextureLayers(Renderer r) {
+			return new Dictionary<int, string>{{0, ""}, {1, ""}};
+		}
+		
 		public override void initializeMachine(GameObject go) {
 			base.initializeMachine(go);
 			ObjectUtil.removeComponent<Trashcan>(go);
@@ -74,9 +78,9 @@ namespace ReikaKalseki.AqueousEngineering {
 			c.allowedOnWall = true;
 			c.allowedOnConstructables = true;
 			
-			Renderer r = mdl.GetComponentInChildren<Renderer>();
+			Renderer[] r = mdl.GetComponentsInChildren<Renderer>();
 			RenderUtil.swapToModdedTextures(r, this);
-			r.materials[0].SetColor("_GlowColor", Color.white);
+			r[0].materials[0].SetColor("_GlowColor", Color.white);
 			//r.materials[1].color = Color.clear;
 			
 			string name = "BubbleRoot";
