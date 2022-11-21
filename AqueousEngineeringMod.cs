@@ -69,11 +69,11 @@ namespace ReikaKalseki.AqueousEngineering
         
         locale.load();
         
-        createEgg(TechType.SpineEel, TechType.BonesharkEgg, 1, "SpineEelDesc", true, 0.5F, BiomeType.BonesField_Ground, BiomeType.LostRiverJunction_Ground);
-        createEgg(TechType.GhostRayBlue, TechType.JumperEgg, 1.75F, "GhostRayDesc", true, 1, BiomeType.TreeCove_LakeFloor);
-        createEgg(TechType.GhostRayRed, TechType.CrabsnakeEgg, 1.25F, "CrimsonRayDesc", true, 1, BiomeType.InactiveLavaZone_Chamber_Floor_Far);
-        createEgg(TechType.Biter, TechType.RabbitrayEgg, 1F, "BiterDesc", false, 1, BiomeType.GrassyPlateaus_CaveFloor, BiomeType.Mountains_CaveFloor);
-        createEgg(TechType.Blighter, TechType.RabbitrayEgg, 1F, "BlighterDesc", false, 1, BiomeType.BloodKelp_CaveFloor);
+        createEgg(TechType.SpineEel, TechType.BonesharkEgg, 1, "SpineEelDesc", true, 0.75F, 4, 0.5F, BiomeType.BonesField_Ground, BiomeType.LostRiverJunction_Ground);
+        createEgg(TechType.GhostRayBlue, TechType.JumperEgg, 1.75F, "GhostRayDesc", true, 0.6F, 2, 1, BiomeType.TreeCove_LakeFloor);
+        createEgg(TechType.GhostRayRed, TechType.CrabsnakeEgg, 1.25F, "CrimsonRayDesc", true, 0.6F, 2, 1, BiomeType.InactiveLavaZone_Chamber_Floor_Far);
+        createEgg(TechType.Biter, TechType.RabbitrayEgg, 1F, "BiterDesc", false, 0.6F, 2, 1, BiomeType.GrassyPlateaus_CaveFloor, BiomeType.Mountains_CaveFloor);
+        createEgg(TechType.Blighter, TechType.RabbitrayEgg, 1F, "BlighterDesc", false, 0.6F, 2, 1, BiomeType.BloodKelp_CaveFloor);
         
         poo = new MiniPoo(locale.getEntry("MiniPoop"));
 	    poo.Patch();
@@ -164,8 +164,14 @@ namespace ReikaKalseki.AqueousEngineering
 		}
     }
     
-    private static void createEgg(TechType creature, TechType basis, float scale, string locKey, bool isBig, float rate, params BiomeType[] spawn) {
-    	CustomEgg.createAndRegisterEgg(creature, basis, scale, locale.getEntry(locKey).desc, isBig, rate, spawn);
+    private static void createEgg(TechType creature, TechType basis, float scale, string locKey, bool isBig, float grownScale, float daysToGrow, float rate, params BiomeType[] spawn) {
+    	Action<CustomEgg> a = e => {
+    		e.eggProperties.maxSize = grownScale;
+    		if (!isBig)
+    			e.eggProperties.initialSize = Mathf.Max(e.eggProperties.initialSize, 0.2F);
+    		e.eggProperties.growingPeriod = daysToGrow*20*60;
+    	};
+    	CustomEgg.createAndRegisterEgg(creature, basis, scale, locale.getEntry(locKey).desc, isBig, a, rate, spawn);
     }
 
   }

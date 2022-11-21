@@ -72,6 +72,7 @@ namespace ReikaKalseki.AqueousEngineering {
 			PrefabIdentifier[] pi = child.GetComponentsInChildren<PrefabIdentifier>();
 			for (int i = pi.Length; i < 6; i++) {
 				GameObject fin = ObjectUtil.createWorldObject("cf1df719-905c-4385-98da-b638fdfd53f7");
+				RenderUtil.convertToModel(fin);
 				fin.EnsureComponent<RepellentFin>();
 				fin.transform.SetParent(child.transform);
 				fin.transform.localScale = new Vector3(0.8F, 0.5F, 0.4F);

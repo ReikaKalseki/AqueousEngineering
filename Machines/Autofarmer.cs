@@ -148,11 +148,11 @@ namespace ReikaKalseki.AqueousEngineering {
 		private void tryHarvestPlant(Planter pl, Plantable pt) {
 			GrownPlant p = pt.linkedGrownPlant;
 			TechType tt = CraftData.GetTechType(p.gameObject);
-			//SNUtil.writeToChat("Try harvest "+p+" : "+tt);
+			SNUtil.log("Try harvest "+p+" : "+tt);
 			if (tt != TechType.None) {
 				FruitPlant fp = p.GetComponent<FruitPlant>();
 				GameObject drop = getHarvest(p, tt, fp);
-				//SNUtil.writeToChat("drops "+drop);
+				SNUtil.log("drops "+drop);
 				if (drop) {
 					drop = UnityEngine.Object.Instantiate(drop);
 					TechType td = CraftData.GetTechType(drop);
@@ -165,21 +165,29 @@ namespace ReikaKalseki.AqueousEngineering {
 						td = tt;
 						drop = UnityEngine.Object.Instantiate(CraftData.GetPrefabForTechType(tt));
 					}
-					//SNUtil.writeToChat("DT "+td+" > "+drop);
+					SNUtil.log("DT "+td+" > "+drop);
 					drop.SetActive(false);
-					if (getStorage().container.AddItem(drop.GetComponent<Pickupable>()) != null) {
+					Pickupable ppb = drop.GetComponent<Pickupable>();
+					if (!ppb) {
+						ppb = UnityEngine.Object.Instantiate(CraftData.GetPrefabForTechType(td)).GetComponent<Pickupable>();
+					}
+					if (ppb && getStorage().container.AddItem(ppb) != null) {
 						FMODAsset ass = SoundManager.buildSound(CraftData.pickupSoundList.ContainsKey(td) ? CraftData.pickupSoundList[td] : CraftData.defaultPickupSound);
 						if (ass != null) {
 							SoundManager.playSoundAt(ass, gameObject.transform.position);
 						}
 						if (fp) {
 							PickPrefab pp = drop.GetComponent<PickPrefab>();
-							pp.SetPickedUp();
+							if (pp)
+								pp.SetPickedUp();
 						}
 						else if (td == TechType.JellyPlant || td == TechType.WhiteMushroom || td == TechType.AcidMushroom) {
 							//pl.ReplaceItem(pt, drop.GetComponent<Plantable>());
 						}
-						tryAllocateFX(p.gameObject);
+						if (p)
+							tryAllocateFX(p.gameObject);
+						else
+							tryAllocateFX(fp.fruits[0].gameObject);
 					}
 				}
 			}

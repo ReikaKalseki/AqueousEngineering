@@ -236,7 +236,7 @@ namespace ReikaKalseki.AqueousEngineering {
 				float f = am.normalizedPoopChance*amt.foodValue*Mathf.Pow(((WaterParkCreature)wp).age, 2F);
 				f *= AqueousEngineeringMod.config.getFloat(AEConfig.ConfigEntries.POO_RATE);
 				//SNUtil.writeToChat(c+" ate > "+f);
-				amt.consume(c, acu.acu, acu.sc, eaten);
+				amt.consume(c, acu, acu.sc, eaten);
 				if (f > 0 && UnityEngine.Random.Range(0F, 1F) < f) {
 					GameObject poo = ObjectUtil.createWorldObject(AqueousEngineeringMod.poo.ClassID);
 					poo.transform.position = c.transform.position+Vector3.down*0.05F;
@@ -266,7 +266,7 @@ namespace ReikaKalseki.AqueousEngineering {
 				return string.Format("[Food FoodValue={0}, BiomeRegions.RegionType=[{1}]]", foodValue, string.Join(",", regionType));
 			}
 			
-			internal abstract void consume(Creature c, WaterPark acu, StorageContainer sc, GameObject go);
+			internal abstract void consume(Creature c, ACUCallbackSystem.ACUCallback acu, StorageContainer sc, GameObject go);
 		}
 		
 		public class AnimalFood : Food {
@@ -283,8 +283,8 @@ namespace ReikaKalseki.AqueousEngineering {
 				return ea.foodValue*0.01F; //so a reginald is ~40%
 			}
 			
-			internal override void consume(Creature c, WaterPark acu, StorageContainer sc, GameObject go) {
-				acu.RemoveItem(go.GetComponent<WaterParkCreature>());
+			internal override void consume(Creature c, ACUCallbackSystem.ACUCallback acu, StorageContainer sc, GameObject go) {
+				acu.acu.RemoveItem(go.GetComponent<WaterParkCreature>());
 				UnityEngine.Object.DestroyImmediate(go);
 			}
 			
@@ -298,7 +298,9 @@ namespace ReikaKalseki.AqueousEngineering {
 				plant = vf;
 			}
 			
-			internal override void consume(Creature c, WaterPark acu, StorageContainer sc, GameObject go) {
+			internal override void consume(Creature c, ACUCallbackSystem.ACUCallback acu, StorageContainer sc, GameObject go) {
+				if (UnityEngine.Random.Range(0F, 1F) <= acu.getBoostStrength(DayNightCycle.main.timePassedAsFloat))
+					return;
 				LiveMixin lv = go.GetComponent<LiveMixin>();
 				if (lv && lv.IsAlive())
 					lv.TakeDamage(10, c.transform.position, DamageType.Normal, c.gameObject);
