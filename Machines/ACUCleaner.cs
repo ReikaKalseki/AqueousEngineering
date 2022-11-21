@@ -39,6 +39,7 @@ namespace ReikaKalseki.AqueousEngineering {
 			ObjectUtil.removeChildObject(go, "Label");
 			
 			GameObject mdl = RenderUtil.setModel(go, "model", ObjectUtil.lookupPrefab("c0175cf7-0b6a-4a1d-938f-dad0dbb6fa06"));
+			mdl.transform.localScale = Vector3.one*0.67F;
 			
 			StorageContainer con = go.GetComponentInChildren<StorageContainer>();
 			initializeStorageContainer(con, 3, 5);
@@ -60,11 +61,10 @@ namespace ReikaKalseki.AqueousEngineering {
 			
 			Renderer r = go.GetComponentInChildren<Renderer>();
 			//SNUtil.dumpTextures(r);
-			RenderUtil.swapToModdedTextures(r, this);/*
-			r.materials[0].SetFloat("_Shininess", 7.5F);
-			r.materials[0].SetFloat("_Fresnel", 1F);
-			r.materials[0].SetFloat("_SpecInt", 15F);
-			lgc.mainRenderer = r;*/
+			RenderUtil.swapToModdedTextures(r, this);
+			r.materials[0].SetFloat("_Shininess", 2.5F);
+			r.materials[0].SetFloat("_Fresnel", 0.8F);
+			r.materials[0].SetFloat("_SpecInt", 2.5F);
 			
 			//go.GetComponent<Constructable>().model = go;
 			//go.GetComponent<ConstructableBounds>().bounds.extents = new Vector3(1.5F, 0.5F, 1.5F);
