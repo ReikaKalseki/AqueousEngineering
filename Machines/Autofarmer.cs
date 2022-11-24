@@ -171,6 +171,7 @@ namespace ReikaKalseki.AqueousEngineering {
 					if (!ppb) {
 						ppb = UnityEngine.Object.Instantiate(CraftData.GetPrefabForTechType(td)).GetComponent<Pickupable>();
 					}
+					SNUtil.log(""+ppb);
 					if (ppb && getStorage().container.AddItem(ppb) != null) {
 						FMODAsset ass = SoundManager.buildSound(CraftData.pickupSoundList.ContainsKey(td) ? CraftData.pickupSoundList[td] : CraftData.defaultPickupSound);
 						if (ass != null) {
@@ -178,12 +179,14 @@ namespace ReikaKalseki.AqueousEngineering {
 						}
 						if (fp) {
 							PickPrefab pp = drop.GetComponent<PickPrefab>();
+							SNUtil.log("fp pp "+pp);
 							if (pp)
 								pp.SetPickedUp();
 						}
 						else if (td == TechType.JellyPlant || td == TechType.WhiteMushroom || td == TechType.AcidMushroom) {
 							//pl.ReplaceItem(pt, drop.GetComponent<Plantable>());
 						}
+						SNUtil.log("fx "+p);
 						if (p)
 							tryAllocateFX(p.gameObject);
 						else

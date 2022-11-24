@@ -213,7 +213,7 @@ namespace ReikaKalseki.AqueousEngineering {
 		}
 		
 		private static void onEaten(ACUCallbackSystem.ACUCallback acu, WaterParkItem wp, Creature c, ACUMetabolism am, Food amt, GameObject eaten) {
-			float food = amt.foodValue*FOOD_SCALAR;
+			float food = amt.foodValue*FOOD_SCALAR*1.5F;
 			if (amt.isRegion(am.primaryRegion)) {
 				food *= 3;
 			}
@@ -227,7 +227,7 @@ namespace ReikaKalseki.AqueousEngineering {
 			}
 			InfectedMixin inf = eaten ? eaten.GetComponent<InfectedMixin>() : null;
 			if (inf && inf.IsInfected()) {
-				food *= 0.25F;
+				food *= 0.4F;
 				c.gameObject.EnsureComponent<InfectedMixin>().IncreaseInfectedAmount(0.2F);
 			}
 			if (c.Hunger.Value >= food) {

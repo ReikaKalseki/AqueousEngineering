@@ -80,6 +80,7 @@ namespace ReikaKalseki.AqueousEngineering {
 			
 			Renderer[] r = mdl.GetComponentsInChildren<Renderer>();
 			RenderUtil.swapToModdedTextures(r, this);
+			RenderUtil.enableAlpha(r[0].materials[0]);
 			r[0].materials[0].SetColor("_GlowColor", Color.white);
 			//r.materials[1].color = Color.clear;
 			

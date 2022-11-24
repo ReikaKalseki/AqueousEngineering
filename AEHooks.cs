@@ -20,6 +20,7 @@ namespace ReikaKalseki.AqueousEngineering {
 	    
 	    static AEHooks() {
 	    	DIHooks.onWorldLoadedEvent += onWorldLoaded;
+	    	DIHooks.constructabilityEvent += enforceACUBuildability;
 	    }
 	    
 	    public static void onWorldLoaded() {	        
@@ -61,5 +62,30 @@ namespace ReikaKalseki.AqueousEngineering {
 			}
 			return cam.GetScreenDistance(scr);
 		}
+		
+		private static bool isBuildingACUBuiltBlock() {
+			if (AqueousEngineeringMod.acuBoosterBlock != null && Builder.constructableTechType == AqueousEngineeringMod.acuBoosterBlock.TechType)
+				return true;
+			if (AqueousEngineeringMod.acuCleanerBlock != null && Builder.constructableTechType == AqueousEngineeringMod.acuCleanerBlock.TechType)
+				return true;
+			return false;
+		}
+		/*
+		private static bool isOnACU(Collider c) {
+			if (!c)
+				return false;
+			BaseExplicitFace face = c.gameObject.FindAncestor<BaseExplicitFace>();
+			if (!face)
+				return false;
+			SNUtil.writeToChat(face+" > "+face.gameObject.GetFullHierarchyPath()+" > "+face.gameObject.name.Contains("WaterPark"));
+			return face && face.gameObject.name.Contains("WaterPark");
+		}
+	    */
+	    public static void enforceACUBuildability(DIHooks.BuildabilityCheck check) {	        
+			if (isBuildingACUBuiltBlock()) {
+	   			check.placeable = check.placeOn && check.placeOn.gameObject.FindAncestor<WaterParkPiece>();//isOnACU(check.placeOn && chec);
+				check.ignoreSpaceRequirements = true;
+			}
+	    }
 	}
 }
