@@ -34,6 +34,8 @@ namespace ReikaKalseki.AqueousEngineering
     public static RemoteCameraAntenna cameraAntennaBlock;
     public static ACUBooster acuBoosterBlock;
     public static PlanktonFeeder planktonFeederBlock;
+    public static BaseBattery batteryBlock;
+    //public static IonCubeBurner ionCubeBlock;
     
     public static OutdoorPot outdoorBasicPot;
     public static OutdoorPot outdoorChicPot;
@@ -69,22 +71,18 @@ namespace ReikaKalseki.AqueousEngineering
         
         locale.load();
         
-        createEgg(TechType.SpineEel, TechType.BonesharkEgg, 1, "SpineEelDesc", true, 0.75F, 4, 0.5F, BiomeType.BonesField_Ground, BiomeType.LostRiverJunction_Ground);
-        createEgg(TechType.GhostRayBlue, TechType.JumperEgg, 1.75F, "GhostRayDesc", true, 0.6F, 2, 1, BiomeType.TreeCove_LakeFloor);
-        createEgg(TechType.GhostRayRed, TechType.CrabsnakeEgg, 1.25F, "CrimsonRayDesc", true, 0.6F, 2, 1, BiomeType.InactiveLavaZone_Chamber_Floor_Far);
-        createEgg(TechType.Biter, TechType.RabbitrayEgg, 1F, "BiterDesc", false, 0.6F, 2, 1, BiomeType.GrassyPlateaus_CaveFloor, BiomeType.Mountains_CaveFloor);
-        createEgg(TechType.Blighter, TechType.RabbitrayEgg, 1F, "BlighterDesc", false, 0.6F, 2, 1, BiomeType.BloodKelp_CaveFloor);
-        
         poo = new MiniPoo(locale.getEntry("MiniPoop"));
 	    poo.Patch();
 	    
-	    sonarBlock = createMachine<BaseSonarPinger, BaseSonarPingerLogic>("SeabaseSonar");
-	    repellentBlock = createMachine<BaseCreatureRepellent, BaseCreatureRepellentLogic>("SeabaseRepellent");
-	    beaconBlock = createMachine<BaseBeacon, BaseBeaconLogic>("SeabaseBeacon");
-	    ampeelAntennaBlock = createMachine<AmpeelAntenna, AmpeelAntennaLogic>("SeabaseAmpeelAntenna");
-	    farmerBlock = createMachine<Autofarmer, AutofarmerLogic>("SeabaseFarmer");
-	    acuCleanerBlock = createMachine<ACUCleaner, ACUCleanerLogic>("SeabaseACUCleaner");
-	    cameraAntennaBlock = createMachine<RemoteCameraAntenna, RemoteCameraAntennaLogic>("SeabaseRemoteCamera");
+	    sonarBlock = createMachine<BaseSonarPinger, BaseSonarPingerLogic>("BaseSonar");
+	    repellentBlock = createMachine<BaseCreatureRepellent, BaseCreatureRepellentLogic>("BaseRepellent");
+	    beaconBlock = createMachine<BaseBeacon, BaseBeaconLogic>("BaseBeacon");
+	    ampeelAntennaBlock = createMachine<AmpeelAntenna, AmpeelAntennaLogic>("BaseAmpeelAntenna");
+	    farmerBlock = createMachine<Autofarmer, AutofarmerLogic>("BaseFarmer");
+	    acuCleanerBlock = createMachine<ACUCleaner, ACUCleanerLogic>("BaseACUCleaner");
+	    cameraAntennaBlock = createMachine<RemoteCameraAntenna, RemoteCameraAntennaLogic>("BaseRemoteCamera");
+	    batteryBlock = createMachine<BaseBattery, BaseBatteryLogic>("BaseBattery");
+	    //ionCubeBlock = createMachine<IonCubeBurner, IonCubeBurnerLogic>("IonCubeBurner");
         
         outdoorBasicPot = new OutdoorPot(TechType.PlanterPot);
         outdoorCompositePot = new OutdoorPot(TechType.PlanterPot2);
@@ -143,14 +141,20 @@ namespace ReikaKalseki.AqueousEngineering
 			RecipeUtil.addIngredient(ampeelAntennaBlock.TechType, sealf.TechType, 2);
 		else
 			RecipeUtil.addIngredient(ampeelAntennaBlock.TechType, TechType.Silicone, 3);
-		
+		/*
+		Spawnable hull = ItemRegistry.instance.getItem("HullPlating");
+		if (hull != null)
+			RecipeUtil.addIngredient(ionCubeBlock.TechType, sealf.TechType, 4);
+		else
+			RecipeUtil.addIngredient(ionCubeBlock.TechType, TechType.TitaniumIngot, 3);
+		*/
 		Spawnable plankton = ItemRegistry.instance.getItem("planktonItem");
 		if (plankton != null) {
 			SNUtil.log("Found plankton item. Adding compat machinery.");
 		    PlanktonFeeder.fuel = (BasicCraftingItem)plankton;
 		    ACUBooster.fuel = PlanktonFeeder.fuel;
-	    	acuBoosterBlock = createMachine<ACUBooster, ACUBoosterLogic>("SeabaseACUBooster");
-		    planktonFeederBlock = createMachine<PlanktonFeeder, PlanktonFeederLogic>("SeabasePlanktonFeeder");
+	    	acuBoosterBlock = createMachine<ACUBooster, ACUBoosterLogic>("BaseACUBooster");
+		    planktonFeederBlock = createMachine<PlanktonFeeder, PlanktonFeederLogic>("BasePlanktonFeeder");
 		    if (motor != null)
 				RecipeUtil.addIngredient(planktonFeederBlock.TechType, motor.TechType, 1);
 	        TechType tt = TechType.None;
@@ -162,16 +166,6 @@ namespace ReikaKalseki.AqueousEngineering
 		else {
 			SNUtil.log("Plankton item not found.");
 		}
-    }
-    
-    private static void createEgg(TechType creature, TechType basis, float scale, string locKey, bool isBig, float grownScale, float daysToGrow, float rate, params BiomeType[] spawn) {
-    	Action<CustomEgg> a = e => {
-    		e.eggProperties.maxSize = grownScale;
-    		if (!isBig)
-    			e.eggProperties.initialSize = Mathf.Max(e.eggProperties.initialSize, 0.2F);
-    		e.eggProperties.growingPeriod = daysToGrow*20*60;
-    	};
-    	CustomEgg.createAndRegisterEgg(creature, basis, scale, locale.getEntry(locKey).desc, isBig, a, rate, spawn);
     }
 
   }

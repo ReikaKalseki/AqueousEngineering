@@ -18,7 +18,7 @@ namespace ReikaKalseki.AqueousEngineering {
 		
 		internal static readonly float POWER_COST = 0.15F;
 		
-		public ACUCleaner(XMLLocale.LocaleEntry e) : base("baseacucleaner", e.name, e.desc, "5fc7744b-5a2c-4572-8e53-eebf990de434") {
+		public ACUCleaner(XMLLocale.LocaleEntry e) : base(e.key, e.name, e.desc, "5fc7744b-5a2c-4572-8e53-eebf990de434") {
 			addIngredient(TechType.Titanium, 5);
 			addIngredient(TechType.ExosuitPropulsionArmModule, 1);
 			addIngredient(TechType.MapRoomCamera, 1);
@@ -125,7 +125,7 @@ namespace ReikaKalseki.AqueousEngineering {
 					if (wp) {
 						Pickupable pp = wp.GetComponent<Pickupable>();
 						TechType tt = pp.GetTechType();
-						if (tt == TechType.SeaTreaderPoop || tt == AqueousEngineeringMod.poo.TechType) {
+						if (tt == TechType.SeaTreaderPoop || tt == AqueousEngineeringMod.poo.TechType || tt == TechType.StalkerTooth) {
 							InventoryItem ii = getStorage().container.AddItem(pp);
 							if (ii != null) {
 								connectedACU.RemoveItem(pp);

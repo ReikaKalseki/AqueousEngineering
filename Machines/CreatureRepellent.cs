@@ -90,7 +90,7 @@ namespace ReikaKalseki.AqueousEngineering {
 			new Vector3(180, 90, 0),
 		};
 		
-		public BaseCreatureRepellent(XMLLocale.LocaleEntry e) : base("basecreaturerepel", e.name, e.desc, "4cb154ef-bdb6-4ff4-9107-f378ce21a9b7") {
+		public BaseCreatureRepellent(XMLLocale.LocaleEntry e) : base(e.key, e.name, e.desc, "4cb154ef-bdb6-4ff4-9107-f378ce21a9b7") {
 			addIngredient(TechType.Polyaniline, 1);
 			addIngredient(TechType.AdvancedWiringKit, 1);
 			addIngredient(TechType.PowerCell, 2);

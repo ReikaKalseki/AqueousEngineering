@@ -10,7 +10,7 @@
 			
 		</pda>
 	</MiniPoop>
-	<SeabaseSonar>
+	<BaseSonar>
 		<name>
 			Seabase Sonar Antenna
 		</name>
@@ -20,8 +20,12 @@
 		<pda>
 			
 		</pda>
-	</SeabaseSonar>
-	<SeabaseRepellent>
+		<images>
+			https://i.imgur.com/1dmnXVC.jpg
+			https://i.imgur.com/EuVldLW.jpg
+		</images>
+	</BaseSonar>
+	<BaseRepellent>
 		<name>
 			Creature Repellant Pylon
 		</name>
@@ -31,8 +35,13 @@
 		<pda>
 			
 		</pda>
-	</SeabaseRepellent>
-	<SeabaseBeacon>
+		<images>
+			https://i.imgur.com/OP1EBai.jpg
+			https://i.imgur.com/zUfvtbp.jpg
+			https://i.imgur.com/x69MINt.jpg
+		</images>
+	</BaseRepellent>
+	<BaseBeacon>
 		<name>
 			Seabase Beacon
 		</name>
@@ -42,8 +51,12 @@
 		<pda>
 			
 		</pda>
-	</SeabaseBeacon>
-	<SeabaseAmpeelAntenna>
+		<images>
+			https://i.imgur.com/FxFSZIX.jpg
+			https://i.imgur.com/vURW5a8.jpg
+		</images>
+	</BaseBeacon>
+	<BaseAmpeelAntenna>
 		<name>
 			Ampeel Antenna
 		</name>
@@ -53,8 +66,11 @@
 		<pda>
 			
 		</pda>
-	</SeabaseAmpeelAntenna>
-	<SeabaseFarmer>
+		<images>
+			https://i.imgur.com/Tmn0WLq.jpg
+		</images>
+	</BaseAmpeelAntenna>
+	<BaseFarmer>
 		<name>
 			Autofarming Unit
 		</name>
@@ -64,8 +80,12 @@
 		<pda>
 			
 		</pda>
-	</SeabaseFarmer>
-	<SeabaseACUCleaner>
+		<images>
+			https://i.imgur.com/3Ox1InD.jpg
+			https://i.imgur.com/qWp7c3k.jpg
+		</images>
+	</BaseFarmer>
+	<BaseACUCleaner>
 		<name>
 			ACU Cleaning System
 		</name>
@@ -75,8 +95,12 @@
 		<pda>
 			
 		</pda>
-	</SeabaseACUCleaner>
-	<SeabaseRemoteCamera>
+		<images>
+			https://i.imgur.com/FUGKWp6.jpg
+			https://i.imgur.com/BYcY1SE.jpg
+		</images>
+	</BaseACUCleaner>
+	<BaseRemoteCamera>
 		<name>
 			Scanner Camera Relay Antenna
 		</name>
@@ -86,8 +110,29 @@
 		<pda>
 			
 		</pda>
-	</SeabaseRemoteCamera>
-	<SeabaseACUBooster>
+		<images>
+			https://i.imgur.com/lFiuQMu.jpg
+			https://i.imgur.com/YVAYuyZ.jpg
+		</images>
+	</BaseRemoteCamera>
+	<BaseBattery>
+		<name>
+			Seabase Battery Bank
+		</name>
+		<desc>
+			Generates no power, but significantly increases the maximum storage of a seabase, allowing it to last longer between intermittent power cycles. Stackable effect.
+		</desc>
+		<pda>
+			
+		</pda>
+		<extradesc>
+			
+		</extradesc>
+		<images>
+			
+		</images>
+	</BaseBattery>
+	<BaseACUBooster>
 		<name>
 			ACU Feeding System
 		</name>
@@ -97,8 +142,14 @@
 		<pda>
 			
 		</pda>
-	</SeabaseACUBooster>
-	<SeabasePlanktonFeeder>
+		<extradesc>
+			Only available if Ecocean is installed.
+		</extradesc>
+		<images>
+			https://i.imgur.com/NZ8lP89.jpg
+		</images>
+	</BaseACUBooster>
+	<BasePlanktonFeeder>
 		<name>
 			Plankton Feeder
 		</name>
@@ -108,7 +159,13 @@
 		<pda>
 			
 		</pda>
-	</SeabasePlanktonFeeder>
+		<extradesc>
+			Only available if Ecocean is installed.
+		</extradesc>
+		<images>
+			https://i.imgur.com/M9QZhke.jpg
+		</images>
+	</BasePlanktonFeeder>
 	<Name>
 		<name>
 			
@@ -142,59 +199,4 @@
 			
 		</pda>
 	</Name>
-	<SpineEelDesc>
-		<name>
-			
-		</name>
-		<desc>
-			An aggressive and poison-resistant eel-like predator found exclusively in the Lost River.
-		</desc>
-		<pda>
-			
-		</pda>
-	</SpineEelDesc>
-	<GhostRayDesc>
-		<name>
-			
-		</name>
-		<desc>
-			A large passive herbivore with unusual biology adapted to its native environment.
-		</desc>
-		<pda>
-			
-		</pda>
-	</GhostRayDesc>
-	<CrimsonRayDesc>
-		<name>
-			
-		</name>
-		<desc>
-			A highly heat-resistant ray species closely related to ghost rays.
-		</desc>
-		<pda>
-			
-		</pda>
-	</CrimsonRayDesc>
-	<BiterDesc>
-		<name>
-			
-		</name>
-		<desc>
-			A small fast predator, most dangerous in swarms.
-		</desc>
-		<pda>
-			
-		</pda>
-	</BiterDesc>
-	<BlighterDesc>
-		<name>
-			
-		</name>
-		<desc>
-			A deep-sea and nearly-blind variant of the biter. Prefers carrion to live prey.
-		</desc>
-		<pda>
-			
-		</pda>
-	</BlighterDesc>
 </Root>

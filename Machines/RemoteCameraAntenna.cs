@@ -20,7 +20,7 @@ namespace ReikaKalseki.AqueousEngineering {
 		internal static readonly float POWER_COST = 0.05F; //per second
 		internal static readonly float POWER_COST_ACTIVE = 1.0F; //per second
 		
-		public RemoteCameraAntenna(XMLLocale.LocaleEntry e) : base("baseremotecam", e.name, e.desc, "8949b0da-5173-431f-a989-e621af02f942") {
+		public RemoteCameraAntenna(XMLLocale.LocaleEntry e) : base(e.key, e.name, e.desc, "8949b0da-5173-431f-a989-e621af02f942") {
 			addIngredient(TechType.Gold, 4);
 			addIngredient(TechType.Beacon, 1);
 			addIngredient(TechType.CopperWire, 3);

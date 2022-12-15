@@ -22,7 +22,7 @@ namespace ReikaKalseki.AqueousEngineering {
 		
 		public static event Action<GameObject> onBaseSonarPingedEvent;
 		
-		public BaseSonarPinger(XMLLocale.LocaleEntry e) : base("basesonarping", e.name, e.desc, "8949b0da-5173-431f-a989-e621af02f942") {
+		public BaseSonarPinger(XMLLocale.LocaleEntry e) : base(e.key, e.name, e.desc, "8949b0da-5173-431f-a989-e621af02f942") {
 			addIngredient(TechType.Magnetite, 3);
 			addIngredient(TechType.Gold, 2);
 			addIngredient(TechType.CyclopsSonarModule, 1);

@@ -19,7 +19,7 @@ namespace ReikaKalseki.AqueousEngineering {
 		
 		internal static readonly float POWER_COST = 1F;
 		
-		public Autofarmer(XMLLocale.LocaleEntry e) : base("basefarmer", e.name, e.desc, "f1cde32e-101a-4dd5-8084-8c950b9c2432") {
+		public Autofarmer(XMLLocale.LocaleEntry e) : base(e.key, e.name, e.desc, "f1cde32e-101a-4dd5-8084-8c950b9c2432") {
 			addIngredient(TechType.TitaniumIngot, 1);
 			addIngredient(TechType.AdvancedWiringKit, 1);
 			addIngredient(TechType.VehicleStorageModule, 1);

@@ -17,7 +17,7 @@ namespace ReikaKalseki.AqueousEngineering {
 	
 	public class BaseBeacon : CustomMachine<BaseBeaconLogic> {
 		
-		public BaseBeacon(XMLLocale.LocaleEntry e) : base("basebeacon", e.name, e.desc, "8949b0da-5173-431f-a989-e621af02f942") {
+		public BaseBeacon(XMLLocale.LocaleEntry e) : base(e.key, e.name, e.desc, "8949b0da-5173-431f-a989-e621af02f942") {
 			addIngredient(TechType.MapRoomUpgradeScanRange, 1);
 			addIngredient(TechType.Beacon, 1);
 			addIngredient(TechType.LEDLight, 1);

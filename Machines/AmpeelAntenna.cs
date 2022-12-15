@@ -16,12 +16,12 @@ namespace ReikaKalseki.AqueousEngineering {
 	
 	public class AmpeelAntenna : CustomMachine<AmpeelAntennaLogic> {
 		
-		internal static readonly float POWER_GEN = 12F; //max, per s per ampeel
-		internal static readonly float POWER_FALLOFF = 0.08F; //per meter
+		internal static readonly float POWER_GEN = 3F; //max, per s per ampeel
+		internal static readonly float POWER_FALLOFF = 0.12F; //per meter
 		internal static readonly float RANGE = POWER_GEN/POWER_FALLOFF;
 		internal static readonly float INTERVAL = 0.25F;
 		
-		public AmpeelAntenna(XMLLocale.LocaleEntry e) : base("baseampeelantenna", e.name, e.desc, "4cb154ef-bdb6-4ff4-9107-f378ce21a9b7") {
+		public AmpeelAntenna(XMLLocale.LocaleEntry e) : base(e.key, e.name, e.desc, "4cb154ef-bdb6-4ff4-9107-f378ce21a9b7") {
 			addIngredient(TechType.CopperWire, 6);
 			addIngredient(TechType.WiringKit, 2);
 			addIngredient(TechType.PowerTransmitter, 1);
@@ -99,6 +99,10 @@ namespace ReikaKalseki.AqueousEngineering {
 			return AmpeelAntenna.INTERVAL;
 		}
 		
+		public override float getBaseEnergyStorageCapacityBonus() {
+			return 50;
+		}
+		
 		protected override void updateEntity(float seconds) {
 			SubRoot sub = getSub();
 			if (sub && sub.powerRelay.GetPower() < sub.powerRelay.GetMaxPower()) {
@@ -109,7 +113,7 @@ namespace ReikaKalseki.AqueousEngineering {
 						if (dd >= AmpeelAntenna.RANGE)
 							continue;
 						float trash;
-						sub.powerRelay.AddEnergy(seconds*(AmpeelAntenna.POWER_GEN-AmpeelAntenna.POWER_FALLOFF*dd), out trash);
+						sub.powerRelay.AddEnergy(seconds*c.liveMixin.GetHealthFraction()*(AmpeelAntenna.POWER_GEN-AmpeelAntenna.POWER_FALLOFF*dd), out trash);
 					}
 				}
 			}
