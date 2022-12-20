@@ -11,7 +11,8 @@ namespace ReikaKalseki.AqueousEngineering
 	public class AEConfig
 	{		
 		public enum ConfigEntries {
-			[ConfigEntry("Feces drop rate", typeof(float), 1F, 0, 4, 0)]POO_RATE,
+			[ConfigEntry("ACU feces drop rate", typeof(float), 1F, 0, 4, 0)]POO_RATE,
+			[ConfigEntry("Seabase Battery power cell storage equivalence", typeof(int), 2, 1, 5, 0)]BATTCELLS,
 		}
 	}
 }

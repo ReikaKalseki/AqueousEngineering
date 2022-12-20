@@ -16,10 +16,10 @@ namespace ReikaKalseki.AqueousEngineering {
 	
 	public class BaseBattery : CustomMachine<BaseBatteryLogic> {
 		
-		internal static readonly float CAPACITY = 400F;
+		internal static readonly int POWERCELLS = AqueousEngineeringMod.config.getInt(AEConfig.ConfigEntries.BATTCELLS);//2;
 		
 		public BaseBattery(XMLLocale.LocaleEntry e) : base(e.key, e.name, e.desc, "c5ae1472-0bdc-4203-8418-fb1f74c8edf5") {
-			addIngredient(TechType.PowerCell, (int)(CAPACITY/200));
+			addIngredient(TechType.PowerCell, POWERCELLS);
 			addIngredient(TechType.WiringKit, 1);
 			addIngredient(TechType.Titanium, 4);
 		}
@@ -42,6 +42,7 @@ namespace ReikaKalseki.AqueousEngineering {
 			//GameObject mdl = ObjectUtil.getChildObject(ObjectUtil.lookupPrefab("0f779340-8064-4308-8baa-6be9324a1e05"), "Starship_tech_box_01_02/Starship_tech_box_01_01");
 			GameObject mdl = RenderUtil.setModel(go, "shelve_02", ObjectUtil.getChildObject(ObjectUtil.lookupPrefab("0f779340-8064-4308-8baa-6be9324a1e05"), "Starship_tech_box_01_02/Starship_tech_box_01_01"));
 			//mdl = UnityEngine.Object.Instantiate(mdl);
+			mdl.transform.localPosition = new Vector3(0, -0.12F, 0.08F);
 			mdl.transform.localScale = Vector3.one;
 			mdl.transform.SetParent(go.transform);
 			mdl.transform.localRotation = Quaternion.Euler(0, 90, 0);
@@ -83,7 +84,7 @@ namespace ReikaKalseki.AqueousEngineering {
 		}
 		
 		public override float getBaseEnergyStorageCapacityBonus() {
-			return BaseBattery.CAPACITY;
+			return BaseBattery.POWERCELLS*200;
 		}
 		
 		protected override void updateEntity(float seconds) {
