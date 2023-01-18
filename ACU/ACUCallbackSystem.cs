@@ -165,9 +165,10 @@ namespace ReikaKalseki.AqueousEngineering {
 						}
 					}
 		   	 	}
-				HashSet<VanillaFlora> plantTypes = ACUEcosystems.collectPlants(this, plants, ref potentialBiomes);
+				HashSet<ACUEcosystems.PlantFood> plantTypes = ACUEcosystems.collectPlants(this, plants, ref potentialBiomes);
 				consistent = potentialBiomes.Count > 0 && plantCount > 0;
-				healthy = plantCount > 0 && plantTypes.Count > (potentialBiomes.Count == 1 && potentialBiomes.First<BiomeRegions.RegionType>() == BiomeRegions.RegionType.LavaZone ? 0 : 1) && herbivoreCount > 0 && carnivoreCount > 0 && carnivoreCount <= Math.Max(1, herbivoreCount/Mathf.Max(1, 6-sparkleCount*0.5F)) && carnivoreCount <= acu.height*1.5F && herbivoreCount > 0 && herbivoreCount <= plantCount*(4+sparkleCount*0.5F);
+				int max = potentialBiomes.Count == 1 ? ACUEcosystems.getPlantsForBiome(potentialBiomes.First<BiomeRegions.RegionType>()).Count : 99;
+				healthy = plantCount > 0 && plantTypes.Count >= Mathf.Min(2, max) && herbivoreCount > 0 && carnivoreCount > 0 && carnivoreCount <= Math.Max(1, herbivoreCount/Mathf.Max(1, 6-sparkleCount*0.5F)) && carnivoreCount <= acu.height*1.5F && herbivoreCount > 0 && herbivoreCount <= plantCount*(4+sparkleCount*0.5F);
 				float boost = 0;
 				if (consistent)
 					boost += 1F;

@@ -23,7 +23,7 @@ namespace ReikaKalseki.AqueousEngineering {
 		internal static readonly float FOOD_SCALAR = 0.2F; //all food values and metabolism multiplied by this, to give granularity
 		
 		private static readonly Dictionary<TechType, AnimalFood> edibleFish = new Dictionary<TechType, AnimalFood>();		
-		private static readonly Dictionary<VanillaFlora, PlantFood> ediblePlants = new Dictionary<VanillaFlora, PlantFood>();
+		private static readonly Dictionary<string, PlantFood> ediblePlants = new Dictionary<string, PlantFood>();
 		
 		 private static readonly Dictionary<TechType, ACUMetabolism> metabolisms = new Dictionary<TechType, ACUMetabolism>() {
 			{TechType.RabbitRay, new ACUMetabolism(0.2F, 0.2F, false, BiomeRegions.RegionType.Shallows)},
@@ -97,8 +97,36 @@ namespace ReikaKalseki.AqueousEngineering {
 				edibleFish[((AnimalFood)f).item] = (AnimalFood)f;
 			}
 			else if (f is PlantFood) {
-				ediblePlants[((PlantFood)f).plant] = (PlantFood)f;
+				foreach (string s in ((PlantFood)f).classIDs)
+					ediblePlants[s] = (PlantFood)f;
 			}
+		}
+		
+		public static List<PlantFood> getPlantsForBiome(BiomeRegions.RegionType r) {
+			List<PlantFood> li = new List<PlantFood>();
+			foreach (PlantFood f in ediblePlants.Values) {
+				if (f.isRegion(r))
+					li.Add(f);
+			}
+			return li;
+		}
+		
+		public static List<AnimalFood> getSmallFishForBiome(BiomeRegions.RegionType r) {
+			List<AnimalFood> li = new List<AnimalFood>();
+			foreach (AnimalFood f in edibleFish.Values) {
+				if (f.isRegion(r))
+					li.Add(f);
+			}
+			return li;
+		}
+		
+		public static List<TechType> getPredatorsForBiome(BiomeRegions.RegionType r) {
+			List<TechType> li = new List<TechType>();
+			foreach (KeyValuePair<TechType, ACUMetabolism> kvp in metabolisms) {
+				if (kvp.Value.isRegion(r, false))
+					li.Add(kvp.Key);
+			}
+			return li;
 		}
 		
 		internal static Creature handleCreature(ACUCallbackSystem.ACUCallback acu, float dT, WaterParkItem wp, TechType tt, List<WaterParkCreature> foodFish, PrefabIdentifier[] plants, ref HashSet<BiomeRegions.RegionType> possibleBiomes) {
@@ -142,19 +170,18 @@ namespace ReikaKalseki.AqueousEngineering {
 			return null;
 		}
 		
-		internal static HashSet<VanillaFlora> collectPlants(ACUCallbackSystem.ACUCallback acu, PrefabIdentifier[] plants, ref HashSet<BiomeRegions.RegionType> possibleBiomes) {
-			HashSet<VanillaFlora> set = new HashSet<VanillaFlora>();
+		internal static HashSet<PlantFood> collectPlants(ACUCallbackSystem.ACUCallback acu, PrefabIdentifier[] plants, ref HashSet<BiomeRegions.RegionType> possibleBiomes) {
+			HashSet<PlantFood> set = new HashSet<PlantFood>();
 			foreach (PrefabIdentifier pi in plants) {
 				if (pi) {
-					VanillaFlora vf = VanillaFlora.getFromID(pi.ClassId);
-					if (vf != null && ediblePlants.ContainsKey(vf)) {
-						PlantFood pf = ediblePlants[vf];
+					if (ediblePlants.ContainsKey(pi.ClassId)) {
+						PlantFood pf = ediblePlants[pi.ClassId];
 						possibleBiomes = new HashSet<BiomeRegions.RegionType>(possibleBiomes.Intersect(pf.regionType));
 						//if (possibleBiomes.Count <= 0)
 						//	SNUtil.writeToChat("Biome list empty after "+vf+" > "+pf);
 						if (acu.nextIsDebug)
-							SNUtil.writeToChat(vf+" > "+pf+" & "+string.Join(",", pf.regionType)+" > "+string.Join(",", possibleBiomes));
-						set.Add(vf);
+							SNUtil.writeToChat(pi+" > "+pf+" & "+string.Join(",", pf.regionType)+" > "+string.Join(",", possibleBiomes));
+						set.Add(pf);
 						acu.plantCount++;
 					}
 				}
@@ -197,10 +224,9 @@ namespace ReikaKalseki.AqueousEngineering {
 				int idx = UnityEngine.Random.Range(0, pia.Length);
 				PrefabIdentifier tt = pia[idx];
 				if (tt) {
-					VanillaFlora vf = VanillaFlora.getFromID(tt.ClassId);
 					//SNUtil.writeToChat(tt+" > "+vf+" > "+ediblePlants.ContainsKey(vf));
-					if (vf != null && ediblePlants.ContainsKey(vf)) {
-						amt = ediblePlants[vf];
+					if (ediblePlants.ContainsKey(tt.ClassId)) {
+						amt = ediblePlants[tt.ClassId];
 						//SNUtil.writeToChat(c+" ate a "+vf+" and got "+amt);
 						eaten = tt.gameObject;
 						return true;
@@ -292,10 +318,18 @@ namespace ReikaKalseki.AqueousEngineering {
 		
 		public class PlantFood : Food {
 			
-			internal readonly VanillaFlora plant;
+			internal readonly HashSet<string> classIDs = new HashSet<string>();
 			
-			internal PlantFood(VanillaFlora vf, float f, params BiomeRegions.RegionType[] r) : base(f, r) {
-				plant = vf;
+			internal PlantFood(VanillaFlora vf, float f, params BiomeRegions.RegionType[] r) : this(vf.getPrefabs(true, true), f, r) {
+				
+			}
+			
+			internal PlantFood(Spawnable sp, float f, params BiomeRegions.RegionType[] r) : this(new List<string>{sp.ClassID}, f, r) {
+				
+			}
+			
+			internal PlantFood(IEnumerable<string> ids, float f, params BiomeRegions.RegionType[] r) : base(f, r) {
+				classIDs.AddRange(ids);
 			}
 			
 			internal override void consume(Creature c, ACUCallbackSystem.ACUCallback acu, StorageContainer sc, GameObject go) {
@@ -328,6 +362,10 @@ namespace ReikaKalseki.AqueousEngineering {
 				isCarnivore = isc;
 				primaryRegion = r;
 				additionalRegions.AddRange(rr);
+			}
+			
+			internal bool isRegion(BiomeRegions.RegionType r, bool primaryOnly) {
+				return r == primaryRegion || (!primaryOnly && additionalRegions.Contains(r));
 			}
 			
 			public override string ToString()

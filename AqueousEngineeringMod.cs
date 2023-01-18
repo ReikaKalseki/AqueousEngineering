@@ -166,6 +166,15 @@ namespace ReikaKalseki.AqueousEngineering
 		else {
 			SNUtil.log("Plankton item not found.");
 		}
+		
+		Spawnable glowShroom = ItemRegistry.instance.getItem("GLOWSHROOM");
+		if (glowShroom != null) {
+			ACUEcosystems.addFood(new ACUEcosystems.PlantFood(glowShroom, 0.25F, BiomeRegions.RegionType.Other));
+		}
+		Spawnable lavaShroom = ItemRegistry.instance.getItem("LAVASHROOM");
+		if (lavaShroom != null) {
+			ACUEcosystems.addFood(new ACUEcosystems.PlantFood(lavaShroom, 0.25F, BiomeRegions.RegionType.LavaZone));
+		}
     }
 
   }
