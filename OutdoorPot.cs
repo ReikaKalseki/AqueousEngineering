@@ -36,9 +36,9 @@ namespace ReikaKalseki.AqueousEngineering {
 		
 		public static void updateLocale() {
 			foreach (OutdoorPot d in pots) {
-				Language.main.strings[d.TechType.AsString()] = "Outdoor "+Language.main.strings[d.pot.AsString()];
-				Language.main.strings["Tooltip_"+d.TechType.AsString()] = Language.main.strings["Tooltip_"+d.pot.AsString()]+" Designed for outdoor use.";
-				SNUtil.log("Relocalized "+d+" > "+Language.main.strings[d.TechType.AsString(false)], AqueousEngineeringMod.modDLL);
+				LanguageHandler.SetLanguageLine(d.TechType.AsString(), "Outdoor "+Language.main.Get(d.pot));
+				LanguageHandler.SetLanguageLine("Tooltip_"+d.TechType.AsString(), Language.main.Get("Tooltip_"+d.pot.AsString())+" Designed for outdoor use.");
+				SNUtil.log("Relocalized "+d+" > "+Language.main.Get(d.TechType), AqueousEngineeringMod.modDLL);
 			}
 		}
 		

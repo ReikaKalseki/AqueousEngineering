@@ -111,6 +111,10 @@ namespace ReikaKalseki.AqueousEngineering {
 			}
 		
 			public void tick() {
+				if (!floor || !lowestSegment) {
+					setACU(null);
+					return;
+				}
 				float time = DayNightCycle.main.timePassedAsFloat;
 				float dT = time-lastTick;
 				lastTick = time;
