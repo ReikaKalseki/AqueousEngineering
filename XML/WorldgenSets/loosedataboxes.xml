@@ -1,7 +1,7 @@
 <Root>
   <customprefab>
     <prefab>databox</prefab>
-    <tech>basesonarping</tech>
+    <tech>BaseSonar</tech>
     <position>
       <x>-1239.37243652344</x>
       <y>-462.375335693359</y>
@@ -27,7 +27,7 @@
   </customprefab>
   <customprefab>
     <prefab>databox</prefab>
-    <tech>basesonarping</tech>
+    <tech>BaseSonar</tech>
     <position>
       <x>900.963256835938</x>
       <y>-201.609039306641</y>
@@ -53,7 +53,7 @@
   </customprefab>
   <customprefab>
     <prefab>databox</prefab>
-    <tech>basecreaturerepel</tech>
+    <tech>BaseRepellent</tech>
     <position>
       <x>1062.60241699219</x>
       <y>-281.115173339844</y>
@@ -79,7 +79,7 @@
   </customprefab>
   <customprefab>
     <prefab>databox</prefab>
-    <tech>basecreaturerepel</tech>
+    <tech>BaseRepellent</tech>
     <position>
       <x>-888.203979492188</x>
       <y>-430.148468017578</y>

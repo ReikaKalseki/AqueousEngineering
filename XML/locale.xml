@@ -126,10 +126,10 @@
 			
 		</pda>
 		<extradesc>
-			
+			Displays charge state using color indicators.
 		</extradesc>
 		<images>
-			
+			https://i.imgur.com/PJqmBs8.jpg
 		</images>
 	</BaseBattery>
 	<BaseACUBooster>

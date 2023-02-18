@@ -201,7 +201,7 @@
   </customprefab>
   <customprefab>
     <prefab>databox</prefab>
-    <tech>basefarmer</tech>
+    <tech>BaseFarmer</tech>
     <position>
       <x>-114.643730163574</x>
       <y>-234.58625793457</y>
