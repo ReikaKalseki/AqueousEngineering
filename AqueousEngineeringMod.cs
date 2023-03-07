@@ -43,6 +43,8 @@ namespace ReikaKalseki.AqueousEngineering
     
     public static MiniPoo poo;
     
+    public static readonly WorldgenDatabase worldgen = new WorldgenDatabase();
+    
     public static readonly XMLLocale locale = new XMLLocale("XML/locale.xml");
 
     [QModPrePatch]
@@ -91,7 +93,7 @@ namespace ReikaKalseki.AqueousEngineering
         outdoorCompositePot.register();
         outdoorChicPot.register();
                  
-        new WorldgenDatabase().load();
+       	worldgen.load();
         
         System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(typeof(AEHooks).TypeHandle);
         

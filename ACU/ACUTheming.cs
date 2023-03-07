@@ -100,7 +100,7 @@ namespace ReikaKalseki.AqueousEngineering {
 				}
 			}
 			else {
-				SNUtil.writeToChat("Grass material cache does not exist at "+rootCachePath+".");
+				SNUtil.log("Grass material cache does not exist at "+rootCachePath+".");
 				Directory.CreateDirectory(rootCachePath);
 			}
 		}
