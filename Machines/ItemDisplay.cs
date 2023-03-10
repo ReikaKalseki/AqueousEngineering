@@ -87,9 +87,12 @@ namespace ReikaKalseki.AqueousEngineering {
 		
 		private GameObject display;
 		private Renderer displayRender;
+		private float additionalRenderSpace = 0.1F;
 		
-		private Vector3 rotationSpeed = Vector3.zero;
-		private Vector3 rotationSpeedTargets = Vector3.zero;
+		private bool needsUpdate = true;
+		
+		//private Vector3 rotationSpeed = Vector3.zero;
+		//private Vector3 rotationSpeedTargets = Vector3.zero;
 		
 		void Start() {
 			SNUtil.log("Reinitializing base item display");
@@ -120,19 +123,42 @@ namespace ReikaKalseki.AqueousEngineering {
 			return 0;
 		}
 		
-		protected override void updateEntity(float seconds) {			
-			if (display) {
+		protected override void updateEntity(float seconds) {
+			if (needsUpdate && DIHooks.getWorldAge() > 0.5F) {
+				updateStoredItem();
+				needsUpdate = false;
+			}
+			if (display) {/*
 				updateRotationSpeedTarget(ref rotationSpeed.x, ref rotationSpeedTargets.x);
 				updateRotationSpeedTarget(ref rotationSpeed.y, ref rotationSpeedTargets.y);
 				updateRotationSpeedTarget(ref rotationSpeed.z, ref rotationSpeedTargets.z);
-			}
-			if (display) {
+				
 				//display.transform.Rotate(rotationSpeed, Space.Self);
 				Vector3 ctr = displayRender.bounds.center*2-displayRender.transform.position;
 				display.transform.RotateAround(ctr, new Vector3(1, 0, 0), rotationSpeed.x);
 				display.transform.RotateAround(ctr, new Vector3(0, 1, 0), rotationSpeed.y);
 				display.transform.RotateAround(ctr, new Vector3(0, 0, 1), rotationSpeed.z);
+				*/
+				float itemOffset = 0.75F+0.1F*Mathf.Pow(Mathf.Max(0, 1+Mathf.Sin(DayNightCycle.main.timePassedAsFloat*0.781F+gameObject.GetInstanceID()*0.147F)), 2);
+				float itemRotation = 9*Mathf.Max(0, 4F-itemOffset*3.5F);
+				display.transform.position = transform.position+Vector3.up*(itemOffset+additionalRenderSpace);
+				display.transform.Rotate(display.transform.up, Space.Self);
 			}
+		}
+		
+		public void updateStoredItem() {
+			StorageContainer sc = getStorage();
+			if (sc) {
+				List<TechType> items = sc.container.GetItemTypes();
+				if (items.Count > 0) {
+					IList<InventoryItem> li = sc.container.GetItems(items[0]);
+					if (li.Count > 0) {
+						updateStoredItem(li[0]);
+						return;
+					}
+				}
+			}
+			updateStoredItem(null);
 		}
 		
 		public void updateStoredItem(InventoryItem ii) {
@@ -173,20 +199,32 @@ namespace ReikaKalseki.AqueousEngineering {
 				UnityEngine.Object.DestroyImmediate(display);
 			if (!go)
 				return;
-			Renderer r = go.GetComponentInChildren<Renderer>();
-			if (r) {
+			Renderer[] rr = go.GetComponentsInChildren<Renderer>();
+			foreach (Renderer r in rr) {
+				if (r.GetComponent<Light>())
+					continue;
 				GameObject cloneFrom = r.gameObject;
 				if (cloneFrom.GetFullHierarchyPath().Contains("$DisplayRoot")) {
 					while (cloneFrom.transform.parent && !cloneFrom.name.Contains("$DisplayRoot"))
 						cloneFrom = cloneFrom.transform.parent.gameObject;
+					string seek = "offset=";
+					int idx = cloneFrom.name.IndexOf(seek, StringComparison.InvariantCultureIgnoreCase);
+					if (idx >= 0) {
+						additionalRenderSpace = float.Parse(cloneFrom.name.Substring(idx+seek.Length), System.Globalization.CultureInfo.InvariantCulture);
+					}
 				}
-				display = UnityEngine.Object.Instantiate(cloneFrom);
-				RenderUtil.convertToModel(display);
+				GameObject renderObj = UnityEngine.Object.Instantiate(cloneFrom);
+				RenderUtil.convertToModel(renderObj);
+				display = new GameObject(DISPLAY_OBJECT_NAME);
+				renderObj.transform.SetParent(display.transform);
 				display.SetActive(true);
+				renderObj.SetActive(true);
 				display.transform.SetParent(transform);
-				display.name = DISPLAY_OBJECT_NAME;
 				display.transform.position = transform.position+Vector3.up;
+				renderObj.transform.localPosition = Vector3.zero;
+				renderObj.transform.localRotation = r.transform.localRotation;
 				displayRender = r;
+				break;
 			}
 		}
 	}
