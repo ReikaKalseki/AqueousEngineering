@@ -36,6 +36,7 @@ namespace ReikaKalseki.AqueousEngineering
     public static PlanktonFeeder planktonFeederBlock;
     public static BaseBattery batteryBlock;
     //public static IonCubeBurner ionCubeBlock;
+    public static ItemDisplay displayBlock;
     
     public static OutdoorPot outdoorBasicPot;
     public static OutdoorPot outdoorChicPot;
@@ -85,6 +86,7 @@ namespace ReikaKalseki.AqueousEngineering
 	    cameraAntennaBlock = createMachine<RemoteCameraAntenna, RemoteCameraAntennaLogic>("BaseRemoteCamera");
 	    batteryBlock = createMachine<BaseBattery, BaseBatteryLogic>("BaseBattery");
 	    //ionCubeBlock = createMachine<IonCubeBurner, IonCubeBurnerLogic>("IonCubeBurner");
+	    displayBlock = createMachine<ItemDisplay, ItemDisplayLogic>("BaseItemDisplay");
         
         outdoorBasicPot = new OutdoorPot(TechType.PlanterPot);
         outdoorCompositePot = new OutdoorPot(TechType.PlanterPot2);

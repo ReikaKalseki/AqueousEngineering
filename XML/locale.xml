@@ -166,17 +166,17 @@
 			https://i.imgur.com/M9QZhke.jpg
 		</images>
 	</BasePlanktonFeeder>
-	<Name>
+	<BaseItemDisplay>
 		<name>
-			
+			Item Display
 		</name>
 		<desc>
-			
+			Holds an item in suspension above it for decorative purposes.
 		</desc>
 		<pda>
 			
 		</pda>
-	</Name>
+	</BaseItemDisplay>
 	<Name>
 		<name>
 			
