@@ -17,6 +17,28 @@ namespace ReikaKalseki.AqueousEngineering {
 	
 	public class ItemDisplay : CustomMachine<ItemDisplayLogic> {
 		
+		internal static readonly Dictionary<TechType, ItemDisplayRenderBehavior> renderPaths = new Dictionary<TechType, ItemDisplayRenderBehavior>();
+		
+		static ItemDisplay() {
+			setRendererBehavior(TechType.Flashlight, ItemDisplayRenderBehavior.getDefaultButSpecificChild("flashlight"));
+			setRendererBehavior(TechType.Polyaniline, new ItemDisplayRenderBehavior(){sizeMultiplier = 1.5F});
+			setRendererBehavior(TechType.HydrochloricAcid, new ItemDisplayRenderBehavior(){sizeMultiplier = 1.5F});
+			setRendererBehavior(TechType.Benzene, new ItemDisplayRenderBehavior(){sizeMultiplier = 2F});
+		}
+		
+		public static void setRendererBehavior(TechType tt, ItemDisplayRenderBehavior path) {
+			renderPaths[tt] = path;
+		}
+		
+		public static void setRendererBehavior(TechType tt, TechType copyOf) {
+			if (renderPaths.ContainsKey[copyOf])
+				renderPaths[tt] = renderPaths[copyOf];
+		}
+		
+		internal ItemDisplayRenderBehavior getBehavior(TechType tt) {
+			return renderPaths.ContainsKey[tt] ? renderPaths[tt] : null;
+		}
+		
 		public ItemDisplay(XMLLocale.LocaleEntry e) : base(e.key, e.name, e.desc, "f1cde32e-101a-4dd5-8084-8c950b9c2432") {
 			addIngredient(TechType.Titanium, 2);
 			addIngredient(TechType.Silver, 1);
@@ -87,7 +109,11 @@ namespace ReikaKalseki.AqueousEngineering {
 		
 		private GameObject display;
 		private Renderer displayRender;
-		private float additionalRenderSpace = 0.1F;
+		private SkyApplier displaySky;
+		
+		private float additionalRenderSpace = 0.075F;
+		private float rotationSpeedScale = 1;
+		private float renderSizeScale = 1;
 		
 		private bool needsUpdate = true;
 		
@@ -140,9 +166,12 @@ namespace ReikaKalseki.AqueousEngineering {
 				display.transform.RotateAround(ctr, new Vector3(0, 0, 1), rotationSpeed.z);
 				*/
 				float itemOffset = 0.75F+0.1F*Mathf.Pow(Mathf.Max(0, 1+Mathf.Sin(DayNightCycle.main.timePassedAsFloat*0.781F+gameObject.GetInstanceID()*0.147F)), 2);
-				float itemRotation = 9*Mathf.Max(0, 4F-itemOffset*3.5F);
+				float itemRotation = rotationSpeedScale*1.33F*Mathf.Max(0, 4F-itemOffset*3F);
+				//SNUtil.writeToChat(itemOffset+" > "+itemRotation);
 				display.transform.position = transform.position+Vector3.up*(itemOffset+additionalRenderSpace);
-				display.transform.Rotate(display.transform.up, Space.Self);
+				display.transform.Rotate(display.transform.up*itemRotation, Space.Self);
+				//if (displaySky)
+				//	displaySky.SetSky(gets);
 			}
 		}
 		
@@ -175,7 +204,7 @@ namespace ReikaKalseki.AqueousEngineering {
 					}
 				}
 			}*/
-			setDisplay(ii != null && ii.item ? ii.item.gameObject : null);
+			setDisplay(ii != null && ii.item ? ii.item : null);
 		}
 		
 		private void updateRotationSpeedTarget(ref float speed, ref float target) {
@@ -190,42 +219,89 @@ namespace ReikaKalseki.AqueousEngineering {
 			}
 		}
 		
-		private void setDisplay(GameObject go) {
+		private void setDisplay(Pickupable pp) {
 			displayRender = null;
+			displaySky = null;
 			if (display)
 				UnityEngine.Object.DestroyImmediate(display);
 			GameObject old = ObjectUtil.getChildObject(gameObject, DISPLAY_OBJECT_NAME);
 			if (old)
 				UnityEngine.Object.DestroyImmediate(display);
+			if (!pp)
+				return;
+
+			Renderer r;
+			GameObject go = findRenderer(pp, out r);
 			if (!go)
 				return;
-			Renderer[] rr = go.GetComponentsInChildren<Renderer>();
-			foreach (Renderer r in rr) {
-				if (r.GetComponent<Light>())
-					continue;
-				GameObject cloneFrom = r.gameObject;
-				if (cloneFrom.GetFullHierarchyPath().Contains("$DisplayRoot")) {
-					while (cloneFrom.transform.parent && !cloneFrom.name.Contains("$DisplayRoot"))
-						cloneFrom = cloneFrom.transform.parent.gameObject;
-					string seek = "offset=";
-					int idx = cloneFrom.name.IndexOf(seek, StringComparison.InvariantCultureIgnoreCase);
-					if (idx >= 0) {
-						additionalRenderSpace = float.Parse(cloneFrom.name.Substring(idx+seek.Length), System.Globalization.CultureInfo.InvariantCulture);
+			GameObject renderObj = UnityEngine.Object.Instantiate(go);
+			RenderUtil.convertToModel(renderObj);
+			display = new GameObject(DISPLAY_OBJECT_NAME);
+			renderObj.transform.SetParent(display.transform);
+			display.SetActive(true);
+			renderObj.SetActive(true);
+			display.transform.SetParent(transform);
+			display.transform.position = transform.position+Vector3.up;
+			renderObj.transform.localPosition = Vector3.zero;
+			renderObj.transform.localRotation = r.transform.localRotation;
+			renderObj.transform.localScale = renderObj.transform.localScale*renderSizeScale;
+			displayRender = r;
+			displaySky = renderObj.GetComponentInChildren<SkyApplier>();
+		}
+		
+		private GameObject findRenderer(Pickupable pp, out Renderer ret) {
+			TechType tt = pp.GetTechType();
+			ItemDisplayRenderBehavior props = ItemDisplay.renderPaths.ContainsKey(tt) ? ItemDisplay.renderPaths[tt] : new ItemDisplayRenderBehavior();
+			additionalRenderSpace = props.verticalOffset;
+			rotationSpeedScale = props.rotationSpeedMultiplier;
+			renderSizeScale = props.sizeMultiplier;
+			if (props.getRenderObj != null) {
+				GameObject obj = props.getRenderObj(pp.gameObject);
+				ret = obj ? obj.GetComponentInChildren<Renderer>() : null;
+				return obj;
+			}
+			else {
+				Renderer[] rr = pp.GetComponentsInChildren<Renderer>();
+				foreach (Renderer r in rr) {
+					if (r.GetComponent<Light>())
+						continue;
+					GameObject cloneFrom = r.gameObject;
+					if (cloneFrom.GetFullHierarchyPath().Contains("$DisplayRoot")) {
+						while (cloneFrom.transform.parent && !cloneFrom.name.Contains("$DisplayRoot"))
+							cloneFrom = cloneFrom.transform.parent.gameObject;
+						string seek = "offset=";
+						int idx = cloneFrom.name.IndexOf(seek, StringComparison.InvariantCultureIgnoreCase);
+						if (idx >= 0) {
+							additionalRenderSpace = float.Parse(cloneFrom.name.Substring(idx+seek.Length), System.Globalization.CultureInfo.InvariantCulture);
+						}
 					}
+					ret = r;
+					return cloneFrom;
 				}
-				GameObject renderObj = UnityEngine.Object.Instantiate(cloneFrom);
-				RenderUtil.convertToModel(renderObj);
-				display = new GameObject(DISPLAY_OBJECT_NAME);
-				renderObj.transform.SetParent(display.transform);
-				display.SetActive(true);
-				renderObj.SetActive(true);
-				display.transform.SetParent(transform);
-				display.transform.position = transform.position+Vector3.up;
-				renderObj.transform.localPosition = Vector3.zero;
-				renderObj.transform.localRotation = r.transform.localRotation;
-				displayRender = r;
-				break;
+				ret = null;
+				return null;
 			}
 		}
+	}
+	
+	public class ItemDisplayRenderBehavior {
+		
+		public float verticalOffset = 0.075F;
+		public float rotationSpeedMultiplier = 1;
+		public float sizeMultiplier = 1;
+		public Func<GameObject, GameObject> getRenderObj = null;
+		
+		public static ItemDisplayRenderBehavior getDefaultButSpecificChild(string path) {
+			return new ItemDisplayRenderBehavior(){getRenderObj = getChildNamed(path)};
+		}
+		
+		public static ItemDisplayRenderBehavior getDefaultButSpecialRenderObj(Func<GameObject, GameObject> f) {
+			return new ItemDisplayRenderBehavior(){getRenderObj = f};
+		}
+		
+		public static Func<GameObject, GameObject> getChildNamed(string path) {
+			return go => ObjectUtil.getChildObject(go, path);
+		}
+		
 	}
 }
