@@ -86,6 +86,10 @@ namespace ReikaKalseki.AqueousEngineering {
 	   			check.placeable = check.placeOn && check.placeOn.gameObject.FindAncestor<WaterParkPiece>();//isOnACU(check.placeOn && chec);
 				check.ignoreSpaceRequirements = true;
 			}
+	   		else if (Builder.constructableTechType == AqueousEngineeringMod.ampeelAntennaBlock.TechType && check.placeOn && Player.main.currentWaterPark && check.placeOn.gameObject.FindAncestor<WaterParkPiece>().GetWaterParkModule() == Player.main.currentWaterPark) {
+	   			check.placeable = true;
+				check.ignoreSpaceRequirements = true;
+		   	}
 	    }
 	}
 }

@@ -20,7 +20,14 @@ namespace ReikaKalseki.AqueousEngineering {
 		internal static readonly Dictionary<TechType, ItemDisplayRenderBehavior> renderPaths = new Dictionary<TechType, ItemDisplayRenderBehavior>();
 		
 		static ItemDisplay() {
+			/*
 			setRendererBehavior(TechType.Flashlight, ItemDisplayRenderBehavior.getDefaultButSpecificChild("flashlight"));
+			setRendererBehavior(TechType.BoneShark, ItemDisplayRenderBehavior.getDefaultButSpecificChild("bone_shark_anim"));
+			setRendererBehavior(TechType.Biter, ItemDisplayRenderBehavior.getDefaultButSpecificChild("Biter_fish_anim"));
+			setRendererBehavior(TechType.Blighter, ItemDisplayRenderBehavior.getDefaultButSpecificChild("Biter_fish_anim"));
+			*/
+			
+			
 			setRendererBehavior(TechType.Polyaniline, new ItemDisplayRenderBehavior(){sizeMultiplier = 1.5F});
 			setRendererBehavior(TechType.HydrochloricAcid, new ItemDisplayRenderBehavior(){sizeMultiplier = 1.5F});
 			setRendererBehavior(TechType.Benzene, new ItemDisplayRenderBehavior(){sizeMultiplier = 2F});
@@ -31,12 +38,12 @@ namespace ReikaKalseki.AqueousEngineering {
 		}
 		
 		public static void setRendererBehavior(TechType tt, TechType copyOf) {
-			if (renderPaths.ContainsKey[copyOf])
+			if (renderPaths.ContainsKey(copyOf))
 				renderPaths[tt] = renderPaths[copyOf];
 		}
 		
 		internal ItemDisplayRenderBehavior getBehavior(TechType tt) {
-			return renderPaths.ContainsKey[tt] ? renderPaths[tt] : null;
+			return renderPaths.ContainsKey(tt) ? renderPaths[tt] : null;
 		}
 		
 		public ItemDisplay(XMLLocale.LocaleEntry e) : base(e.key, e.name, e.desc, "f1cde32e-101a-4dd5-8084-8c950b9c2432") {
@@ -231,9 +238,13 @@ namespace ReikaKalseki.AqueousEngineering {
 				return;
 
 			Renderer r;
-			GameObject go = findRenderer(pp, out r);
+			TechType tt = pp.GetTechType();
+			GameObject go = findRenderer(pp, tt, out r);
 			if (!go)
 				return;
+			if (WaterParkCreature.waterParkCreatureParameters.ContainsKey(tt)) {
+				renderSizeScale *= WaterParkCreature.waterParkCreatureParameters[tt].maxSize/WaterParkCreature.waterParkCreatureParameters[tt].outsideSize*0.33F;
+			}
 			GameObject renderObj = UnityEngine.Object.Instantiate(go);
 			RenderUtil.convertToModel(renderObj);
 			display = new GameObject(DISPLAY_OBJECT_NAME);
@@ -249,8 +260,7 @@ namespace ReikaKalseki.AqueousEngineering {
 			displaySky = renderObj.GetComponentInChildren<SkyApplier>();
 		}
 		
-		private GameObject findRenderer(Pickupable pp, out Renderer ret) {
-			TechType tt = pp.GetTechType();
+		private GameObject findRenderer(Pickupable pp, TechType tt, out Renderer ret) {
 			ItemDisplayRenderBehavior props = ItemDisplay.renderPaths.ContainsKey(tt) ? ItemDisplay.renderPaths[tt] : new ItemDisplayRenderBehavior();
 			additionalRenderSpace = props.verticalOffset;
 			rotationSpeedScale = props.rotationSpeedMultiplier;
@@ -261,6 +271,11 @@ namespace ReikaKalseki.AqueousEngineering {
 				return obj;
 			}
 			else {
+				Animator a = pp.GetComponentInChildren<Animator>();
+				if (a) {
+					ret = a.GetComponentInChildren<Renderer>();
+					return a.gameObject;
+				}
 				Renderer[] rr = pp.GetComponentsInChildren<Renderer>();
 				foreach (Renderer r in rr) {
 					if (r.GetComponent<Light>())
