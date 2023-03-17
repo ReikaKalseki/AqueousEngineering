@@ -159,17 +159,17 @@ namespace ReikaKalseki.AqueousEngineering {
 					if (fp) {
 						PickPrefab pp = drop.GetComponent<PickPrefab>();
 						td = pp.pickTech;
-						drop = CraftData.GetPrefabForTechType(td);
+						drop = ObjectUtil.lookupPrefab(td);
 					}
 					else if (td == TechType.JellyPlantSeed || td == TechType.WhiteMushroomSpore || td == TechType.AcidMushroomSpore) {
 						td = tt;
-						drop = UnityEngine.Object.Instantiate(CraftData.GetPrefabForTechType(tt));
+						drop = UnityEngine.Object.Instantiate(ObjectUtil.lookupPrefab(tt));
 					}
 					SNUtil.log("DT "+td+" > "+drop);
 					drop.SetActive(false);
 					Pickupable ppb = drop.GetComponent<Pickupable>();
 					if (!ppb) {
-						ppb = UnityEngine.Object.Instantiate(CraftData.GetPrefabForTechType(td)).GetComponent<Pickupable>();
+						ppb = UnityEngine.Object.Instantiate(ObjectUtil.lookupPrefab(td)).GetComponent<Pickupable>();
 					}
 					SNUtil.log(""+ppb);
 					if (ppb && getStorage().container.AddItem(ppb) != null) {
@@ -212,7 +212,7 @@ namespace ReikaKalseki.AqueousEngineering {
 				case TechType.Creepvine:
 					return  ? TechType.CreepvineSeedCluster : TechType.CreepvinePiece;*/
 				default:
-					return CraftData.harvestOutputList.ContainsKey(tt) ? CraftData.GetPrefabForTechType(CraftData.harvestOutputList[tt]) : null;
+					return CraftData.harvestOutputList.ContainsKey(tt) ? ObjectUtil.lookupPrefab(CraftData.harvestOutputList[tt]) : null;
 			}
 		}
 	}

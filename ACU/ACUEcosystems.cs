@@ -304,7 +304,7 @@ namespace ReikaKalseki.AqueousEngineering {
 			}
 			
 			static float calculateFoodValue(TechType tt) {
-				GameObject go = CraftData.GetPrefabForTechType(SNUtil.getTechType("Cooked"+tt));
+				GameObject go = ObjectUtil.lookupPrefab(SNUtil.getTechType("Cooked"+tt));
 				Eatable ea = go.GetComponent<Eatable>();
 				return ea.foodValue*0.01F; //so a reginald is ~40%
 			}

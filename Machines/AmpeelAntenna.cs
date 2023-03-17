@@ -88,8 +88,6 @@ namespace ReikaKalseki.AqueousEngineering {
 		
 	public class AmpeelAntennaLogic : CustomMachineLogic {
 		
-		private GameObject wireObject;
-		
 		void Start() {
 			SNUtil.log("Reinitializing base ampeel antenna");
 			AqueousEngineeringMod.ampeelAntennaBlock.initializeMachine(gameObject);
