@@ -47,8 +47,7 @@ namespace ReikaKalseki.AqueousEngineering {
 		}
 		
 		public ItemDisplay(XMLLocale.LocaleEntry e) : base(e.key, e.name, e.desc, "f1cde32e-101a-4dd5-8084-8c950b9c2432") {
-			addIngredient(TechType.Titanium, 2);
-			addIngredient(TechType.Silver, 1);
+			addIngredient(TechType.Titanium, 1);
 		}
 
 		public override bool UnlockedAtStart {

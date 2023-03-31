@@ -181,6 +181,20 @@
 			https://i.imgur.com/7NWXKLn.jpg
 		</images>
 	</BaseItemDisplay>
+	<BaseDomeLight>
+		<name>
+			Dome Light
+		</name>
+		<desc>
+			A small light that illuminates in all directions.
+		</desc>
+		<pda>
+			
+		</pda>
+		<images>
+			
+		</images>
+	</BaseDomeLight>
 	<Name>
 		<name>
 			

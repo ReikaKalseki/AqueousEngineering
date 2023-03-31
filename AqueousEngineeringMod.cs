@@ -37,6 +37,7 @@ namespace ReikaKalseki.AqueousEngineering
     public static BaseBattery batteryBlock;
     //public static IonCubeBurner ionCubeBlock;
     public static ItemDisplay displayBlock;
+    public static BaseDomeLight domeLightBlock;
     
     public static OutdoorPot outdoorBasicPot;
     public static OutdoorPot outdoorChicPot;
@@ -87,6 +88,7 @@ namespace ReikaKalseki.AqueousEngineering
 	    batteryBlock = createMachine<BaseBattery, BaseBatteryLogic>("BaseBattery");
 	    //ionCubeBlock = createMachine<IonCubeBurner, IonCubeBurnerLogic>("IonCubeBurner");
 	    displayBlock = createMachine<ItemDisplay, ItemDisplayLogic>("BaseItemDisplay");
+	    domeLightBlock = createMachine<BaseDomeLight, BaseDomeLightLogic>("BaseDomeLight");
         
         outdoorBasicPot = new OutdoorPot(TechType.PlanterPot);
         outdoorCompositePot = new OutdoorPot(TechType.PlanterPot2);
@@ -145,6 +147,12 @@ namespace ReikaKalseki.AqueousEngineering
 			RecipeUtil.addIngredient(ampeelAntennaBlock.TechType, sealf.TechType, 2);
 		else
 			RecipeUtil.addIngredient(ampeelAntennaBlock.TechType, TechType.Silicone, 3);
+		
+		Spawnable bgl = ItemRegistry.instance.getItem("BaseGlass");
+		if (bgl != null)
+			RecipeUtil.addIngredient(displayBlock.TechType, bgl.TechType, 1);
+		else
+			RecipeUtil.addIngredient(displayBlock.TechType, TechType.Glass, 1);
 		/*
 		Spawnable hull = ItemRegistry.instance.getItem("HullPlating");
 		if (hull != null)
