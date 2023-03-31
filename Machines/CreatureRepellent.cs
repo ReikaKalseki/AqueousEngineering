@@ -242,7 +242,7 @@ namespace ReikaKalseki.AqueousEngineering {
 				cooldown -= seconds;
 				return;
 			}
-			if (consumePower(BaseCreatureRepellent.POWER_COST, seconds)) {
+			if (consumePower(BaseCreatureRepellent.POWER_COST*seconds)) {
 				lastTickTime = DayNightCycle.main.timePassedAsFloat;
 				bool flag = false;
 				HashSet<Creature> set = WorldUtil.getObjectsNearWithComponent<Creature>(gameObject.transform.position, BaseCreatureRepellent.RANGE*BaseCreatureRepellent.maxRangeFactor);
@@ -288,7 +288,7 @@ namespace ReikaKalseki.AqueousEngineering {
 					}
 				}
 				if (flag) {
-					if (!consumePower(BaseCreatureRepellent.POWER_COST_ACTIVE-BaseCreatureRepellent.POWER_COST, seconds))
+					if (!consumePower((BaseCreatureRepellent.POWER_COST_ACTIVE-BaseCreatureRepellent.POWER_COST)*seconds))
 						cooldown = 5;
 				}
 			}

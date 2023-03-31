@@ -139,7 +139,7 @@ namespace ReikaKalseki.AqueousEngineering {
 			//SNUtil.writeToChat("I am ticking @ "+go.transform.position);
 			if (Vector3.Distance(Player.main.transform.position, transform.position) >= PlanktonFeeder.RANGE)
 				return;
-			if (consumePower(PlanktonFeeder.POWER_COST, seconds) && getStorage().container.GetCount(PlanktonFeeder.fuel.TechType) > 0) {
+			if (consumePower(PlanktonFeeder.POWER_COST*seconds) && getStorage().container.GetCount(PlanktonFeeder.fuel.TechType) > 0) {
 				setState(true);
 				float r = PlanktonFeeder.RANGE;
 				HashSet<Creature> set = WorldUtil.getObjectsNearWithComponent<Creature>(gameObject.transform.position, r);

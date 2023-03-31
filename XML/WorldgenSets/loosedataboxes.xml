@@ -103,4 +103,54 @@
     </scale>
     <xmlID>4b2c1774-83ec-4136-a151-9ed63d06a734</xmlID>
   </customprefab>
+  <customprefab>
+    <prefab>databox</prefab>
+    <tech>BaseBattery</tech>
+    <position>
+      <x>-1625.17846679688</x>
+      <y>-358.873809814453</y>
+      <z>101.551963806152</z>
+    </position>
+    <rotation>
+      <x>2.8000066280365</x>
+      <y>58.0000762939453</y>
+      <z>9.99998569488525</z>
+      <quaternion>
+        <x>0.063528910279274</x>
+        <y>0.480958729982376</y>
+        <z>0.0644053220748901</z>
+        <w>0.872063517570496</w>
+      </quaternion>
+    </rotation>
+    <scale>
+      <x>0.75</x>
+      <y>0.75</y>
+      <z>0.75</z>
+    </scale>
+  </customprefab>
+  <customprefab>
+    <prefab>databox</prefab>
+    <tech>BaseBattery</tech>
+    <position>
+      <x>807.080078125</x>
+      <y>-281.898681640625</y>
+      <z>-1171.05322265625</z>
+    </position>
+    <rotation>
+      <x>-6.00309633114193E-08</x>
+      <y>251.999923706055</y>
+      <z>0.132255807518959</z>
+      <quaternion>
+        <x>0.000933727191295475</x>
+        <y>0.809016883373261</y>
+        <z>-0.000678390904795378</z>
+        <w>-0.587784290313721</w>
+      </quaternion>
+    </rotation>
+    <scale>
+      <x>0.75</x>
+      <y>0.75</y>
+      <z>0.75</z>
+    </scale>
+  </customprefab>
 </Root>

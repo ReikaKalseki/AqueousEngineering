@@ -76,7 +76,7 @@ namespace ReikaKalseki.AqueousEngineering {
 		}
 		
 		private void ping(float time) {
-			if (consumePower(BaseSonarPinger.POWER_COST, 1)) {
+			if (consumePower(BaseSonarPinger.POWER_COST)) {
 				lastPing = time;
 				BaseSonarPinger.pingEvent(gameObject);
 				if (Inventory.main.equipment.GetCount(TechType.MapRoomHUDChip) > 0)

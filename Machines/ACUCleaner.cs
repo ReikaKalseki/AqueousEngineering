@@ -118,7 +118,7 @@ namespace ReikaKalseki.AqueousEngineering {
 			if (!connectedACU) {
 				connectedACU = tryFindACU();
 			}
-			if (connectedACU && consumePower(ACUCleaner.POWER_COST, seconds)) {
+			if (connectedACU && consumePower(ACUCleaner.POWER_COST*seconds)) {
 				//rotator.transform.position = connectedACU.transform.position+Vector3.down*1.45F;
 				//rotator.transform.localScale = new Vector3(13.8F, 1, 13.8F);
 				foreach (WaterParkItem wp in connectedACU.items) {

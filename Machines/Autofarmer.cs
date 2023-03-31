@@ -110,7 +110,7 @@ namespace ReikaKalseki.AqueousEngineering {
 					}
 				}
 			}
-			if (growbeds.Count > 0 && consumePower(Autofarmer.POWER_COST, seconds)) {
+			if (growbeds.Count > 0 && consumePower(Autofarmer.POWER_COST*seconds)) {
 				Planter p = growbeds[UnityEngine.Random.Range(0, growbeds.Count)];
 				if (p) {
 					tryHarvestFrom(p);

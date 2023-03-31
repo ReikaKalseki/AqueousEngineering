@@ -111,7 +111,7 @@ namespace ReikaKalseki.AqueousEngineering {
 			if (!connectedACU) {
 				connectedACU = tryFindACU();
 			}
-			if (connectedACU && consumePower(ACUBooster.POWER_COST, seconds) && getStorage().container.GetCount(ACUBooster.fuel.TechType) > 0) {
+			if (connectedACU && consumePower(ACUBooster.POWER_COST*seconds) && getStorage().container.GetCount(ACUBooster.fuel.TechType) > 0) {
 				//rotator.transform.position = connectedACU.transform.position+Vector3.down*1.45F;
 				//rotator.transform.localScale = new Vector3(13.8F, 1, 13.8F);
 				/*
