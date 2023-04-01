@@ -357,8 +357,8 @@ namespace ReikaKalseki.AqueousEngineering {
 			}
 			
 			internal ACUMetabolism(float mf, float pp, bool isc, BiomeRegions.RegionType r, List<BiomeRegions.RegionType> rr) {
-				normalizedPoopChance = pp;
-				metabolismPerSecond = mf*0.0003F;
+				normalizedPoopChance = pp*1.5F;
+				metabolismPerSecond = mf*0.0002F;
 				isCarnivore = isc;
 				primaryRegion = r;
 				additionalRegions.AddRange(rr);
