@@ -127,10 +127,14 @@ namespace ReikaKalseki.AqueousEngineering
 			RecipeUtil.addIngredient(repellentBlock.TechType, TechType.SeamothElectricalDefense, 1);
 		
 		Spawnable luminol = ItemRegistry.instance.getItem("Luminol");
-		if (luminol != null)
+		if (luminol != null) { //c2c is loaded
 			RecipeUtil.addIngredient(sonarBlock.TechType, luminol.TechType, 2);
-		else
+			RecipeUtil.removeIngredient(sonarBlock.TechType, TechType.CyclopsSonarModule); //cyclops gates it too late
+			RecipeUtil.addIngredient(sonarBlock.TechType, TechType.SeamothSonarModule, 1);
+		}
+		else {
 			RecipeUtil.addIngredient(sonarBlock.TechType, TechType.WiringKit, 1);
+		}
 		
 		Spawnable motor = ItemRegistry.instance.getItem("Motor");
 		if (motor != null) {
