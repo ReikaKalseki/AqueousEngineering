@@ -239,7 +239,7 @@ namespace ReikaKalseki.AqueousEngineering {
 		}
 		
 		private static void onEaten(ACUCallbackSystem.ACUCallback acu, WaterParkItem wp, Creature c, ACUMetabolism am, Food amt, GameObject eaten) {
-			float food = amt.foodValue*FOOD_SCALAR*1.5F;
+			float food = amt.foodValue*FOOD_SCALAR*2.5F;
 			if (amt.isRegion(am.primaryRegion)) {
 				food *= 3;
 			}
@@ -357,8 +357,8 @@ namespace ReikaKalseki.AqueousEngineering {
 			}
 			
 			internal ACUMetabolism(float mf, float pp, bool isc, BiomeRegions.RegionType r, List<BiomeRegions.RegionType> rr) {
-				normalizedPoopChance = pp*1.5F;
-				metabolismPerSecond = mf*0.0002F;
+				normalizedPoopChance = pp;
+				metabolismPerSecond = mf*0.0003F;
 				isCarnivore = isc;
 				primaryRegion = r;
 				additionalRegions.AddRange(rr);

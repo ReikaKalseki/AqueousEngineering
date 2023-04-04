@@ -16,9 +16,9 @@ namespace ReikaKalseki.AqueousEngineering {
 	
 	public class BaseSonarPinger : CustomMachine<BaseSonarPingerLogic> {
 		
-		internal static readonly float POWER_COST = 10F; //per ping
+		internal static readonly float POWER_COST = 3F; //per ping
 		internal static readonly float FIRE_RATE = 4F; //interval in seconds
-		internal static readonly float MAX_RANGE = 300F; //m
+		internal static readonly float MAX_RANGE = 350F; //m
 		
 		public static event Action<GameObject> onBaseSonarPingedEvent;
 		
@@ -46,7 +46,8 @@ namespace ReikaKalseki.AqueousEngineering {
 			
 			Renderer r = go.GetComponentInChildren<Renderer>();
 			//SNUtil.dumpTextures(r);
-			RenderUtil.swapToModdedTextures(r, this);/*
+			RenderUtil.swapToModdedTextures(r, this);
+			/*
 			r.materials[0].SetFloat("_Shininess", 7.5F);
 			r.materials[0].SetFloat("_Fresnel", 1F);
 			r.materials[0].SetFloat("_SpecInt", 15F);
