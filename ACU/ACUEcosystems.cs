@@ -212,7 +212,7 @@ namespace ReikaKalseki.AqueousEngineering {
 					if (edibleFish.ContainsKey(tt)) {
 						eaten = pp.gameObject;
 						amt = edibleFish[tt];
-						SNUtil.writeToChat(c+" ate a "+tt+" and got "+amt+", is now "+c.Hunger.Value);
+						//SNUtil.writeToChat(c+" ate a "+tt+" and got "+amt+", is now "+c.Hunger.Value);
 						return true;
 					}
 				}
@@ -269,6 +269,11 @@ namespace ReikaKalseki.AqueousEngineering {
 					poo.transform.rotation = UnityEngine.Random.rotationUniform;
 					acu.acu.AddItem(poo.GetComponent<Pickupable>());
 					//SNUtil.writeToChat("Poo spawned");
+				}
+				ACUCallbackSystem.CreatureCache cache = acu.getOrCreateCreatureStatus(c);
+				if (cache != null) {
+					cache.hunger = c.Hunger.Value;
+					cache.happy = c.Happy.Value;
 				}
 			}
 		}

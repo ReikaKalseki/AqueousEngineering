@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.IO;
 using System.Reflection;
+using System.Xml;
 
 using UnityEngine;
 using UnityEngine.UI;
@@ -22,13 +23,144 @@ namespace ReikaKalseki.AqueousEngineering {
 		
 		public static readonly ACUCallbackSystem instance = new ACUCallbackSystem();
 		
+		private readonly string xmlPathRoot;
+		
+		private readonly Dictionary<Vector3, CachedACUData> cache = new Dictionary<Vector3, CachedACUData>();
+		
 		private ACUCallbackSystem() {
+			xmlPathRoot = Path.Combine(Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location), "acu_data_cache");
+		}
+		
+		internal void register() {
+			IngameMenuHandler.Main.RegisterOnLoadEvent(loadSave);
+			IngameMenuHandler.Main.RegisterOnSaveEvent(save);
+		}
+		
+		internal class CreatureCache {
+			
+			internal readonly string entityID;
+			
+			internal float hunger;
+			internal float happy;
+			
+			internal CreatureCache(string id) {
+				entityID = id;
+			}
+			
+			internal void loadFromXML(XmlElement e) {
+				hunger = (float)e.getFloat("hunger", double.NaN);
+				happy = (float)e.getFloat("happy", double.NaN);
+			}
+			
+			internal void saveToXML(XmlElement e) {
+				e.addProperty("hunger", hunger);
+				e.addProperty("happy", happy);
+				e.addProperty("entityID", entityID);
+			}
+			
+			internal void apply(Creature c) {
+				c.Hunger.Value = hunger;
+				c.Happy.Value = happy;
+			}
+			
+			public override string ToString()
+			{
+				return string.Format("[CreatureCache EntityID={0}, Hunger={1}, Happy={2}]", entityID, hunger, happy);
+			}
+
 			
 		}
 		
+		internal class CachedACUData {
+			
+			internal readonly Vector3 acuRoot;
+			
+			internal float lastPlanktonBoost;
+			internal float lastTick;
+			
+			internal Dictionary<string, CreatureCache> creatureData = new Dictionary<string, CreatureCache>();
+			
+			internal CachedACUData(Vector3 pos) {
+				acuRoot = pos;
+			}
+			
+			internal void loadFromXML(XmlElement e) {
+				lastPlanktonBoost = (float)e.getFloat("plankon", double.NaN);
+				lastTick = (float)e.getFloat("tick", double.NaN);
+				
+				foreach (XmlElement e2 in e.getDirectElementsByTagName("creatureStatus")) {
+					CreatureCache c = new CreatureCache(e2.getProperty("entityID"));
+					c.loadFromXML(e2);
+				}
+			}
+			
+			internal void saveToXML(XmlElement e) {
+				e.addProperty("position", acuRoot);
+				e.addProperty("plankton", lastPlanktonBoost);
+				e.addProperty("tick", lastTick);
+				
+				foreach (CreatureCache go in creatureData.Values) {
+					XmlElement e2 = e.OwnerDocument.CreateElement("creatureStatus");
+					go.saveToXML(e2);
+					e.AppendChild(e2);
+				}
+			}
+			
+			public override string ToString()
+			{
+				return string.Format("[CachedACUData AcuRoot={0}, LastPlanktonBoost={1}, LastTick={2}, CreatureData={3}]", acuRoot, lastPlanktonBoost, lastTick, creatureData.toDebugString());
+			}
+
+			
+		}
+		
+		private void loadSave() {
+			string path = Path.Combine(xmlPathRoot, SaveLoadManager.main.currentSlot+".xml");
+			if (File.Exists(path)) {
+				XmlDocument doc = new XmlDocument();
+				doc.Load(path);
+				foreach (XmlElement e in doc.DocumentElement.ChildNodes) {
+					try {
+						CachedACUData pfb = new CachedACUData(e.getVector("position").Value);
+						pfb.loadFromXML(e);
+						cache[pfb.acuRoot] = pfb;
+					}
+					catch (Exception ex) {
+						SNUtil.log("Error parsing entry '"+e.InnerXml+"': "+ex.ToString());
+					}
+				}
+			}
+			SNUtil.log("Loaded ACU data cache: ");
+			SNUtil.log(cache.toDebugString());
+		}
+		
+		private void save() {
+			string path = Path.Combine(xmlPathRoot, SaveLoadManager.main.currentSlot+".xml");
+			XmlDocument doc = new XmlDocument();
+			XmlElement rootnode = doc.CreateElement("Root");
+			doc.AppendChild(rootnode);
+			foreach (CachedACUData go in cache.Values) {
+				XmlElement e = doc.CreateElement("cache");
+				go.saveToXML(e);
+				doc.DocumentElement.AppendChild(e);
+			}
+			Directory.CreateDirectory(xmlPathRoot);
+			doc.Save(path);
+		}
+		
 		public void tick(WaterPark acu) {
-			if (acu && acu.gameObject)
-				acu.gameObject.EnsureComponent<ACUCallback>().setACU(acu);
+			if (acu && acu.gameObject) {
+				ACUCallback com = acu.gameObject.EnsureComponent<ACUCallback>();
+				com.setACU(acu);
+			}
+		}
+		
+		private CachedACUData getOrCreateCache(ACUCallback acu) {
+			Vector3 pos = acu.lowestSegment.transform.position;
+			if (!cache.ContainsKey(pos)) {
+				cache[pos] = new CachedACUData(pos);
+			}
+			return cache[pos];
 		}
 		
 		public void debugACU() {
@@ -50,7 +182,6 @@ namespace ReikaKalseki.AqueousEngineering {
 		internal class ACUCallback : MonoBehaviour {
 			
 			internal WaterPark acu;
-			private float lastTick;
 			
 			internal StorageContainer sc;
 			internal List<WaterParkPiece> column;
@@ -69,10 +200,10 @@ namespace ReikaKalseki.AqueousEngineering {
 			
 			internal bool nextIsDebug = false;
 			
-			private float lastPlanktonBoost;
-			
 			private GameObject bubbleVents;
 			private ParticleSystem[] ventBubbleEmitters;
+			
+			private CachedACUData cache;
 			
 			internal void setACU(WaterPark w) {
 				if (acu != w) {
@@ -83,6 +214,7 @@ namespace ReikaKalseki.AqueousEngineering {
 					decoHolders = null;
 					lowestSegment = null;
 					floor = null;
+					cache = null;
 					
 					acu = w;
 					
@@ -97,17 +229,53 @@ namespace ReikaKalseki.AqueousEngineering {
 						decoHolders = ObjectUtil.getChildObjects(lowestSegment, ACUTheming.ACU_DECO_SLOT_NAME);
 						bubbleVents = ObjectUtil.getChildObject(lowestSegment, "Bubbles");
 						ventBubbleEmitters = bubbleVents.GetComponentsInChildren<ParticleSystem>();
+						load();
 					}
 				}
 			}
 			
+			private void load() {
+				cache = instance.getOrCreateCache(this);
+				foreach (CreatureCache cc in cache.creatureData.Values) {
+					WaterParkItem wp = getItemByID(cc.entityID);
+					if (wp) {
+						Creature c = wp.GetComponent<Creature>();
+						if (c) {
+							cc.apply(c);
+							SNUtil.log("Deserializing cached ACU creature status "+cc);
+						}
+					}
+				}
+			}
+			
+			internal WaterParkItem getItemByID(string id) {
+				foreach (WaterParkItem wp in acu.items) {
+					PrefabIdentifier pi = wp.GetComponent<PrefabIdentifier>();
+					if (pi && pi.Id == id)
+						return wp;
+				}
+				return null;
+			}
+			
+			internal CreatureCache getOrCreateCreatureStatus(MonoBehaviour wp) {
+				if (cache == null)
+					return null;
+				string id = wp.gameObject.FindAncestor<PrefabIdentifier>().Id; //NOT classID
+				if (!cache.creatureData.ContainsKey(id)) {
+					cache.creatureData[id] = new CreatureCache(id);
+				}
+				return cache.creatureData[id];
+			}
+			
 			public float getBoostStrength(float time) {
-				float dt = time-lastPlanktonBoost;
+				if (cache == null)
+					return 0;
+				float dt = time-cache.lastPlanktonBoost;
 				return dt <= 15 ? 1-dt/15F : 0;
 			}
 			
 			public void boost() {
-				lastPlanktonBoost = DayNightCycle.main.timePassedAsFloat;
+				cache.lastPlanktonBoost = DayNightCycle.main.timePassedAsFloat;
 			}
 		
 			public void tick() {
@@ -116,8 +284,8 @@ namespace ReikaKalseki.AqueousEngineering {
 					return;
 				}
 				float time = DayNightCycle.main.timePassedAsFloat;
-				float dT = time-lastTick;
-				lastTick = time;
+				float dT = time-cache.lastTick;
+				cache.lastTick = time;
 				if (dT <= 0.0001)
 					return;
 				//SNUtil.writeToChat(dT+" s");

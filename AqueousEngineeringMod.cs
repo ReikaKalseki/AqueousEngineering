@@ -98,6 +98,8 @@ namespace ReikaKalseki.AqueousEngineering
         outdoorChicPot.register();
                  
        	worldgen.load();
+       	
+       	ACUCallbackSystem.instance.register();
         
         System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(typeof(AEHooks).TypeHandle);
         
