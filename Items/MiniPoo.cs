@@ -13,35 +13,20 @@ using ReikaKalseki.DIAlterra;
 
 namespace ReikaKalseki.AqueousEngineering {
 	
-	public class MiniPoo : BasicCraftingItem {
+	public class MiniPoo : Spawnable {
 		
-		public MiniPoo(XMLLocale.LocaleEntry e) : base("MiniPoop", e.name, e.desc, "WorldEntities/Natural/SeaTreaderPoop") {
-			sprite = SpriteManager.Get(TechType.SeaTreaderPoop);
+		public MiniPoo(XMLLocale.LocaleEntry e) : base("MiniPoop", e.name, e.desc) {
+			OnFinishedPatching += () => {ItemRegistry.instance.addItem(this);};
 		}
 		
-		public override void prepareGameObject(GameObject go, Renderer[] r) {
-			base.prepareGameObject(go, r);
-			
+		public override GameObject GetGameObject() {
+			GameObject go = ObjectUtil.createWorldObject("61ac1241-e990-4646-a618-bddb6960325b");
 			go.transform.localScale = Vector3.one*0.2F;
-		}
-
-		public override CraftTree.Type FabricatorType {
-			get {
-				return CraftTree.Type.None;
-			}
-		}
-
-		public override TechGroup GroupForPDA {
-			get {
-				return TechGroup.Uncategorized;
-			}
-		}
-
-		public override TechCategory CategoryForPDA {
-			get {
-				return TechCategory.Misc;
-			}
+			return go;
 		}
 		
+		protected override Atlas.Sprite GetItemSprite() {
+			return SpriteManager.Get(TechType.SeaTreaderPoop);
+		}
 	}
 }
