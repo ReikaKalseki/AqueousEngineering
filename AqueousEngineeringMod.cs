@@ -71,6 +71,8 @@ namespace ReikaKalseki.AqueousEngineering
 			FileLog.Log(ex.ToString());
         }
         
+        ModVersionCheck.getFromGitVsInstall("Aqueous Engineering", modDLL, "AqueousEngineering").register();
+        
         CustomPrefab.addPrefabNamespace("ReikaKalseki.AqueousEngineering");
         
         locale.load();

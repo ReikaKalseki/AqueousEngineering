@@ -156,7 +156,7 @@ namespace ReikaKalseki.AqueousEngineering {
 			return propTypes.ContainsKey(r) ? propTypes[r].getRandomEntry() : null;
 		}
 		
-		internal static void updateACUTheming(ACUCallbackSystem.ACUCallback acu, BiomeRegions.RegionType theme, bool changed) {
+		internal static void updateACUTheming(ACUCallbackSystem.ACUCallback acu, BiomeRegions.RegionType theme, float time, bool changed) {
 			if (!acu.lowestSegment)
 				return;
 			//SNUtil.writeToChat(""+li.Count);
@@ -216,6 +216,8 @@ namespace ReikaKalseki.AqueousEngineering {
 			
 			if (!changed)
 				return;
+			
+			acu.lastThemeUpdate = time;
 				
 			string floorTex = Enum.GetName(typeof(BiomeRegions.RegionType), theme);
 			if (!string.IsNullOrEmpty(floorTex)) {

@@ -200,6 +200,8 @@ namespace ReikaKalseki.AqueousEngineering {
 			
 			internal bool nextIsDebug = false;
 			
+			internal float lastThemeUpdate;
+			
 			private GameObject bubbleVents;
 			private ParticleSystem[] ventBubbleEmitters;
 			
@@ -405,7 +407,7 @@ namespace ReikaKalseki.AqueousEngineering {
 						theme = BiomeRegions.RegionType.Shallows;
 					bool changed = theme != currentTheme;
 					currentTheme = theme;
-					ACUTheming.updateACUTheming(this, theme, changed);
+					ACUTheming.updateACUTheming(this, theme, time, changed || time-lastThemeUpdate > 5);
 				}
 				nextIsDebug = false;
 			}
