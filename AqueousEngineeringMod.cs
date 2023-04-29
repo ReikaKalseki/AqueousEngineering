@@ -38,6 +38,7 @@ namespace ReikaKalseki.AqueousEngineering
     //public static IonCubeBurner ionCubeBlock;
     public static ItemDisplay displayBlock;
     public static BaseDomeLight domeLightBlock;
+    public static ATPTap atpTapBlock;
     
     public static OutdoorPot outdoorBasicPot;
     public static OutdoorPot outdoorChicPot;
@@ -91,6 +92,7 @@ namespace ReikaKalseki.AqueousEngineering
 	    //ionCubeBlock = createMachine<IonCubeBurner, IonCubeBurnerLogic>("IonCubeBurner");
 	    displayBlock = createMachine<ItemDisplay, ItemDisplayLogic>("BaseItemDisplay");
 	    domeLightBlock = createMachine<BaseDomeLight, BaseDomeLightLogic>("BaseDomeLight");
+	    atpTapBlock = createMachine<ATPTap, ATPTapLogic>("BaseATPTap");
         
         outdoorBasicPot = new OutdoorPot(TechType.PlanterPot);
         outdoorCompositePot = new OutdoorPot(TechType.PlanterPot2);
@@ -102,7 +104,9 @@ namespace ReikaKalseki.AqueousEngineering
        	worldgen.load();
        	
        	ACUCallbackSystem.instance.register();
-        
+       	
+       	StoryHandler.instance.registerTrigger(new StoryTrigger("Precursor_LavaCastleBase_ThermalPlant2"), new TechUnlockEffect(atpTapBlock.TechType, 0.05F));
+			
         System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(typeof(AEHooks).TypeHandle);
         
         TechnologyUnlockSystem.instance.addDirectUnlock(TechType.Shocker, ampeelAntennaBlock.TechType);
@@ -148,6 +152,19 @@ namespace ReikaKalseki.AqueousEngineering
 		else {
 			RecipeUtil.addIngredient(acuCleanerBlock.TechType, TechType.Lubricant, 2);
 			RecipeUtil.addIngredient(farmerBlock.TechType, TechType.Lubricant, 5);
+		}
+		
+		Spawnable plating = ItemRegistry.instance.getItem("HullPlating");
+		if (plating != null) { //c2c is loaded
+			RecipeUtil.addIngredient(atpTapBlock.TechType, plating.TechType, 4);
+		}
+		else {
+			RecipeUtil.addIngredient(atpTapBlock.TechType, TechType.PlasteelIngot, 2);
+		}
+		
+		Spawnable glowOil = ItemRegistry.instance.getItem("GlowOil");
+		if (glowOil != null) {
+			RecipeUtil.addIngredient(atpTapBlock.TechType, glowOil.TechType, 3);
 		}
 		
 		Spawnable sealf = ItemRegistry.instance.getItem("SealFabric");

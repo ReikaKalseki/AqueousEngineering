@@ -195,6 +195,20 @@
 			https://i.imgur.com/JoA3gTH.jpg
 		</images>
 	</BaseDomeLight>
+	<BaseATPTap>
+		<name>
+			Precursor Power Tap
+		</name>
+		<desc>
+			A device that can siphon a tiny fraction of the power flowing through active precursor power conduits.
+		</desc>
+		<pda>
+			
+		</pda>
+		<images>
+			https://i.imgur.com/PH3Bet8.jpg
+		</images>
+	</BaseATPTap>
 	<Name>
 		<name>
 			
