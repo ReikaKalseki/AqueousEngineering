@@ -94,6 +94,14 @@ namespace ReikaKalseki.AqueousEngineering {
 			return 2;
 		}
 		
+		protected override void load(System.Xml.XmlElement data) {
+			lastFeedTime = (float)data.getFloat("last", float.NaN);
+		}
+		
+		protected override void save(System.Xml.XmlElement data) {
+			data.addProperty("last", lastFeedTime);
+		}
+		
 		private WaterPark tryFindACU() {
 			SubRoot sub = getSub();
 			if (!sub) {

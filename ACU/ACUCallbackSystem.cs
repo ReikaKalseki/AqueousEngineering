@@ -85,7 +85,7 @@ namespace ReikaKalseki.AqueousEngineering {
 			}
 			
 			internal void loadFromXML(XmlElement e) {
-				lastPlanktonBoost = (float)e.getFloat("plankon", double.NaN);
+				lastPlanktonBoost = (float)e.getFloat("plankton", double.NaN);
 				lastTick = (float)e.getFloat("tick", double.NaN);
 				
 				foreach (XmlElement e2 in e.getDirectElementsByTagName("creatureStatus")) {
