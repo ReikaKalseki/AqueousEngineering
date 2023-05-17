@@ -23,7 +23,7 @@ namespace ReikaKalseki.AqueousEngineering
     //public static readonly ModLogger logger = new ModLogger();
 	public static readonly Assembly modDLL = Assembly.GetExecutingAssembly();
     
-    public static readonly Config<AEConfig.ConfigEntries> config = new Config<AEConfig.ConfigEntries>();
+    public static readonly Config<AEConfig.ConfigEntries> config = new Config<AEConfig.ConfigEntries>(modDLL);
     
     public static BaseSonarPinger sonarBlock;
     public static BaseCreatureRepellent repellentBlock;
@@ -39,6 +39,8 @@ namespace ReikaKalseki.AqueousEngineering
     public static ItemDisplay displayBlock;
     public static BaseDomeLight domeLightBlock;
     public static ATPTap atpTapBlock;
+    public static BaseStasisTurret stasisBlock;
+    public static BaseControlPanel controlsBlock;
     
     public static OutdoorPot outdoorBasicPot;
     public static OutdoorPot outdoorChicPot;
@@ -46,9 +48,11 @@ namespace ReikaKalseki.AqueousEngineering
     
     public static MiniPoo poo;
     
+    public static HolographicControl seabaseStasisControl;
+    
     public static readonly WorldgenDatabase worldgen = new WorldgenDatabase();
     
-    public static readonly XMLLocale locale = new XMLLocale("XML/locale.xml");
+    public static readonly XMLLocale locale = new XMLLocale(modDLL, "XML/locale.xml");
 
     [QModPrePatch]
     public static void PreLoad() {
@@ -73,6 +77,7 @@ namespace ReikaKalseki.AqueousEngineering
         }
         
         ModVersionCheck.getFromGitVsInstall("Aqueous Engineering", modDLL, "AqueousEngineering").register();
+        SNUtil.checkModHash(modDLL);
         
         CustomPrefab.addPrefabNamespace("ReikaKalseki.AqueousEngineering");
         
@@ -80,6 +85,9 @@ namespace ReikaKalseki.AqueousEngineering
         
         poo = new MiniPoo(locale.getEntry("MiniPoop"));
 	    poo.Patch();
+	    
+	    seabaseStasisControl = new HolographicControl("SeabaseStasis", "Fire stasis pulse", fireStasisPulses);
+	    seabaseStasisControl.setIcons("Textures/StasisButton", 200).Patch();
 	    
 	    sonarBlock = createMachine<BaseSonarPinger, BaseSonarPingerLogic>("BaseSonar");
 	    repellentBlock = createMachine<BaseCreatureRepellent, BaseCreatureRepellentLogic>("BaseRepellent");
@@ -93,6 +101,8 @@ namespace ReikaKalseki.AqueousEngineering
 	    displayBlock = createMachine<ItemDisplay, ItemDisplayLogic>("BaseItemDisplay");
 	    domeLightBlock = createMachine<BaseDomeLight, BaseDomeLightLogic>("BaseDomeLight");
 	    atpTapBlock = createMachine<ATPTap, ATPTapLogic>("BaseATPTap");
+	    stasisBlock = createMachine<BaseStasisTurret, BaseStasisTurretLogic>("BaseStasisTurret");
+	    controlsBlock = createMachine<BaseControlPanel, BaseControlPanelLogic>("BaseControlPanel");
         
         outdoorBasicPot = new OutdoorPot(TechType.PlanterPot);
         outdoorCompositePot = new OutdoorPot(TechType.PlanterPot2);
@@ -113,8 +123,19 @@ namespace ReikaKalseki.AqueousEngineering
         TechnologyUnlockSystem.instance.addDirectUnlock(TechType.Beacon, beaconBlock.TechType);
         TechnologyUnlockSystem.instance.addDirectUnlock(poo.TechType, acuCleanerBlock.TechType);
         TechnologyUnlockSystem.instance.addDirectUnlock(TechType.BaseMapRoom, cameraAntennaBlock.TechType);
+        TechnologyUnlockSystem.instance.addDirectUnlock(TechType.StasisRifle, stasisBlock.TechType);
         
         ConsoleCommandsHandler.Main.RegisterConsoleCommand<Action>("debugACU", ACUCallbackSystem.instance.debugACU);
+    }
+    
+    private static void fireStasisPulses(HolographicControl.HolographicControlTag btn) {
+    	SubRoot sub = btn.gameObject.FindAncestor<SubRoot>();
+    	if (sub && sub.isBase) {
+    		foreach (BaseStasisTurretLogic lgc in sub.GetComponentsInChildren<BaseStasisTurretLogic>()) {
+    			lgc.fire();
+    		}
+    	}
+    	btn.enableForDuration(BaseStasisTurret.COOLDOWN);
     }
     
     private static M createMachine<M, N>(string lck, TechnologyFragment[] frags = null) where N : CustomMachineLogic where M : CustomMachine<N> {
@@ -129,10 +150,14 @@ namespace ReikaKalseki.AqueousEngineering
     [QModPostPatch]
     public static void PostLoad() {
 		Spawnable azurite = ItemRegistry.instance.getItem("VENT_CRYSTAL");
-		if (azurite != null)
-			RecipeUtil.addIngredient(repellentBlock.TechType, azurite.TechType, 8);
-		else
+		if (azurite != null) {
+			RecipeUtil.addIngredient(repellentBlock.TechType, azurite.TechType, 2);
+			RecipeUtil.addIngredient(stasisBlock.TechType, azurite.TechType, 6);
+		}
+		else {
 			RecipeUtil.addIngredient(repellentBlock.TechType, TechType.SeamothElectricalDefense, 1);
+			RecipeUtil.addIngredient(stasisBlock.TechType, TechType.StasisRifle, 1);
+		}
 		
 		Spawnable luminol = ItemRegistry.instance.getItem("Luminol");
 		if (luminol != null) { //c2c is loaded

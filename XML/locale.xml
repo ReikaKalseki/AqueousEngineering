@@ -209,6 +209,56 @@
 			https://i.imgur.com/PH3Bet8.jpg
 		</images>
 	</BaseATPTap>
+	<BaseStasisTurret>
+		<name>
+			Stasis Pylon
+		</name>
+		<desc>
+			A device which can be commanded to trigger a stasis pulse around itself, to temporarily freeze local fauna to allow safe entry or exit into the seabase.
+		</desc>
+		<extradesc>
+			Manual input required - cannot fire automatically
+		</extradesc>
+		<pda>
+			
+		</pda>
+	</BaseStasisTurret>
+	<BaseControlPanel>
+		<name>
+			Control Terminal
+		</name>
+		<desc>
+			Hosts controls for other devices.
+		</desc>
+		<extradesc>
+			
+		</extradesc>
+		<pda>
+			
+		</pda>
+	</BaseControlPanel>
+	<Name>
+		<name>
+			
+		</name>
+		<desc>
+			
+		</desc>
+		<pda>
+			
+		</pda>
+	</Name>
+	<Name>
+		<name>
+			
+		</name>
+		<desc>
+			
+		</desc>
+		<pda>
+			
+		</pda>
+	</Name>
 	<Name>
 		<name>
 			
