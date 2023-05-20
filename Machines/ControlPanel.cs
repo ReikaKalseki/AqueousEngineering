@@ -74,11 +74,32 @@ namespace ReikaKalseki.AqueousEngineering {
 		
 	public class BaseControlPanelLogic : CustomMachineLogic {
 		
+		private static float[] offsets = new float[]{0, -0.125F, 0.33F, 0.5F};
+		
 		private HolographicControl.HolographicControlTag[] buttons = null;
+		
+		private float lastButtonValidityCheck = -1;
+		
+		private readonly HashSet<string> activeButtons = new HashSet<string>();
 		
 		void Start() {
 			SNUtil.log("Reinitializing base control panel");
 			AqueousEngineeringMod.controlsBlock.initializeMachine(gameObject);
+		}
+		
+		protected override void load(System.Xml.XmlElement data) {
+			activeButtons.Clear();
+			foreach (System.Xml.XmlElement e in data.getDirectElementsByTagName("activeButton")) {
+				activeButtons.Add(e.InnerText);
+			}
+		}
+		
+		protected override void save(System.Xml.XmlElement data) {
+			foreach (string s in activeButtons) {
+				System.Xml.XmlElement e = data.OwnerDocument.CreateElement("activeButton");
+				e.InnerText = s;
+				data.AppendChild(e);
+			}
 		}
 		
 		public void addButton(HolographicControl control) {
@@ -94,10 +115,23 @@ namespace ReikaKalseki.AqueousEngineering {
 					return;
 			}
 			GameObject btn = ObjectUtil.createWorldObject(control.ClassID);
+			HolographicControl.HolographicControlTag com = btn.GetComponentInChildren<HolographicControl.HolographicControlTag>();
+			if (activeButtons.Contains(control.ClassID)) {
+				com.setState(true);
+				//activeButtons.Remove(control.ClassID);
+			}
 			btn.transform.SetParent(box.transform);
-			buttons = box.GetComponentsInChildren<HolographicControl.HolographicControlTag>();
-			foreach (HolographicControl.HolographicControlTag tag in buttons) {
-				float f = 2F/buttons.Length-1;
+			updateButtons();
+		}
+		
+		void updateButtons() {
+			buttons = GetComponentsInChildren<HolographicControl.HolographicControlTag>();
+			float offset = -0.4F+buttons.Length*0.3125F;//0.33F; //-0.125 for 1, 0.33 for 2, 0.5 for 3;
+			if (buttons.Length < offsets.Length)
+				offset = offsets[buttons.Length];
+			for (int i = 0; i < buttons.Length; i++) {
+				HolographicControl.HolographicControlTag tag = buttons[i];
+				float f = (2F/buttons.Length)*i-offset;
 				tag.transform.parent.localPosition = new Vector3(f, 0, 0.1F);
 				tag.transform.parent.localScale = new Vector3(2, 2, 1F);
 				tag.transform.localRotation = Quaternion.identity;
@@ -105,8 +139,29 @@ namespace ReikaKalseki.AqueousEngineering {
 			}
 		}
 		
+		void SetHolographicControlState(HolographicControl.HolographicControlTag tag) {
+			string id = tag.GetComponentInParent<PrefabIdentifier>().ClassId;
+			if (tag.getState())
+				activeButtons.Add(id);
+			else
+				activeButtons.Remove(id);
+		}
+		
 		protected override void updateEntity(float seconds) {
-			
+			float time = DayNightCycle.main.timePassedAsFloat;
+			if (time-lastButtonValidityCheck >= 1) {
+				lastButtonValidityCheck = time;
+				bool changed = false;
+				foreach (HolographicControl.HolographicControlTag tag in buttons) {
+					if (tag && !tag.isStillValid()) {
+						tag.destroy();
+						activeButtons.Remove(tag.GetComponentInParent<PrefabIdentifier>().ClassId);
+						changed = true;
+					}
+				}
+				if (changed)
+					updateButtons();
+			}
 		}	
 	}
 }

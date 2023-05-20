@@ -34,8 +34,10 @@ namespace ReikaKalseki.AqueousEngineering {
 			registerGrassProp(BiomeRegions.RegionType.RedGrass, "Coral_reef_red_seaweed_02", 25, 0.5F);
 			registerGrassProp(BiomeRegions.RegionType.Koosh, "Coral_reef_small_deco_03_billboards", 15, 0.5F);
 			registerGrassProp(BiomeRegions.RegionType.Koosh, "coral_reef_grass_03_02", 15, 0.5F);
-			registerGrassProp(BiomeRegions.RegionType.GrandReef, "coral_reef_grass_11_02_gr", 25, 0.5F);
-			registerGrassProp(BiomeRegions.RegionType.GrandReef, "coral_reef_grass_07_gr", 25, 0.5F);
+			//registerGrassProp(BiomeRegions.RegionType.GrandReef, "coral_reef_grass_11_02_gr", 25, 0.5F);
+			registerGrassProp(BiomeRegions.RegionType.GrandReef, "coral_reef_grass_11_02", 12, 0.5F);
+			registerGrassProp(BiomeRegions.RegionType.GrandReef, "coral_reef_grass_07", 25, 0.5F);
+			//registerGrassProp(BiomeRegions.RegionType.GrandReef, "coral_reef_grass_07_gr", 25, 0.5F);
 			//registerGrassProp(BiomeRegions.RegionType.GrandReef, "coral_reef_grass_10_gr", 25, 0.5F);
 			registerGrassProp(BiomeRegions.RegionType.BloodKelp, "coral_reef_grass_07_bk", 25, 0.5F);
 			registerGrassProp(BiomeRegions.RegionType.LostRiver, "coral_reef_grass_11_03_lr", 25, 0.5F);

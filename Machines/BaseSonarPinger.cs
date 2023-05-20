@@ -65,15 +65,27 @@ namespace ReikaKalseki.AqueousEngineering {
 		
 	}
 		
-	public class BaseSonarPingerLogic : CustomMachineLogic {
+	public class BaseSonarPingerLogic : ToggleableMachineBase {
 		
 		private float lastPing;
 		
 		private GameObject rotator;
 		
+		private Renderer mainRenderer;
+		
 		void Start() {
 			SNUtil.log("Reinitializing base sonar");
 			AqueousEngineeringMod.sonarBlock.initializeMachine(gameObject);
+		}
+		
+		protected override void load(System.Xml.XmlElement data) {
+			base.load(data);
+			lastPing = (float)data.getFloat("last", float.NaN);
+		}
+		
+		protected override void save(System.Xml.XmlElement data) {
+			base.save(data);
+			data.addProperty("last", lastPing);
 		}
 		
 		private void ping(float time) {
@@ -93,14 +105,19 @@ namespace ReikaKalseki.AqueousEngineering {
 		}
 		
 		protected override void updateEntity(float seconds) {
-			//if (mainRenderer == null)
-			//	mainRenderer = ObjectUtil.getChildObject(gameObject, "model").GetComponent<Renderer>();
+			base.updateEntity(seconds);
+			if (mainRenderer == null)
+				mainRenderer = GetComponentInChildren<Renderer>();
 			
 			//SNUtil.writeToChat("I am ticking @ "+go.transform.position);
 			if (!rotator)
 				rotator = ObjectUtil.getChildObject(gameObject, "Power_Transmitter");
 			float time = DayNightCycle.main.timePassedAsFloat;
-			if (rotator && getSub() && getSub().powerRelay.GetPower() > 0.1F) {
+			if (mainRenderer)
+				RenderUtil.setEmissivity(mainRenderer, isEnabled ? 1 : 0, "GlowStrength");
+			if (!isEnabled)
+				return;
+			if (rotator && getSub()) {
 				Vector3 angs = rotator.transform.localEulerAngles;
 				angs.y += 90*seconds;
 				rotator.transform.localEulerAngles = angs;
@@ -108,6 +125,10 @@ namespace ReikaKalseki.AqueousEngineering {
 			if (time-lastPing >= BaseSonarPinger.FIRE_RATE && isInAppropriateLocation()) {
 				ping(time);
 			}
-		}	
+		}
+		
+		protected override HolographicControl getButtonType() {
+			return AqueousEngineeringMod.seabaseSonarControl;
+		}
 	}
 }

@@ -211,7 +211,7 @@ namespace ReikaKalseki.AqueousEngineering {
 		
 	}
 		
-	public class BaseCreatureRepellentLogic : CustomMachineLogic {
+	public class BaseCreatureRepellentLogic : ToggleableMachineBase {
 		
 		private float cooldown;
 		private float lastTickTime;
@@ -231,7 +231,24 @@ namespace ReikaKalseki.AqueousEngineering {
 			return cooldown <= 0.01F && DayNightCycle.main.timePassedAsFloat-lastTickTime <= 0.5F;
 		}
 		
+		protected override void load(System.Xml.XmlElement data) {
+			lastTickTime = (float)data.getFloat("last", float.NaN);
+			cooldown = (float)data.getFloat("cooldown", float.NaN);
+			isEnabled = data.getBoolean("toggled");
+		}
+		
+		protected override void save(System.Xml.XmlElement data) {
+			data.addProperty("last", lastTickTime);
+			data.addProperty("cooldown", cooldown);
+			data.addProperty("toggled", isEnabled);
+		}
+		
+		protected override HolographicControl getButtonType() {
+			return AqueousEngineeringMod.seabaseRepellentControl;
+		}
+		
 		protected override void updateEntity(float seconds) {
+			base.updateEntity(seconds);
 			//if (mainRenderer == null)
 			//	mainRenderer = ObjectUtil.getChildObject(gameObject, "model").GetComponent<Renderer>();
 						
@@ -242,7 +259,9 @@ namespace ReikaKalseki.AqueousEngineering {
 				cooldown -= seconds;
 				return;
 			}
-			if (consumePower(BaseCreatureRepellent.POWER_COST*seconds)) {
+			if (GameModeUtils.RequiresPower() && !consumePower(BaseCreatureRepellent.POWER_COST*seconds))
+				isEnabled = false;
+			if (isEnabled) {
 				lastTickTime = DayNightCycle.main.timePassedAsFloat;
 				bool flag = false;
 				HashSet<Creature> set = WorldUtil.getObjectsNearWithComponent<Creature>(gameObject.transform.position, BaseCreatureRepellent.RANGE*BaseCreatureRepellent.maxRangeFactor);

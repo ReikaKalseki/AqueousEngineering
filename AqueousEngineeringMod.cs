@@ -49,6 +49,8 @@ namespace ReikaKalseki.AqueousEngineering
     public static MiniPoo poo;
     
     public static HolographicControl seabaseStasisControl;
+    public static HolographicControl seabaseSonarControl;
+    public static HolographicControl seabaseRepellentControl;
     
     public static readonly WorldgenDatabase worldgen = new WorldgenDatabase();
     
@@ -86,8 +88,12 @@ namespace ReikaKalseki.AqueousEngineering
         poo = new MiniPoo(locale.getEntry("MiniPoop"));
 	    poo.Patch();
 	    
-	    seabaseStasisControl = new HolographicControl("SeabaseStasis", "Fire stasis pulse", fireStasisPulses);
-	    seabaseStasisControl.setIcons("Textures/StasisButton", 200).Patch();
+	    seabaseStasisControl = new HolographicControl("SeabaseStasis", "Fire stasis pulse", fireStasisPulses, btn => machineExists<BaseStasisTurretLogic>(btn));
+	    seabaseStasisControl.setIcons("Textures/HoloButtons/StasisButton", 200).Patch();
+	    seabaseSonarControl = new HolographicControl("SeabaseSonar", "Toggle sonar", btn => toggleMachines<BaseSonarPingerLogic>(btn), btn => machineExists<BaseSonarPingerLogic>(btn));
+	    seabaseSonarControl.setIcons("Textures/HoloButtons/SonarButton", 200).Patch();
+	    seabaseRepellentControl = new HolographicControl("SeabaseRepellent", "Toggle repellant pylon", btn => toggleMachines<BaseCreatureRepellentLogic>(btn), btn => machineExists<BaseCreatureRepellentLogic>(btn));
+	    seabaseRepellentControl.setIcons("Textures/HoloButtons/RepellentButton", 200).Patch();
 	    
 	    sonarBlock = createMachine<BaseSonarPinger, BaseSonarPingerLogic>("BaseSonar");
 	    repellentBlock = createMachine<BaseCreatureRepellent, BaseCreatureRepellentLogic>("BaseRepellent");
@@ -136,6 +142,21 @@ namespace ReikaKalseki.AqueousEngineering
     		}
     	}
     	btn.enableForDuration(BaseStasisTurret.COOLDOWN);
+    }
+    
+    private static void toggleMachines<M>(HolographicControl.HolographicControlTag btn) where M : ToggleableMachineBase {
+    	btn.setState(!btn.getState());
+    	SubRoot sub = btn.gameObject.FindAncestor<SubRoot>();
+    	if (sub && sub.isBase) {
+    		foreach (M lgc in sub.GetComponentsInChildren<M>()) {
+    			lgc.isEnabled = btn.getState();
+    		}
+    	}
+    }
+    
+    private static bool machineExists<M>(HolographicControl.HolographicControlTag btn) where M : CustomMachineLogic {
+    	SubRoot sub = btn.gameObject.FindAncestor<SubRoot>();
+    	return sub && sub.isBase && sub.GetComponentsInChildren<M>().Length > 0;
     }
     
     private static M createMachine<M, N>(string lck, TechnologyFragment[] frags = null) where N : CustomMachineLogic where M : CustomMachine<N> {

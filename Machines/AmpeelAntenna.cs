@@ -24,7 +24,8 @@ namespace ReikaKalseki.AqueousEngineering {
 		public AmpeelAntenna(XMLLocale.LocaleEntry e) : base(e.key, e.name, e.desc, "4cb154ef-bdb6-4ff4-9107-f378ce21a9b7") {
 			addIngredient(TechType.CopperWire, 6);
 			addIngredient(TechType.WiringKit, 2);
-			addIngredient(TechType.PowerTransmitter, 1);
+			addIngredient(TechType.Gold, 1);
+			addIngredient(TechType.Titanium, 1);
 		}
 
 		public override bool UnlockedAtStart {

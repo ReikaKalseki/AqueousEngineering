@@ -62,7 +62,7 @@ namespace ReikaKalseki.AqueousEngineering {
 		
 	public class BaseStasisTurretLogic : CustomMachineLogic {
 		
-		private float lastPing;
+		private float lastFire;
 		
 		private float lastButtonCheck = -1;
 		
@@ -92,8 +92,8 @@ namespace ReikaKalseki.AqueousEngineering {
 		
 		public void fire() {
 			float time = DayNightCycle.main.timePassedAsFloat;
-			if (time-lastPing > BaseStasisTurret.COOLDOWN && consumePower(BaseStasisTurret.POWER_COST)) {
-				lastPing = time;
+			if (time-lastFire > BaseStasisTurret.COOLDOWN && consumePower(BaseStasisTurret.POWER_COST)) {
+				lastFire = time;
 				GameObject sph = ObjectUtil.lookupPrefab(TechType.StasisRifle).GetComponent<StasisRifle>().effectSpherePrefab;
 				sph = UnityEngine.Object.Instantiate(sph);
 				sph.SetActive(true);
@@ -109,7 +109,7 @@ namespace ReikaKalseki.AqueousEngineering {
 		
 		protected override void updateEntity(float seconds) {
 			float time = DayNightCycle.main.timePassedAsFloat;
-			if (time-lastButtonCheck >= 2) {
+			if (time-lastButtonCheck >= 1) {
 				lastButtonCheck = time;
 				addButton();
 			}
