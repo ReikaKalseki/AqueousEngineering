@@ -66,25 +66,22 @@ namespace ReikaKalseki.AqueousEngineering {
 		
 		private float lastButtonCheck = -1;
 		
+		private GameObject sparker;
+		
+		private ParticleSystem[] particles;
+		
+		private Renderer mainRenderer;
+		
 		void Start() {
 			SNUtil.log("Reinitializing base stasis turret");
 			AqueousEngineeringMod.stasisBlock.initializeMachine(gameObject);
 		}
 		
-		private void addButton() {/*
-			foreach (BaseFoundationPiece bf in getSub().GetComponentsInChildren<BaseFoundationPiece>()) {
-				if (bf.name.Contains("Moonpool")) {
-					GameObject box = ObjectUtil.getChildObject(bf.gameObject, "ButtonHolder");
-					if (!box) {
-						box = new GameObject("ButtonHolder");
-						box.transform.SetParent(bf.transform);
-						box.transform.localPosition = Vector3.zero;
-						GameObject btn = ObjectUtil.createWorldObject(AqueousEngineeringMod.seabaseStasisControl.ClassID);
-						btn.transform.SetParent(box.transform);
-						btn.transform.localPosition = new Vector3(0, 0.75F, 3F);
-					}
-				}
-			}*/
+		private void addButton() {
+			if (!getSub()) {
+				SNUtil.log("Could not add button for stasis turret, no sub");
+				return;
+			}
 			foreach (BaseControlPanelLogic panel in getSub().GetComponentsInChildren<BaseControlPanelLogic>()) {
 				panel.addButton(AqueousEngineeringMod.seabaseStasisControl);
 			}
@@ -108,10 +105,39 @@ namespace ReikaKalseki.AqueousEngineering {
 		}
 		
 		protected override void updateEntity(float seconds) {
+			if (mainRenderer == null)
+				mainRenderer = GetComponentInChildren<Renderer>();
+			if (!sparker) {
+				sparker = ObjectUtil.createWorldObject("ff8e782e-e6f3-40a6-9837-d5b6dcce92bc");
+				sparker.transform.localScale = new Vector3(0.4F, 0.4F, 0.4F);
+				sparker.transform.parent = transform;
+				//sparker.transform.eulerAngles = new Vector3(325, 180, 0);
+				ObjectUtil.removeComponent<DamagePlayerInRadius>(sparker);
+				ObjectUtil.removeComponent<PlayerDistanceTracker>(sparker);
+				//ObjectUtil.removeChildObject(sparker, "ElecLight");
+				sparker.transform.localPosition = new Vector3(0, 0.95F, 0);
+				foreach (ParticleSystem p in particles) {
+					ParticleSystem.MainModule pm = p.main;
+					pm.startSize = 0.4F;
+				}
+			}
+			if (particles == null) {
+				particles = sparker.GetComponentsInChildren<ParticleSystem>();
+			}
+			bool active = !GameModeUtils.RequiresPower() || (getSub() && getSub().powerRelay.GetPower() > 0.1F);
+			sparker.SetActive(active);
+			if (mainRenderer)
+				RenderUtil.setEmissivity(mainRenderer, active ? 200 : 0, "GlowStrength");
 			float time = DayNightCycle.main.timePassedAsFloat;
 			if (time-lastButtonCheck >= 1) {
 				lastButtonCheck = time;
 				addButton();
+				
+				sparker.transform.localPosition = new Vector3(0, 0.95F, 0);
+				foreach (ParticleSystem p in particles) {
+					ParticleSystem.MainModule pm = p.main;
+					pm.startSize = 0.4F;
+				}
 			}
 		}	
 	}

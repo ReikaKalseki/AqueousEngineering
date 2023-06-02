@@ -92,6 +92,12 @@ namespace ReikaKalseki.AqueousEngineering {
 			foreach (System.Xml.XmlElement e in data.getDirectElementsByTagName("activeButton")) {
 				activeButtons.Add(e.InnerText);
 			}
+			SNUtil.log("Loaded control panel with active buttons "+activeButtons.toDebugString(), AqueousEngineeringMod.modDLL);
+			if (buttons != null) {
+				foreach (HolographicControl.HolographicControlTag tag in buttons) {
+					tag.setState(activeButtons.Contains(tag.GetComponentInParent<PrefabIdentifier>().ClassId));
+				}
+			}
 		}
 		
 		protected override void save(System.Xml.XmlElement data) {
@@ -116,12 +122,13 @@ namespace ReikaKalseki.AqueousEngineering {
 			}
 			GameObject btn = ObjectUtil.createWorldObject(control.ClassID);
 			HolographicControl.HolographicControlTag com = btn.GetComponentInChildren<HolographicControl.HolographicControlTag>();
+			btn.transform.SetParent(box.transform);
+			updateButtons();
 			if (activeButtons.Contains(control.ClassID)) {
 				com.setState(true);
 				//activeButtons.Remove(control.ClassID);
 			}
-			btn.transform.SetParent(box.transform);
-			updateButtons();
+			SNUtil.log("Added button "+btn+" to control panel; active: "+com.getState(), AqueousEngineeringMod.modDLL);
 		}
 		
 		void updateButtons() {
@@ -149,7 +156,7 @@ namespace ReikaKalseki.AqueousEngineering {
 		
 		protected override void updateEntity(float seconds) {
 			float time = DayNightCycle.main.timePassedAsFloat;
-			if (time-lastButtonValidityCheck >= 1) {
+			if (time-lastButtonValidityCheck >= 1 && buttons != null) {
 				lastButtonValidityCheck = time;
 				bool changed = false;
 				foreach (HolographicControl.HolographicControlTag tag in buttons) {
