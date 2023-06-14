@@ -96,7 +96,7 @@ namespace ReikaKalseki.AqueousEngineering {
 			
 			Renderer screen = floor.GetComponentInChildren<Renderer>();
 			RenderUtil.swapTextures(AqueousEngineeringMod.modDLL, screen, "Textures/Machines/ItemDisplayScreen");
-			RenderUtil.setEmissivity(screen, 1.5F, "GlowStrength");
+			RenderUtil.setEmissivity(screen, 1.5F);
 			screen.materials[0].SetColor("_Color", Color.white);
 			screen.materials[0].SetColor("_GlowColor", Color.white);
 			screen.materials[0].SetFloat("_Fresnel", 0F);

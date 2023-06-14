@@ -127,7 +127,7 @@ namespace ReikaKalseki.AqueousEngineering {
 			bool active = !GameModeUtils.RequiresPower() || (getSub() && getSub().powerRelay.GetPower() > 0.1F);
 			sparker.SetActive(active);
 			if (mainRenderer)
-				RenderUtil.setEmissivity(mainRenderer, active ? 200 : 0, "GlowStrength");
+				RenderUtil.setEmissivity(mainRenderer, active ? 200 : 0);
 			float time = DayNightCycle.main.timePassedAsFloat;
 			if (time-lastButtonCheck >= 1) {
 				lastButtonCheck = time;

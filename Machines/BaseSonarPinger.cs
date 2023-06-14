@@ -114,7 +114,7 @@ namespace ReikaKalseki.AqueousEngineering {
 				rotator = ObjectUtil.getChildObject(gameObject, "Power_Transmitter");
 			float time = DayNightCycle.main.timePassedAsFloat;
 			if (mainRenderer)
-				RenderUtil.setEmissivity(mainRenderer, isEnabled ? 1 : 0, "GlowStrength");
+				RenderUtil.setEmissivity(mainRenderer, isEnabled ? 1 : 0);
 			if (!isEnabled)
 				return;
 			if (rotator && getSub()) {

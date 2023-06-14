@@ -52,7 +52,7 @@ namespace ReikaKalseki.AqueousEngineering {
 			go.GetComponentInChildren<Collider>().transform.localScale = mdl.transform.localScale;
 			Renderer r = mdl.GetComponentInChildren<Renderer>();
 			r.materials[0].SetColor("_GlowColor", Color.white);
-			RenderUtil.setEmissivity(r, 0, "GlowStrength");
+			RenderUtil.setEmissivity(r, 0);
 			Light l = go.GetComponentInChildren<Light>();
 			if (!l)
 				l = ObjectUtil.addLight(go);
@@ -88,7 +88,7 @@ namespace ReikaKalseki.AqueousEngineering {
 		}
 		
 		private void setState(bool on) {
-			RenderUtil.setEmissivity(render, on ? 3 : 0, "GlowStrength");
+			RenderUtil.setEmissivity(render, on ? 3 : 0);
 			light.enabled = on;
 		}
 	}

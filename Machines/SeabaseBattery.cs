@@ -50,7 +50,7 @@ namespace ReikaKalseki.AqueousEngineering {
 			Renderer r = mdl.GetComponentInChildren<Renderer>();
 			//SNUtil.dumpTextures(r);
 			RenderUtil.swapToModdedTextures(r, this);
-			RenderUtil.setEmissivity(r, 2, "GlowStrength");
+			RenderUtil.setEmissivity(r, 2);
 			r.materials[0].SetFloat("_Shininess", 2F);
 			r.materials[0].SetFloat("_Fresnel", 0.6F);
 			r.materials[0].SetFloat("_SpecInt", 8F);

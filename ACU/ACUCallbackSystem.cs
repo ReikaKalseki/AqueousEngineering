@@ -381,7 +381,7 @@ namespace ReikaKalseki.AqueousEngineering {
 				}
 				if (teeth < 10 && consistent && healthy && potentialBiomes.Contains(BiomeRegions.RegionType.Kelp)) {
 					foreach (Stalker s in stalkers) {
-						float f = dT*stalkerToyValue*0.001F*s.Happy.Value;
+						float f = dT*stalkerToyValue*0.004F*s.Happy.Value;
 						//SNUtil.writeToChat(s.Happy.Value+" x "+stalkerToys.Count+" > "+f);
 						if (UnityEngine.Random.Range(0F, 1F) < f) {
 							//do not use, so can have ref to GO; reimplement // s.LoseTooth();
