@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Collections.Generic;
+using System.Xml;
 
 using UnityEngine;
 
@@ -73,6 +74,8 @@ namespace ReikaKalseki.AqueousEngineering {
 		
 		private Renderer effect;
 		
+		private int colorIndexToUse = -1;
+		
 		void Start() {
 			SNUtil.log("Reinitializing base beacon");
 			AqueousEngineeringMod.beaconBlock.initializeMachine(gameObject);
@@ -80,6 +83,15 @@ namespace ReikaKalseki.AqueousEngineering {
 		
 		protected override float getTickRate() {
 			return 0.5F;
+		}
+		
+		protected override void load(XmlElement data) {
+			colorIndexToUse = data.getInt("color", -1);
+		}
+		
+		protected override void save(XmlElement data) {
+			if (ping)
+				data.addProperty("color", ping.colorIndex);
 		}
 		
 		protected override void updateEntity(float seconds) {
@@ -93,9 +105,17 @@ namespace ReikaKalseki.AqueousEngineering {
 			}
 			if (!beacon) {
 				beacon = gameObject.GetComponent<Beacon>();
+				beacon.SetBeaconActiveState(false);
 				ping = gameObject.GetComponent<PingInstance>();
 			}
 			if (beacon) {
+				//if (beacon.beaconLabel && beacon.beaconLabel.pingInstance)
+				//	colorIndex = beacon.beaconLabel.pingInstance.colorIndex;
+				if (colorIndexToUse >= 0) {
+					ping.colorIndex = colorIndexToUse;
+					colorIndexToUse = -1;
+					PingManager.NotifyColor(ping);
+				}
 				SubRoot sub = getSub();
 				if (sub) {
 					List<Vehicle> docked = new List<Vehicle>();
