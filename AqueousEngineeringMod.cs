@@ -87,6 +87,7 @@ namespace ReikaKalseki.AqueousEngineering
         
         poo = new MiniPoo(locale.getEntry("MiniPoop"));
 	    poo.Patch();
+		BioReactorHandler.Main.SetBioReactorCharge(poo.TechType, BaseBioReactor.GetCharge(TechType.SeaTreaderPoop)/4);
 	    
 	    seabaseStasisControl = new HolographicControl("SeabaseStasis", "Fire stasis pulse", fireStasisPulses, btn => machineExists<BaseStasisTurretLogic>(btn));
 	    seabaseStasisControl.setIcons("Textures/HoloButtons/StasisButton", 200).Patch();

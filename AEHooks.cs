@@ -55,10 +55,14 @@ namespace ReikaKalseki.AqueousEngineering {
 			if (!sub) {
 				sub = WorldUtil.getClosest<SubRoot>(cam.gameObject);
 			}
-			if (sub && Vector3.Distance(sub.transform.position, cam.transform.position) <= 400) {
-				RemoteCameraAntennaLogic lgc = sub.GetComponentInChildren<RemoteCameraAntennaLogic>();
-				if (lgc && lgc.isReady())
-					return 0;
+			if (sub) {
+				float dist = Vector3.Distance(sub.transform.position, cam.transform.position);
+				if (dist <= 400) {
+					RemoteCameraAntennaLogic lgc = sub.GetComponentInChildren<RemoteCameraAntennaLogic>();
+					if (lgc && lgc.isReady()) {
+						return dist <= 350 ? 0 : (float)MathUtil.linterpolate(dist, 350, 400, 0, 400, true);
+					}
+				}
 			}
 			return cam.GetScreenDistance(scr);
 		}
