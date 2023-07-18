@@ -16,7 +16,7 @@ namespace ReikaKalseki.AqueousEngineering {
 	
 	public class ACUBooster : CustomMachine<ACUBoosterLogic> {
 		
-		internal static readonly float POWER_COST = 0.125F;
+		internal static readonly float POWER_COST = 0.0625F;
 		internal static readonly float CONSUMPTION_RATE = 15*60; //s
 		
 		internal static BasicCraftingItem fuel;

@@ -35,7 +35,7 @@ namespace ReikaKalseki.AqueousEngineering {
 			if (!item)
 		   		return false;
 			TechType tt = item.GetTechType();
-			if (tt == TechType.ScrapMetal || tt == TechType.Titanium || tt == TechType.Silver)
+			if (ACUCallbackSystem.isStalkerToy(tt))
 				return true;
 			GameObject go = item.gameObject;
 			if (go.GetComponent<Creature>() == null && go.GetComponent<CreatureEgg>() == null)

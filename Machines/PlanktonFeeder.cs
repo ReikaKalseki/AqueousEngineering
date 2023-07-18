@@ -16,7 +16,7 @@ namespace ReikaKalseki.AqueousEngineering {
 	
 	public class PlanktonFeeder : CustomMachine<PlanktonFeederLogic>, MultiTexturePrefab<StringPrefabContainer> {
 		
-		internal static readonly float POWER_COST = 0.5F; //per second
+		internal static readonly float POWER_COST = 0.125F; //per second
 		internal static readonly float CONSUMPTION_RATE = 1F/240F; //per second
 		internal static readonly float RANGE = 250F; //m
 		

@@ -31,6 +31,7 @@ namespace ReikaKalseki.AqueousEngineering {
 			setRendererBehavior(TechType.Polyaniline, new ItemDisplayRenderBehavior(){sizeMultiplier = 1.5F});
 			setRendererBehavior(TechType.HydrochloricAcid, new ItemDisplayRenderBehavior(){sizeMultiplier = 1.5F});
 			setRendererBehavior(TechType.Benzene, new ItemDisplayRenderBehavior(){sizeMultiplier = 2F});
+			setRendererBehavior(TechType.BloodOil, new ItemDisplayRenderBehavior(){sizeMultiplier = 0.25F});
 			setRendererBehavior(TechType.ReactorRod, ItemDisplayRenderBehavior.getDefaultButSpecificChild("model"));
 		}
 		

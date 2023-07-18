@@ -23,6 +23,22 @@ namespace ReikaKalseki.AqueousEngineering {
 		
 		public static readonly ACUCallbackSystem instance = new ACUCallbackSystem();
 		
+		private static readonly Dictionary<TechType, float> toyValues = new Dictionary<TechType, float>();
+		
+		static ACUCallbackSystem() {
+			addStalkerToy(TechType.Titanium, 0.5F);
+			addStalkerToy(TechType.ScrapMetal, 1F);
+			addStalkerToy(TechType.Silver, 2F);
+		}
+		
+		public static void addStalkerToy(TechType tt, float amt) {
+			toyValues[tt] = amt;
+		}
+		
+		public static bool isStalkerToy(TechType tt) {
+			return toyValues.ContainsKey(tt);
+		}
+		
 		private readonly string xmlPathRoot;
 		
 		private readonly Dictionary<Vector3, CachedACUData> cache = new Dictionary<Vector3, CachedACUData>();
@@ -312,21 +328,9 @@ namespace ReikaKalseki.AqueousEngineering {
 						continue;
 					Pickupable pp = wp.gameObject.GetComponentInChildren<Pickupable>();
 					TechType tt = pp ? pp.GetTechType() : TechType.None;
-					if (tt == TechType.Titanium || tt == TechType.ScrapMetal || tt == TechType.Silver) {
+					if (isStalkerToy(tt)) {
+						stalkerToyValue += toyValues[tt];
 						pp.gameObject.transform.localScale = Vector3.one*0.5F;
-						float v = 0;
-						switch(tt) {
-							case TechType.Titanium:
-								v = 0.5F;
-								break;
-							case TechType.ScrapMetal:
-								v = 1;
-								break;
-							case TechType.Silver:
-								v = 2;
-								break;
-						}
-						stalkerToyValue += v;
 					}
 					else if (tt == TechType.StalkerTooth) {
 						pp.gameObject.transform.localScale = Vector3.one*0.125F;
