@@ -41,6 +41,7 @@ namespace ReikaKalseki.AqueousEngineering
     public static ATPTap atpTapBlock;
     public static BaseStasisTurret stasisBlock;
     public static BaseControlPanel controlsBlock;
+    public static BaseDrillableGrinder grinderBlock;
     
     public static OutdoorPot outdoorBasicPot;
     public static OutdoorPot outdoorChicPot;
@@ -110,6 +111,7 @@ namespace ReikaKalseki.AqueousEngineering
 	    atpTapBlock = createMachine<ATPTap, ATPTapLogic>("BaseATPTap");
 	    stasisBlock = createMachine<BaseStasisTurret, BaseStasisTurretLogic>("BaseStasisTurret");
 	    controlsBlock = createMachine<BaseControlPanel, BaseControlPanelLogic>("BaseControlPanel");
+	    grinderBlock = createMachine<BaseDrillableGrinder, BaseDrillableGrinderLogic>("BaseDrillableGrinder");
         
         outdoorBasicPot = new OutdoorPot(TechType.PlanterPot);
         outdoorCompositePot = new OutdoorPot(TechType.PlanterPot2);
@@ -195,6 +197,7 @@ namespace ReikaKalseki.AqueousEngineering
 		if (motor != null) {
 			RecipeUtil.addIngredient(acuCleanerBlock.TechType, motor.TechType, 1);
 			RecipeUtil.addIngredient(farmerBlock.TechType, motor.TechType, 2);
+			RecipeUtil.addIngredient(grinderBlock.TechType, motor.TechType, 5);
 		}
 		else {
 			RecipeUtil.addIngredient(acuCleanerBlock.TechType, TechType.Lubricant, 2);

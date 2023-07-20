@@ -137,7 +137,7 @@
 			ACU Feeding System
 		</name>
 		<desc>
-			Periodically adds small amounts of plankton to the ACU to top up food supplies for herbivorous fish, increasing their fertility.
+			Periodically adds small amounts of plankton to the ACU to top up food supplies for herbivorous fish, increasing their fertility. Does not stack.
 		</desc>
 		<pda>
 			
@@ -237,6 +237,20 @@
 			
 		</pda>
 	</BaseControlPanel>
+	<BaseDrillableGrinder>
+		<name>
+			Rock Crusher
+		</name>
+		<desc>
+			Breaks down large resource deposits into hand-collectable chunks.
+		</desc>
+		<extradesc>
+			
+		</extradesc>
+		<pda>
+			
+		</pda>
+	</BaseDrillableGrinder>
 	<Name>
 		<name>
 			

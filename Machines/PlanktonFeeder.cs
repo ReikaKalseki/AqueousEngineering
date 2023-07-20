@@ -38,7 +38,7 @@ namespace ReikaKalseki.AqueousEngineering {
 		
 		public PlanktonFeeder(XMLLocale.LocaleEntry e) : base(e.key, e.name, e.desc, "bedc40fb-bd97-4b4d-a943-d39360c9c7bd") {
 			addIngredient(TechType.FiberMesh, 1);
-			addIngredient(TechType.Pipe, 2);
+			addIngredient(TechType.Pipe, 5);
 			addIngredient(TechType.Titanium, 3);
 			
 			glowIntensity = 1;
