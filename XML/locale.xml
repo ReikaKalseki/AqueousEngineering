@@ -29,6 +29,9 @@
 		<name>
 			Creature Repellant Pylon
 		</name>
+		<navName>
+			Repellant Pylon
+		</navName>
 		<desc>
 			Discourages close approach of creatures to the seabase.
 		</desc>
@@ -89,6 +92,9 @@
 		<name>
 			ACU Cleaning System
 		</name>
+		<navName>
+			ACU Cleaner
+		</navName>
 		<desc>
 			Keeps the ACU clean of debris, including excreted waste from the contained animals.
 		</desc>
@@ -104,6 +110,9 @@
 		<name>
 			Scanner Camera Relay Antenna
 		</name>
+		<navName>
+			Camera Relay
+		</navName>
 		<desc>
 			Eliminates the distance attenuation from scanner room camera signals for the attached seabase.
 		</desc>
@@ -136,6 +145,9 @@
 		<name>
 			ACU Feeding System
 		</name>
+		<navName>
+			ACU Feeder
+		</navName>
 		<desc>
 			Periodically adds small amounts of plankton to the ACU to top up food supplies for herbivorous fish, increasing their fertility. Does not stack.
 		</desc>
@@ -222,6 +234,9 @@
 		<pda>
 			
 		</pda>
+		<images>
+			https://i.imgur.com/qgKQDna.jpg
+		</images>
 	</BaseStasisTurret>
 	<BaseControlPanel>
 		<name>
@@ -236,6 +251,10 @@
 		<pda>
 			
 		</pda>
+		<images>
+			https://i.imgur.com/DkfcDed.jpg
+			https://i.imgur.com/GLo1Kix.jpg
+		</images>
 	</BaseControlPanel>
 	<BaseDrillableGrinder>
 		<name>
@@ -248,8 +267,15 @@
 			
 		</extradesc>
 		<pda>
+			The rock crusher is a powerful industrial device designed to substantially increase mineralogic yields. It can break down large material deposits into pieces compatible with direct use in fabrication, without the need to transport heavy and expensive drilling equipment to the mining site.
 			
+			Manufacturer's Note: Under certain circumstances, the combined act of markedly increasing material surface area and agitating the material in the water may trigger a chemical reaction with the local environment and alter the products yielded from the grinding process.
+			
+			Not rated for ultrahard crystalline materials.
 		</pda>
+		<images>
+			https://i.imgur.com/L0xNPH2.jpg
+		</images>
 	</BaseDrillableGrinder>
 	<Name>
 		<name>

@@ -163,8 +163,11 @@ namespace ReikaKalseki.AqueousEngineering
     }
     
     private static M createMachine<M, N>(string lck, TechnologyFragment[] frags = null) where N : CustomMachineLogic where M : CustomMachine<N> {
-    	M m = (M)Activator.CreateInstance(typeof(M), locale.getEntry(lck));
+    	XMLLocale.LocaleEntry e = locale.getEntry(lck);
+    	M m = (M)Activator.CreateInstance(typeof(M), e);
         m.Patch();
+        if (!string.IsNullOrEmpty(e.pda))
+        	m.addPDAPage(e.pda, lck);
         if (frags != null)
         	m.addFragments(frags.Length, 4F, frags);
         SNUtil.log("Registered custom machine "+m);

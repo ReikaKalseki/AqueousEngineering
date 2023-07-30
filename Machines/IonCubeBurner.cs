@@ -38,6 +38,10 @@ namespace ReikaKalseki.AqueousEngineering {
 			return false;
 		}
 		
+		protected override bool isPowerGenerator() {
+			return true;
+		}
+		
 		public override void initializeMachine(GameObject go) {
 			base.initializeMachine(go);
 			ObjectUtil.removeComponent<Trashcan>(go);

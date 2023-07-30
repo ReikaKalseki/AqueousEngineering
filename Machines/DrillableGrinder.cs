@@ -122,6 +122,9 @@ namespace ReikaKalseki.AqueousEngineering {
 				Drillable d = other.gameObject.FindAncestor<Drillable>();
 				//SNUtil.writeToChat("Drillable: "+d);
 				if (d && d.resources.Length > 0) {
+					SpecialDrillable s = other.gameObject.FindAncestor<SpecialDrillable>();
+					if (s && !s.allowAutomatedGrinding())
+						return;
 					isGrinding = true;
 					TechType tt = d.resources[0].techType;
 					SoundManager.SoundData sound = workingSound;
@@ -178,15 +181,16 @@ namespace ReikaKalseki.AqueousEngineering {
 						for (int i = 0; i < amt; i++) {
 							GameObject drop = d.ChooseRandomResource();
 							if (drop) {
-								drop = UnityEngine.Object.Instantiate<GameObject>(drop);
 								DrillableGrindingResult res = new DrillableGrindingResult(this, tt, d, drop);
 								BaseDrillableGrinder.pingEvent(res);
-								drop = res.drop;
-								if (drop) {
-									drop.transform.position = aoe.transform.position+Vector3.down*0.7F+transform.forward*0.25F;
-									drop.transform.rotation = UnityEngine.Random.rotationUniform;
-									drop.GetComponent<Rigidbody>().isKinematic = false;
-									drop.GetComponent<Rigidbody>().AddForce(transform.forward.normalized*15);
+								if (res.drop) {
+									for (int a = 0; a < res.dropCount; a++) {
+										GameObject use = UnityEngine.Object.Instantiate(res.drop);
+										use.transform.position = aoe.transform.position+Vector3.down*0.7F+transform.forward*0.25F;
+										use.transform.rotation = UnityEngine.Random.rotationUniform;
+										use.GetComponent<Rigidbody>().isKinematic = false;
+										use.GetComponent<Rigidbody>().AddForce(transform.forward.normalized*15);
+									}
 								}
 							}
 						}
@@ -221,6 +225,7 @@ namespace ReikaKalseki.AqueousEngineering {
 		public readonly GameObject originalDrop;
 		
 		public GameObject drop;
+		public int dropCount = 1;
 		
 		internal DrillableGrindingResult(BaseDrillableGrinderLogic lgc, TechType tt, Drillable d, GameObject go) {
 			grinder = lgc;

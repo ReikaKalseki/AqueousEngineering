@@ -41,6 +41,7 @@ namespace ReikaKalseki.AqueousEngineering {
 	    	{TechType.SpineEel, new ACUMetabolism(0.6F, 3F, true, BiomeRegions.RegionType.LostRiver)},
 			{TechType.GhostRayBlue, new ACUMetabolism(0.67F, 0.6F, false, BiomeRegions.RegionType.LostRiver)},
 			{TechType.GhostRayRed, new ACUMetabolism(1.25F, 0.6F, false, BiomeRegions.RegionType.LavaZone)},
+			{TechType.Mesmer, new ACUMetabolism(0.1F, 0.7F, true, BiomeRegions.RegionType.Koosh, BiomeRegions.RegionType.LostRiver)},
 	    };
 		
 		static ACUEcosystems() {
