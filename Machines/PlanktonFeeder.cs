@@ -84,6 +84,10 @@ namespace ReikaKalseki.AqueousEngineering {
 			r[0].materials[0].SetColor("_GlowColor", Color.white);
 			//r.materials[1].color = Color.clear;
 			
+			BoxCollider box = go.GetComponentInChildren<BoxCollider>();
+			box.size = mdl.transform.localScale;
+			box.center = Vector3.zero;
+			
 			string name = "BubbleRoot";
 			GameObject child = ObjectUtil.getChildObject(go, name);
 			if (child == null) {
