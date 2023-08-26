@@ -186,6 +186,7 @@ namespace ReikaKalseki.AqueousEngineering {
 								if (res.drop) {
 									for (int a = 0; a < res.dropCount; a++) {
 										GameObject use = UnityEngine.Object.Instantiate(res.drop);
+										use.SetActive(true);
 										use.transform.position = aoe.transform.position+Vector3.down*0.7F+transform.forward*0.25F;
 										use.transform.rotation = UnityEngine.Random.rotationUniform;
 										use.GetComponent<Rigidbody>().isKinematic = false;
