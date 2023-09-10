@@ -96,7 +96,7 @@ namespace ReikaKalseki.AqueousEngineering {
 		   	}
 	   		else if (Builder.constructableTechType == AqueousEngineeringMod.batteryBlock.TechType) {
 	   			//SNUtil.writeToChat(check.placeOn ? check.placeOn.gameObject.GetFullHierarchyPath() : "null");
-	   			check.placeable &= check.placeOn && ObjectUtil.isRoom(check.placeOn.gameObject, false);
+	   			check.placeable &= check.placeOn && (ObjectUtil.isRoom(check.placeOn.gameObject, false) || ObjectUtil.isMoonpool(check.placeOn.gameObject, false, false));
 				check.ignoreSpaceRequirements = false;
 		   	}
 	    }
