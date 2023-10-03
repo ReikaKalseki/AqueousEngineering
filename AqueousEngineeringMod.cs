@@ -132,7 +132,7 @@ namespace ReikaKalseki.AqueousEngineering
         TechnologyUnlockSystem.instance.addDirectUnlock(TechType.Beacon, beaconBlock.TechType);
         TechnologyUnlockSystem.instance.addDirectUnlock(poo.TechType, acuCleanerBlock.TechType);
         TechnologyUnlockSystem.instance.addDirectUnlock(TechType.BaseMapRoom, cameraAntennaBlock.TechType);
-        TechnologyUnlockSystem.instance.addDirectUnlock(TechType.StasisRifle, stasisBlock.TechType);
+        //TechnologyUnlockSystem.instance.addDirectUnlock(TechType.StasisRifle, stasisBlock.TechType);
         
         ConsoleCommandsHandler.Main.RegisterConsoleCommand<Action>("debugACU", ACUCallbackSystem.instance.debugACU);
     }

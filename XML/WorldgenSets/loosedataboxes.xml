@@ -229,4 +229,30 @@
     </scale>
     <xmlID>481eb177-e055-48b3-a095-f8496f87c7bc</xmlID>
   </customprefab>
+  <customprefab>
+    <prefab>databox</prefab>
+    <tech>BaseStasisTurret</tech>
+    <position>
+      <x>534.770690917969</x>
+      <y>-135.855987548828</y>
+      <z>-662.115417480469</z>
+    </position>
+    <rotation>
+      <x>0.274714440107346</x>
+      <y>0.0199132766574621</y>
+      <z>8.29190158843994</z>
+      <quaternion>
+        <x>0.00240362342447042</x>
+        <y>0</y>
+        <z>0.0722967386245728</z>
+        <w>0.997380316257477</w>
+      </quaternion>
+    </rotation>
+    <scale>
+      <x>0.75</x>
+      <y>0.75</y>
+      <z>0.75</z>
+    </scale>
+    <xmlID>d74e7343-c7fe-4116-a82e-dc4784f2fa38</xmlID>
+  </customprefab>
 </Root>
