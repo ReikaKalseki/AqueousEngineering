@@ -264,42 +264,7 @@ namespace ReikaKalseki.AqueousEngineering {
 			if (isEnabled) {
 				lastTickTime = DayNightCycle.main.timePassedAsFloat;
 				bool flag = false;
-				HashSet<Creature> set = WorldUtil.getObjectsNearWithComponent<Creature>(gameObject.transform.position, BaseCreatureRepellent.RANGE*BaseCreatureRepellent.maxRangeFactor);
-				foreach (Creature c in set) {
-					if (c && c.friend != Player.main.gameObject && (c.Aggression.Value > 0 || c.GetComponent<AggressiveWhenSeeTarget>())) {
-						if (c is GhostLeviatanVoid)
-							continue;
-						float r = BaseCreatureRepellent.RANGE;
-						float r0 = BaseCreatureRepellent.RANGE_INNER;
-						CreatureEffectivity ce = null;
-						TechType tt = CraftData.GetTechType(c.gameObject);
-						if (tt != TechType.None && BaseCreatureRepellent.effectivityMap.ContainsKey(tt)) {
-							ce = BaseCreatureRepellent.effectivityMap[tt];
-							r *= ce.rangeFactor;
-							r0 *= ce.rangeFactor;
-						}
-						float dd = Vector3.Distance(c.transform.position, transform.position);
-						float f = dd <= r0 ? 0.3F : 0.15F;
-						if (dd >= r)
-							continue;
-						//SNUtil.writeToChat(c+" @ "+c.transform.position+" D="+dd+" > "+c.Scared.Value);
-						c.flinch = 1;
-						f *= 2;
-						if (ce != null)
-							f *= ce.effectivity;
-						c.Scared.Add(f*seconds);
-						c.Aggression.Add(-f*seconds*0.4F);
-						flag = true;
-						if (c.Scared.Value > 0.5F && dd < r*0.5F) {
-							Vector3 vec = transform.position+((c.transform.position-transform.position)*3);
-							c.GetComponent<SwimBehaviour>().SwimTo(vec, 20*f);
-						}
-						if (dd <= 4F && c.liveMixin) {
-							float dmg = ce != null ? ce.damageFactor : 1;
-							c.liveMixin.TakeDamage(3*seconds*dmg, c.transform.position, DamageType.Electrical, gameObject);
-						}
-					}
-				}
+				WorldUtil.getGameObjectsNear(transform.position, BaseCreatureRepellent.RANGE*BaseCreatureRepellent.maxRangeFactor, go => flag |= tryRepel(go, seconds));
 				if (Player.main.IsSwimming()) {
 					float ddp = Vector3.Distance(Player.main.transform.position, transform.position);
 					if (ddp <= 2.5F) {
@@ -311,6 +276,44 @@ namespace ReikaKalseki.AqueousEngineering {
 						cooldown = 5;
 				}
 			}
-		}	
+		}
+		
+		private bool tryRepel(GameObject go, float seconds) {
+			Creature c = go.GetComponent<Creature>();
+			if (c && c.friend != Player.main.gameObject && (c.Aggression.Value > 0 || c.GetComponent<AggressiveWhenSeeTarget>())) {
+				if (c is GhostLeviatanVoid)
+					return false;
+				float r = BaseCreatureRepellent.RANGE;
+				float r0 = BaseCreatureRepellent.RANGE_INNER;
+				CreatureEffectivity ce = null;
+				TechType tt = CraftData.GetTechType(c.gameObject);
+				if (tt != TechType.None && BaseCreatureRepellent.effectivityMap.ContainsKey(tt)) {
+					ce = BaseCreatureRepellent.effectivityMap[tt];
+					r *= ce.rangeFactor;
+					r0 *= ce.rangeFactor;
+				}
+				float dd = Vector3.Distance(c.transform.position, transform.position);
+				float f = dd <= r0 ? 0.3F : 0.15F;
+				if (dd >= r)
+					return false;
+				//SNUtil.writeToChat(c+" @ "+c.transform.position+" D="+dd+" > "+c.Scared.Value);
+				c.flinch = 1;
+				f *= 2;
+				if (ce != null)
+					f *= ce.effectivity;
+				c.Scared.Add(f*seconds);
+				c.Aggression.Add(-f*seconds*0.4F);
+				if (c.Scared.Value > 0.5F && dd < r*0.5F) {
+					Vector3 vec = transform.position+((c.transform.position-transform.position)*3);
+					c.GetComponent<SwimBehaviour>().SwimTo(vec, 20*f);
+				}
+				if (dd <= 4F && c.liveMixin) {
+					float dmg = ce != null ? ce.damageFactor : 1;
+					c.liveMixin.TakeDamage(3*seconds*dmg, c.transform.position, DamageType.Electrical, gameObject);
+				}
+				return true;
+			}
+			return false;
+		}
 	}
 }

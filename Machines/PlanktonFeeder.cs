@@ -146,37 +146,45 @@ namespace ReikaKalseki.AqueousEngineering {
 			if (consumePower(PlanktonFeeder.POWER_COST*seconds) && getStorage().container.GetCount(PlanktonFeeder.fuel.TechType) > 0) {
 				setState(true);
 				float r = PlanktonFeeder.RANGE;
-				HashSet<Creature> set = WorldUtil.getObjectsNearWithComponent<Creature>(gameObject.transform.position, r);
-				foreach (Creature c in set) {
-					TechType tt = c.GetComponent<TechTag>().type;
-					WildFeedingBehavior feed = PlanktonFeeder.behaviors.ContainsKey(tt) ? PlanktonFeeder.behaviors[tt] : null;
-					if (feed != null) {
-						float dd = Vector3.Distance(c.transform.position, transform.position);
-						if (dd >= feed.maxAttractRange)
-							continue;
-						c.GetComponent<SwimBehaviour>().SwimTo(transform.position, feed.attractionSpeed);
-						c.leashPosition = transform.position;
-						StayAtLeashPosition leash = c.GetComponent<StayAtLeashPosition>();
-						if (leash) {
-							leash.leashDistance = feed.minRange;
-							leash.swimVelocity = feed.attractionSpeed;
-						}
-						if (c is GhostLeviathan) {
-							c.Aggression.Add(-0.005F*seconds);
-						}
-						c.Hunger.Add(-0.04F*seconds);
-						if (dd <= feed.maxBreedRange && UnityEngine.Random.Range(0F, 1F) <= feed.breedChance*seconds*0.005F) {
-							tryBreed(c);
-						}
-					}
-				}
-				if (set.Count > 0 && UnityEngine.Random.Range(0F, 1F) <= PlanktonFeeder.CONSUMPTION_RATE*seconds) {
+				bool any = false;
+				WorldUtil.getGameObjectsNear(gameObject.transform.position, r, go => any |= tryBreedCycle(go, seconds));
+				if (any && UnityEngine.Random.Range(0F, 1F) <= PlanktonFeeder.CONSUMPTION_RATE*seconds) {
 					getStorage().container.DestroyItem(PlanktonFeeder.fuel.TechType);
 				}
 			}
 			else {
 				setState(false);
 			}
+		}
+		
+		private bool tryBreedCycle(GameObject go, float seconds) {
+			TechTag ttag = go.GetComponent<TechTag>();
+			if (!ttag)
+				return false;
+			TechType tt = ttag.type;
+			WildFeedingBehavior feed = PlanktonFeeder.behaviors.ContainsKey(tt) ? PlanktonFeeder.behaviors[tt] : null;
+			if (feed != null) {
+				Creature c = go.GetComponent<Creature>();
+				float dd = Vector3.Distance(go.transform.position, transform.position);
+				if (dd >= feed.maxAttractRange)
+					return false;
+				go.GetComponent<SwimBehaviour>().SwimTo(transform.position, feed.attractionSpeed);
+				c.leashPosition = transform.position;
+				StayAtLeashPosition leash = go.GetComponent<StayAtLeashPosition>();
+				if (leash) {
+					leash.leashDistance = feed.minRange;
+					leash.swimVelocity = feed.attractionSpeed;
+				}
+				if (c is GhostLeviathan) {
+					c.Aggression.Add(-0.005F*seconds);
+				}
+				c.Hunger.Add(-0.04F*seconds);
+				if (dd <= feed.maxBreedRange && UnityEngine.Random.Range(0F, 1F) <= feed.breedChance*seconds*0.005F) {
+					tryBreed(c);
+				}
+				return true;
+			}
+			return false;
 		}
 		
 		private void setState(bool enable) {

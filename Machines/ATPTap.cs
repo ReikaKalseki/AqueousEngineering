@@ -56,7 +56,7 @@ namespace ReikaKalseki.AqueousEngineering {
 		
 	public class ATPTapLogic : CustomMachineLogic {
 		
-		private GameObject cableObject;
+		private bool hasCable;
 		
 		private ThermalPlant thermalComponent;
 		
@@ -102,21 +102,21 @@ namespace ReikaKalseki.AqueousEngineering {
 		}
 		
 		private void tryFindCable() {
-			cableObject = null;
+			hasCable = false;
 			if (Vector3.Distance(transform.position, drfLocation) <= 200) {
 				return; //those cables are dead
 			}
-			foreach (PrefabIdentifier pi in WorldUtil.getObjectsNearWithComponent<PrefabIdentifier>(transform.position, 4)) {
-				if (pi && cableObjects.Contains(pi.classId)) {
-					cableObject = pi.gameObject;
-					break;
-				}
-			}
-			setEmissiveStates(cableObject);
+			hasCable = WorldUtil.areAnyObjectsNear(transform.position, 4, isValidCable);
+			setEmissiveStates(hasCable);
+		}
+		
+		private bool isValidCable(GameObject go) {
+			PrefabIdentifier pi = go.GetComponent<PrefabIdentifier>();
+			return pi && cableObjects.Contains(pi.classId);
 		}
 		
 		private void AddPower() {
-			if (this.getBuildable().constructed && this.cableObject) {
+			if (this.getBuildable().constructed && hasCable) {
 				//float trash = 0f;
 				//thermalComponent.powerSource.AddEnergy(25, out trash);
 				SubRoot sub = getSub();
