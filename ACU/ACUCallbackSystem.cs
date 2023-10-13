@@ -44,7 +44,7 @@ namespace ReikaKalseki.AqueousEngineering {
 		private readonly Dictionary<Vector3, CachedACUData> cache = new Dictionary<Vector3, CachedACUData>();
 		
 		private ACUCallbackSystem() {
-			xmlPathRoot = Path.Combine(Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location), "acu_data_cache");
+			xmlPathRoot = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "acu_data_cache");
 		}
 		
 		internal void register() {
@@ -385,7 +385,7 @@ namespace ReikaKalseki.AqueousEngineering {
 				}
 				if (teeth < 10 && consistent && healthy && potentialBiomes.Contains(BiomeRegions.RegionType.Kelp)) {
 					foreach (Stalker s in stalkers) {
-						float f = dT*stalkerToyValue*0.004F*s.Happy.Value;
+						float f = dT*stalkerToyValue*0.006F*s.Happy.Value;
 						//SNUtil.writeToChat(s.Happy.Value+" x "+stalkerToys.Count+" > "+f);
 						if (UnityEngine.Random.Range(0F, 1F) < f) {
 							//do not use, so can have ref to GO; reimplement // s.LoseTooth();

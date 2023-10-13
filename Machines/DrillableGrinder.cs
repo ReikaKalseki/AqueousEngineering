@@ -53,8 +53,12 @@ namespace ReikaKalseki.AqueousEngineering {
 			go.transform.localScale = new Vector3(1F, 1F, 1F);
 			
 			Renderer r = go.GetComponentInChildren<Renderer>();
-			r.transform.localScale = new Vector3(1, 2, 1);
+			Vector3 sc = new Vector3(1, 2, 1);
+			r.transform.localScale = sc;
 			RenderUtil.swapToModdedTextures(r, this);
+			
+			foreach (Collider c in go.GetComponentsInChildren<Collider>())
+				c.gameObject.transform.localScale = new Vector3(1, 1, sc.y);
 		}
 		
 		internal static void pingEvent(DrillableGrindingResult e) {
@@ -97,7 +101,7 @@ namespace ReikaKalseki.AqueousEngineering {
 				aoe = go.EnsureComponent<BoxCollider>();
 				go.EnsureComponent<BaseDrillableGrinderColliderTag>().machine = this;
 			}
-			aoe.transform.localPosition = new Vector3(0, 1.5F, 0.5F);
+			aoe.transform.localPosition = new Vector3(0, 1.5F, 0.75F);
 			aoe.transform.localRotation = Quaternion.identity;
 			aoe.isTrigger = true;
 			aoe.center = Vector3.zero;
@@ -119,6 +123,8 @@ namespace ReikaKalseki.AqueousEngineering {
 		
 	    internal void OnTriggerStay(Collider other) {
 			if (!other.isTrigger && isReady) {
+				SoundManager.SoundData sound = workingSound;
+				float loopTime = 3.25F;
 				Drillable d = other.gameObject.FindAncestor<Drillable>();
 				//SNUtil.writeToChat("Drillable: "+d);
 				if (d && d.resources.Length > 0) {
@@ -127,8 +133,6 @@ namespace ReikaKalseki.AqueousEngineering {
 						return;
 					isGrinding = true;
 					TechType tt = d.resources[0].techType;
-					SoundManager.SoundData sound = workingSound;
-					float loopTime = 3.25F;
 					if (tt == TechType.Kyanite) {
 						//too hard : make grinding noises and sparks and such
 						sound = jammedSound;
@@ -148,16 +152,34 @@ namespace ReikaKalseki.AqueousEngineering {
 						d.lootPinataObjects.Clear();*/
 						drill(d, tt);
 					}
-					if (DayNightCycle.main.timePassedAsFloat-lastSound >= loopTime-0.1F) {
-						lastSound = DayNightCycle.main.timePassedAsFloat;
-						SoundManager.playSoundAt(sound, transform.position);
+					if (d.GetComponent<ReactsOnDrilled>())
+						d.gameObject.SendMessage("onDrilled");
+				}
+				else {
+					Player p = other.gameObject.FindAncestor<Player>();
+					if (p && p.IsSwimming()) {
+						isGrinding = true;
+						p.liveMixin.TakeDamage(20*Time.deltaTime, p.transform.position, DamageType.Drill, gameObject);
 					}
+					SeaMoth v = other.gameObject.FindAncestor<SeaMoth>();
+					if (v) {
+						isGrinding = true;
+						v.liveMixin.TakeDamage(10*Time.deltaTime, v.transform.position, DamageType.Drill, gameObject);
+						sound = jammedSound;
+						loopTime = 1.6805F;
+					}
+				}
+				
+				if (isGrinding) {
 					float dT = Time.deltaTime;
 					foreach (GameObject dd in drills) {
 						dd.transform.Rotate(new Vector3(0, dT*100, 0), Space.Self);
 					}
-					if (d.GetComponent<ReactsOnDrilled>())
-						d.gameObject.SendMessage("onDrilled");
+					
+					if (DayNightCycle.main.timePassedAsFloat-lastSound >= loopTime-0.1F) {
+						lastSound = DayNightCycle.main.timePassedAsFloat;
+						SoundManager.playSoundAt(sound, transform.position);
+					}
 				}
 			}
 	    }

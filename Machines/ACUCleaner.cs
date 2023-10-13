@@ -20,8 +20,8 @@ namespace ReikaKalseki.AqueousEngineering {
 		
 		public ACUCleaner(XMLLocale.LocaleEntry e) : base(e.key, e.name, e.desc, "5fc7744b-5a2c-4572-8e53-eebf990de434") {
 			addIngredient(TechType.Titanium, 5);
-			addIngredient(TechType.ExosuitPropulsionArmModule, 1);
-			addIngredient(TechType.MapRoomCamera, 1);
+			addIngredient(TechType.FiberMesh, 2);
+			addIngredient(TechType.ComputerChip, 1);
 		}
 
 		public override bool UnlockedAtStart {
