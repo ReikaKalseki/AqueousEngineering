@@ -130,12 +130,29 @@ namespace ReikaKalseki.AqueousEngineering
 	    		RenderUtil.swapTextures(modDLL, r, "Textures/RepairFragment");
 	    		RenderUtil.setGlossiness(r, 1.5F, 0, 0.85F);
 	    		RenderUtil.setEmissivity(r, 10);
+	    		foreach (Collider c in go.GetComponentsInChildren<Collider>()) {
+	    			if (c is BoxCollider)
+	    				((BoxCollider)c).size *= 1.5F;
+	    			if (c is SphereCollider)
+	    				((SphereCollider)c).radius *= 1.5F;
+	    			if (c is CapsuleCollider)
+	    				((CapsuleCollider)c).radius *= 1.5F;
+	    		}
 			});
 	    }
+       	
 	    repairBlock = createMachine<RepairBeacon, RepairBeaconLogic>("BaseRepairBeacon");
-	    repairBlock.addFragments(8, 6F, repairBeaconFragments);
-	    foreach (TechnologyFragment f in repairBeaconFragments)
+	    repairBlock.addFragments(1, 6F, repairBeaconFragments);
+                 
+       	worldgen.load();
+       	
+       	int count = 0;
+       	foreach (TechnologyFragment f in repairBeaconFragments) {
+       		count += worldgen.getCount(f.fragmentPrefab.ClassID);
 	    	f.fragmentPrefab.setDisplayName(locale.getEntry("BaseRepairBeacon").getField<string>("frag"));
+       	}
+		SNUtil.log("Found "+count+" "+repairBlock.ClassID+" fragments to use", modDLL);
+       	PDAHandler.EditFragmentsToScan(GenUtil.getFragment(repairBlock.TechType, 0).TechType, count);
         
         outdoorBasicPot = new OutdoorPot(TechType.PlanterPot);
         outdoorCompositePot = new OutdoorPot(TechType.PlanterPot2);
@@ -143,8 +160,6 @@ namespace ReikaKalseki.AqueousEngineering
         outdoorBasicPot.register();
         outdoorCompositePot.register();
         outdoorChicPot.register();
-                 
-       	worldgen.load();
        	
        	ACUCallbackSystem.instance.register();
        	

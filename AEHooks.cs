@@ -17,10 +17,14 @@ using ReikaKalseki.AqueousEngineering;
 namespace ReikaKalseki.AqueousEngineering {
 	
 	public static class AEHooks {
+		
+		private static readonly Vector3 mountainWreckLaserable = new Vector3(684.46F, -359.33F, 1218.44F);
+		private static readonly Vector3 mountainWreckBlock = new Vector3(686.81F, -364.29F, 1223.04F);
 	    
 	    static AEHooks() {
 	    	DIHooks.onWorldLoadedEvent += onWorldLoaded;
 	    	DIHooks.constructabilityEvent += enforceACUBuildability;
+	    	DIHooks.onSkyApplierSpawnEvent += onSkyApplierSpawn;
 	    	//DIHooks.onRedundantScanEvent += ch => ch.preventNormalDrop = onRedundantScan();
 	    }
 	    
@@ -31,6 +35,14 @@ namespace ReikaKalseki.AqueousEngineering {
 		    foreach (TechnologyFragment f in AqueousEngineeringMod.repairBeaconFragments)
 		    	LanguageHandler.Main.SetLanguageLine(f.fragmentPrefab.TechType.AsString(), s);
 	    }
+		
+		public static void onSkyApplierSpawn(SkyApplier sk) {
+			PrefabIdentifier pi = sk.GetComponent<PrefabIdentifier>();
+			if (sk.GetComponent<StarshipDoor>() && Vector3.Distance(mountainWreckLaserable, sk.transform.position) <= 0.5)
+				new WreckDoorSwaps.DoorSwap(sk.transform.position, "Laser").applyTo(sk.gameObject);
+			else if (pi && pi.ClassId == "055b3160-f57b-46ba-80f5-b708d0c8180e" && Vector3.Distance(mountainWreckBlock, sk.transform.position) <= 0.5)
+				new WreckDoorSwaps.DoorSwap(sk.transform.position, "Blocked").applyTo(sk.gameObject);
+		}
 	   
 	   	public static void tickACU(WaterPark acu) {
 	   		ACUCallbackSystem.instance.tick(acu);
