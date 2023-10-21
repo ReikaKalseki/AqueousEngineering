@@ -21,10 +21,15 @@ namespace ReikaKalseki.AqueousEngineering {
 	    static AEHooks() {
 	    	DIHooks.onWorldLoadedEvent += onWorldLoaded;
 	    	DIHooks.constructabilityEvent += enforceACUBuildability;
+	    	//DIHooks.onRedundantScanEvent += ch => ch.preventNormalDrop = onRedundantScan();
 	    }
 	    
 	    public static void onWorldLoaded() {	        
 	    	OutdoorPot.updateLocale();
+	    	
+	    	string s = AqueousEngineeringMod.locale.getEntry("BaseRepairBeacon").getField<string>("frag");
+		    foreach (TechnologyFragment f in AqueousEngineeringMod.repairBeaconFragments)
+		    	LanguageHandler.Main.SetLanguageLine(f.fragmentPrefab.TechType.AsString(), s);
 	    }
 	   
 	   	public static void tickACU(WaterPark acu) {
@@ -100,5 +105,13 @@ namespace ReikaKalseki.AqueousEngineering {
 				check.ignoreSpaceRequirements = false;
 		   	}
 	    }
+	   /*
+	   public static bool onRedundantScan() {
+	   	PDAScanner.ScanTarget tgt = PDAScanner.scanTarget;
+	   	if (tgt.gameObject) {
+	   		PrefabIdentifier pi = tgt.gameObject.GetComponent<PrefabIdentifier>();
+	   		if (pi && AqueousEngineeringMod.repa
+	   	}
+	   }*/
 	}
 }

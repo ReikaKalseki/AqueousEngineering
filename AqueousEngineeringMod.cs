@@ -25,7 +25,9 @@ namespace ReikaKalseki.AqueousEngineering
     
     public static readonly Config<AEConfig.ConfigEntries> config = new Config<AEConfig.ConfigEntries>(modDLL);
     
-    public static BaseSonarPinger sonarBlock;
+    internal static readonly SoundManager.SoundData beepSound = SoundManager.registerSound(AqueousEngineeringMod.modDLL, "aebeep", "Sounds/beep.ogg", SoundManager.soundMode3D);
+		
+	public static BaseSonarPinger sonarBlock;
     public static BaseCreatureRepellent repellentBlock;
     public static BaseBeacon beaconBlock;
     public static AmpeelAntenna ampeelAntennaBlock;
@@ -42,6 +44,7 @@ namespace ReikaKalseki.AqueousEngineering
     public static BaseStasisTurret stasisBlock;
     public static BaseControlPanel controlsBlock;
     public static BaseDrillableGrinder grinderBlock;
+    public static RepairBeacon repairBlock;
     
     public static OutdoorPot outdoorBasicPot;
     public static OutdoorPot outdoorChicPot;
@@ -52,6 +55,8 @@ namespace ReikaKalseki.AqueousEngineering
     public static HolographicControl seabaseStasisControl;
     public static HolographicControl seabaseSonarControl;
     public static HolographicControl seabaseRepellentControl;
+    
+    public static TechnologyFragment[] repairBeaconFragments;
     
     public static readonly WorldgenDatabase worldgen = new WorldgenDatabase();
     
@@ -112,6 +117,25 @@ namespace ReikaKalseki.AqueousEngineering
 	    stasisBlock = createMachine<BaseStasisTurret, BaseStasisTurretLogic>("BaseStasisTurret");
 	    controlsBlock = createMachine<BaseControlPanel, BaseControlPanelLogic>("BaseControlPanel");
 	    grinderBlock = createMachine<BaseDrillableGrinder, BaseDrillableGrinderLogic>("BaseDrillableGrinder");
+	    string[] li = VanillaFlora.MUSHROOM_BUMP.getPrefabs(true, true).ToArray();
+	    repairBeaconFragments = new TechnologyFragment[li.Length-2];
+	    for (int i = 1; i < li.Length-1; i++) { //only idx 1,2,3 since 0 is rotated and tall and 4 has a light and is just 3 anyway
+	    	repairBeaconFragments[i-1] = new TechnologyFragment(li[i], go => {
+				ObjectUtil.removeComponent<LiveMixin>(go);
+				ObjectUtil.removeComponent<PlantBehaviour>(go);
+				ObjectUtil.removeComponent<CoralBlendWhite>(go);
+				ObjectUtil.removeComponent<FMOD_StudioEventEmitter>(go);
+				ObjectUtil.removeComponent<Pickupable>(go);
+				Renderer r = go.GetComponentInChildren<Renderer>();
+	    		RenderUtil.swapTextures(modDLL, r, "Textures/RepairFragment");
+	    		RenderUtil.setGlossiness(r, 1.5F, 0, 0.85F);
+	    		RenderUtil.setEmissivity(r, 10);
+			});
+	    }
+	    repairBlock = createMachine<RepairBeacon, RepairBeaconLogic>("BaseRepairBeacon");
+	    repairBlock.addFragments(8, 6F, repairBeaconFragments);
+	    foreach (TechnologyFragment f in repairBeaconFragments)
+	    	f.fragmentPrefab.setDisplayName(locale.getEntry("BaseRepairBeacon").getField<string>("frag"));
         
         outdoorBasicPot = new OutdoorPot(TechType.PlanterPot);
         outdoorCompositePot = new OutdoorPot(TechType.PlanterPot2);
@@ -162,14 +186,12 @@ namespace ReikaKalseki.AqueousEngineering
     	return sub && sub.isBase && sub.GetComponentsInChildren<M>().Length > 0;
     }
     
-    private static M createMachine<M, N>(string lck, TechnologyFragment[] frags = null) where N : CustomMachineLogic where M : CustomMachine<N> {
+    private static M createMachine<M, N>(string lck) where N : CustomMachineLogic where M : CustomMachine<N> {
     	XMLLocale.LocaleEntry e = locale.getEntry(lck);
     	M m = (M)Activator.CreateInstance(typeof(M), e);
         m.Patch();
         if (!string.IsNullOrEmpty(e.pda))
         	m.addPDAPage(e.pda, lck);
-        if (frags != null)
-        	m.addFragments(frags.Length, 4F, frags);
         SNUtil.log("Registered custom machine "+m);
         return m;
     }
@@ -213,6 +235,14 @@ namespace ReikaKalseki.AqueousEngineering
 		}
 		else {
 			RecipeUtil.addIngredient(atpTapBlock.TechType, TechType.PlasteelIngot, 2);
+		}
+		
+		Spawnable drone = ItemRegistry.instance.getItem("LathingDrone");
+		if (drone != null) { //c2c is loaded
+			RecipeUtil.addIngredient(repairBlock.TechType, drone.TechType, 1);
+		}
+		else {
+			RecipeUtil.addIngredient(repairBlock.TechType, TechType.Welder, 2);
 		}
 		
 		Spawnable glowOil = ItemRegistry.instance.getItem("GlowOil");

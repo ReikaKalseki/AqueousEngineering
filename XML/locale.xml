@@ -277,17 +277,20 @@
 			https://i.imgur.com/L0xNPH2.jpg
 		</images>
 	</BaseDrillableGrinder>
-	<Name>
+	<BaseRepairBeacon>
 		<name>
-			
+			Hull Repair Nanite Controller
 		</name>
 		<desc>
-			
+			Deploys repair nanites to perform small-scale repairs to ship structural members.
 		</desc>
 		<pda>
 			
 		</pda>
-	</Name>
+		<frag>
+			Broken Hull Repair Nanites
+		</frag>
+	</BaseRepairBeacon>
 	<Name>
 		<name>
 			

@@ -56,11 +56,15 @@ namespace ReikaKalseki.AqueousEngineering {
 		
 	public class ATPTapLogic : CustomMachineLogic {
 		
+		internal static readonly SoundManager.SoundData workingSound = SoundManager.registerSound(AqueousEngineeringMod.modDLL, "atptap", "Sounds/atptap.ogg", SoundManager.soundMode3D);
+		
 		private bool hasCable;
 		
 		private ThermalPlant thermalComponent;
 		
 		private Renderer render;
+		
+		private float lastSound = -1;
 		
 		private static readonly HashSet<string> cableObjects = new HashSet<string>(){
 			"31f84eba-d435-438c-a58e-f3f7bae8bfbd",
@@ -95,6 +99,11 @@ namespace ReikaKalseki.AqueousEngineering {
 				thermalComponent = GetComponent<ThermalPlant>();
 			thermalComponent.enabled = false;
 			thermalComponent.CancelInvoke();
+					
+			if (hasCable && getBuildable().constructed && DayNightCycle.main.timePassedAsFloat-lastSound >= 6.2F) {
+				lastSound = DayNightCycle.main.timePassedAsFloat;
+				SoundManager.playSoundAt(workingSound, transform.position);
+			}
 			/*
 			if (!cableObject) {
 				cableObject = tryFindCable();
@@ -122,7 +131,7 @@ namespace ReikaKalseki.AqueousEngineering {
 				SubRoot sub = getSub();
 				if (sub) {
 					float trash = 0f;
-					sub.powerRelay.AddEnergy(25, out trash);
+					sub.powerRelay.AddEnergy(AqueousEngineeringMod.config.getInt(AEConfig.ConfigEntries.ATPTAPRATE), out trash);
 				}
 			}
 		}
