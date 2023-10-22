@@ -121,15 +121,16 @@ namespace ReikaKalseki.AqueousEngineering
 	    repairBeaconFragments = new TechnologyFragment[li.Length-2];
 	    for (int i = 1; i < li.Length-1; i++) { //only idx 1,2,3 since 0 is rotated and tall and 4 has a light and is just 3 anyway
 	    	repairBeaconFragments[i-1] = new TechnologyFragment(li[i], go => {
-				ObjectUtil.removeComponent<LiveMixin>(go);
-				ObjectUtil.removeComponent<PlantBehaviour>(go);
 				ObjectUtil.removeComponent<CoralBlendWhite>(go);
+				ObjectUtil.removeComponent<PlantBehaviour>(go);
+				ObjectUtil.removeComponent<LiveMixin>(go);
 				ObjectUtil.removeComponent<FMOD_StudioEventEmitter>(go);
 				ObjectUtil.removeComponent<Pickupable>(go);
-				Renderer r = go.GetComponentInChildren<Renderer>();
-	    		RenderUtil.swapTextures(modDLL, r, "Textures/RepairFragment");
-	    		RenderUtil.setGlossiness(r, 1.5F, 0, 0.85F);
-	    		RenderUtil.setEmissivity(r, 10);
+				foreach (Renderer r in go.GetComponentsInChildren<Renderer>()) {
+		    		RenderUtil.swapTextures(modDLL, r, "Textures/RepairFragment");
+		    		RenderUtil.setGlossiness(r, 1.5F, 0, 0.85F);
+		    		RenderUtil.setEmissivity(r, 10);
+				}
 	    		foreach (Collider c in go.GetComponentsInChildren<Collider>()) {
 	    			if (c is BoxCollider)
 	    				((BoxCollider)c).size *= 1.5F;

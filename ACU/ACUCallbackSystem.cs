@@ -417,7 +417,7 @@ namespace ReikaKalseki.AqueousEngineering {
 			}
 		}
 		
-		private List<WaterParkPiece> getACUComponents(WaterPark acu) {
+		internal List<WaterParkPiece> getACUComponents(WaterPark acu) {
 			List<WaterParkPiece> li = new List<WaterParkPiece>();
 			foreach (WaterParkPiece wp in acu.transform.parent.GetComponentsInChildren<WaterParkPiece>()) {
 				if (wp && wp.name.ToLowerInvariant().Contains("bottom") && wp.GetBottomPiece().GetModule() == acu)
@@ -426,10 +426,18 @@ namespace ReikaKalseki.AqueousEngineering {
 			return li;
 		}
 		
-		private GameObject getACUFloor(List<WaterParkPiece> li) {
+		internal GameObject getACUFloor(IEnumerable<WaterParkPiece> li) {
 			foreach (WaterParkPiece wp in li) {
 				if (wp.floorBottom && wp.floorBottom.activeSelf && wp.IsBottomPiece())
 					return wp.floorBottom;
+			}
+			return null;
+		}
+		
+		internal GameObject getACUCeiling(IEnumerable<WaterParkPiece> li) {
+			foreach (WaterParkPiece wp in li) {
+				if (wp.ceilingTop && wp.ceilingTop.activeSelf)
+					return wp.ceilingTop;
 			}
 			return null;
 		}

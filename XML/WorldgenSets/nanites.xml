@@ -242,4 +242,12 @@
     </scale>
     <xmlID>0a2f940c-ba73-4987-9988-5453fbeb9ac2</xmlID>
   </customprefab>
+  <generator>
+    <type>ReikaKalseki.AqueousEngineering.MountainWreckRoomDebrisSpawner</type>
+    <position>
+      <x>682.16</x>
+      <y>-365.54</y>
+      <z>1221.85</z>
+    </position>
+  </generator>
 </Root>

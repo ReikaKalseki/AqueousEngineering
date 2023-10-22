@@ -150,13 +150,25 @@ namespace ReikaKalseki.AqueousEngineering {
 			TechType tt = CraftData.GetTechType(p.gameObject);
 			//SNUtil.log("Try harvest "+p+" : "+tt);
 			if (tt != TechType.None) {
+				BasicCustomPlant plant = BasicCustomPlant.getPlant(tt);
+				GameObject drop;
 				FruitPlant fp = p.GetComponent<FruitPlant>();
-				GameObject drop = getHarvest(p, tt, fp);
+				bool custom = plant is CustomHarvestBehavior;
+				if (custom) {
+					CustomHarvestBehavior c = (CustomHarvestBehavior)plant;
+					if (!c.canBeAutoharvested())
+						return;
+					drop = c.tryHarvest(p.gameObject);
+				}
+				else {
+					drop = getHarvest(p, tt, fp);
+					if (drop)
+						drop = UnityEngine.Object.Instantiate(drop);
+				}
 				//SNUtil.log("drops "+drop);
 				if (drop) {
-					drop = UnityEngine.Object.Instantiate(drop);
 					TechType td = CraftData.GetTechType(drop);
-					if (fp) {
+					if (fp && !custom) {
 						PickPrefab pp = drop.GetComponent<PickPrefab>();
 						td = pp.pickTech;
 						drop = ObjectUtil.lookupPrefab(td);
@@ -177,7 +189,7 @@ namespace ReikaKalseki.AqueousEngineering {
 						if (ass != null) {
 							SoundManager.playSoundAt(ass, gameObject.transform.position);
 						}
-						if (fp) {
+						if (fp && !custom) {
 							PickPrefab pp = drop.GetComponent<PickPrefab>();
 							//SNUtil.log("fp pp "+pp);
 							if (pp)

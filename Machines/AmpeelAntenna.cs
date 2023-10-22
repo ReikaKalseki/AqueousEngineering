@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Reflection;
+using System.Linq;
 using System.Collections.Generic;
 
 using UnityEngine;
@@ -93,9 +94,29 @@ namespace ReikaKalseki.AqueousEngineering {
 		
 	public class AmpeelAntennaLogic : CustomMachineLogic {
 		
+		private WaterPark connectedACU;
+		private WaterParkPiece connectedACUPart;
+		
+		private float lastACUCheckTime = -1;
+		
 		void Start() {
 			SNUtil.log("Reinitializing base ampeel antenna");
 			AqueousEngineeringMod.ampeelAntennaBlock.initializeMachine(gameObject);
+			
+			connectedACU = tryFindACU();
+		}
+		
+		private WaterPark tryFindACU() {
+			SubRoot sub = getSub();
+			if (!sub) {
+				return null;
+			}
+			foreach (WaterPark wp in sub.GetComponentsInChildren<WaterPark>()) {
+				if (Mathf.Abs(wp.transform.position.y-transform.position.y) <= 0.5F && Vector3.Distance(wp.transform.position, transform.position) <= 1) {
+					return wp;
+				}
+			}
+			return null;
 		}
 		
 		protected override float getTickRate() {
@@ -106,20 +127,48 @@ namespace ReikaKalseki.AqueousEngineering {
 			return 50;
 		}
 		
+		protected override bool isOutdoors() {
+			return !connectedACU;
+		}
+		
 		protected override void updateEntity(float seconds) {
+			float time = DayNightCycle.main.timePassedAsFloat;
 			SubRoot sub = getSub();
+			if (sub && connectedACU && !connectedACUPart) {
+				IEnumerable<WaterParkPiece> li = sub.GetComponentsInChildren<WaterParkPiece>().Where(wp => wp.GetWaterParkModule() == connectedACU);
+				connectedACUPart = ACUCallbackSystem.instance.getACUCeiling(li).transform.parent.GetComponent<WaterParkPiece>();
+				transform.position = connectedACUPart.transform.position+Vector3.up*1.95F;
+				transform.rotation = Quaternion.Euler(180, 0, 0);
+			}
+			if (!connectedACU && time-lastACUCheckTime >= 0.5) {
+				connectedACUPart = null;
+				lastACUCheckTime = time;
+				bool hasACU = connectedACU;
+				connectedACU = tryFindACU();
+				if ((bool)(connectedACU) != hasACU)
+					setupSky();
+			}
 			if (sub && sub.powerRelay.GetPower() < sub.powerRelay.GetMaxPower()) {
 				HashSet<Shocker> set = WorldUtil.getObjectsNearWithComponent<Shocker>(gameObject.transform.position, AmpeelAntenna.RANGE);
 				foreach (Shocker c in set) {
-					if (c.liveMixin.IsAlive() && !c.gameObject.GetComponent<WaterParkCreature>()) {
-						float dd = Vector3.Distance(c.transform.position, transform.position);
+					if (isValid(c)) {
+						float dd = connectedACU ? 0 : Vector3.Distance(c.transform.position, transform.position);
 						if (dd >= AmpeelAntenna.RANGE)
 							continue;
 						float trash;
-						sub.powerRelay.AddEnergy(seconds*c.liveMixin.GetHealthFraction()*(AmpeelAntenna.POWER_GEN-AmpeelAntenna.POWER_FALLOFF*dd), out trash);
+						sub.powerRelay.AddEnergy(seconds*c.liveMixin.GetHealthFraction()*(connectedACU ? 0.4F : 1)*(AmpeelAntenna.POWER_GEN-AmpeelAntenna.POWER_FALLOFF*dd), out trash);
 					}
 				}
 			}
-		}	
+		}
+		
+		private bool isValid(Shocker c) {
+			if (!c.liveMixin.IsAlive())
+				return false;
+			WaterParkCreature wp = c.gameObject.GetComponent<WaterParkCreature>();
+			if (!wp)
+				return !connectedACU;
+			return wp.currentWaterPark == connectedACU;
+		}
 	}
 }
