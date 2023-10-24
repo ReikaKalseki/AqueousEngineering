@@ -126,6 +126,7 @@ namespace ReikaKalseki.AqueousEngineering
 				ObjectUtil.removeComponent<LiveMixin>(go);
 				ObjectUtil.removeComponent<FMOD_StudioEventEmitter>(go);
 				ObjectUtil.removeComponent<Pickupable>(go);
+				go.EnsureComponent<NaniteFragment>();
 				foreach (Renderer r in go.GetComponentsInChildren<Renderer>()) {
 		    		RenderUtil.swapTextures(modDLL, r, "Textures/RepairFragment");
 		    		RenderUtil.setGlossiness(r, 1.5F, 0, 0.85F);
@@ -175,6 +176,14 @@ namespace ReikaKalseki.AqueousEngineering
         //TechnologyUnlockSystem.instance.addDirectUnlock(TechType.StasisRifle, stasisBlock.TechType);
         
         ConsoleCommandsHandler.Main.RegisterConsoleCommand<Action>("debugACU", ACUCallbackSystem.instance.debugACU);
+    }
+    
+    class NaniteFragment : MonoBehaviour {
+    	
+		void OnScanned() {
+    		SNUtil.addBlueprintNotification(repairBlock.TechType);
+		}
+    	
     }
     
     private static void fireStasisPulses(HolographicControl.HolographicControlTag btn) {
