@@ -201,8 +201,7 @@ namespace ReikaKalseki.AqueousEngineering {
 		}
 		
 		void OnCollisionStay(Collision c) {
-			SNUtil.writeToChat(""+c.collider);
-			if (root && root.isFunctional() && c.collider && (c.collider.gameObject.FindAncestor<Creature>() || c.collider.gameObject.FindAncestor<Player>())) {
+			if (root && root.isFunctional() && c.collider && ObjectUtil.isPlayerOrCreature(c.collider, true)) {
 				LiveMixin live = c.gameObject.FindAncestor<LiveMixin>();
 				if (live)
 					live.TakeDamage(8*Time.deltaTime, c.contacts[0].point, DamageType.Electrical, gameObject);

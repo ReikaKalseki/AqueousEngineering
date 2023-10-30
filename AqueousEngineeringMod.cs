@@ -135,8 +135,11 @@ namespace ReikaKalseki.AqueousEngineering
 	    		foreach (Collider c in go.GetComponentsInChildren<Collider>()) {
 	    			if (c is BoxCollider)
 	    				((BoxCollider)c).size *= 1.5F;
-	    			if (c is SphereCollider)
-	    				((SphereCollider)c).radius *= 1.5F;
+	    			if (c is SphereCollider) {
+	    				SphereCollider s = (SphereCollider)c;
+	    				s.radius *= 1.5F;
+	    				s.radius = Mathf.Max(0.225F, s.radius);
+	    			}
 	    			if (c is CapsuleCollider)
 	    				((CapsuleCollider)c).radius *= 1.5F;
 	    		}
