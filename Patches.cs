@@ -101,4 +101,76 @@ namespace ReikaKalseki.AqueousEngineering {
 		}
 	}
 	
+	[HarmonyPatch(typeof(BaseNuclearReactor))]
+	[HarmonyPatch("Update")]
+	public static class NuclearReactorPowerHook {
+		
+		static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions) {
+			List<CodeInstruction> codes = new List<CodeInstruction>(instructions);
+			try {
+				PatchLib.addPowerGenHook("BaseNuclearReactor", codes);
+				FileLog.Log("Done patch "+MethodBase.GetCurrentMethod().DeclaringType);
+			}
+			catch (Exception e) {
+				FileLog.Log("Caught exception when running patch "+MethodBase.GetCurrentMethod().DeclaringType+"!");
+				FileLog.Log(e.Message);
+				FileLog.Log(e.StackTrace);
+				FileLog.Log(e.ToString());
+			}
+			return codes.AsEnumerable();
+		}
+	}
+	
+	[HarmonyPatch(typeof(BaseBioReactor))]
+	[HarmonyPatch("Update")]
+	public static class BioReactorPowerHook {
+		
+		static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions) {
+			List<CodeInstruction> codes = new List<CodeInstruction>(instructions);
+			try {
+				PatchLib.addPowerGenHook("BaseBioReactor", codes);
+				FileLog.Log("Done patch "+MethodBase.GetCurrentMethod().DeclaringType);
+			}
+			catch (Exception e) {
+				FileLog.Log("Caught exception when running patch "+MethodBase.GetCurrentMethod().DeclaringType+"!");
+				FileLog.Log(e.Message);
+				FileLog.Log(e.StackTrace);
+				FileLog.Log(e.ToString());
+			}
+			return codes.AsEnumerable();
+		}
+	}
+	
+	[HarmonyPatch(typeof(Crafter))]
+	[HarmonyPatch("Craft")]
+	public static class FabSpeedHook {
+		
+		static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions) {
+			List<CodeInstruction> codes = new List<CodeInstruction>(instructions);
+			try {
+				int idx = InstructionHandlers.getInstruction(codes, 0, 0, OpCodes.Callvirt, "CrafterLogic", "Craft", true, new Type[]{typeof(TechType), typeof(float)});
+				codes.InsertRange(idx, new List<CodeInstruction>{
+					new CodeInstruction(OpCodes.Ldarg_0), InstructionHandlers.createMethodCall("ReikaKalseki.AqueousEngineering.AEHooks", "getCrafterTime", false, typeof(float), typeof(Crafter))
+				});
+				FileLog.Log("Done patch "+MethodBase.GetCurrentMethod().DeclaringType);
+			}
+			catch (Exception e) {
+				FileLog.Log("Caught exception when running patch "+MethodBase.GetCurrentMethod().DeclaringType+"!");
+				FileLog.Log(e.Message);
+				FileLog.Log(e.StackTrace);
+				FileLog.Log(e.ToString());
+			}
+			return codes.AsEnumerable();
+		}
+	}
+	
+	static class PatchLib {
+		
+		internal static void addPowerGenHook(string caller, List<CodeInstruction> codes) {
+			int idx = InstructionHandlers.getInstruction(codes, 0, 0, OpCodes.Call, caller, "ProducePower", true, new Type[]{typeof(float)});
+			codes.InsertRange(idx+1, new List<CodeInstruction>{new CodeInstruction(OpCodes.Ldarg_0), InstructionHandlers.createMethodCall("ReikaKalseki.AqueousEngineering.AEHooks", "getReactorGeneration", false, typeof(float), typeof(MonoBehaviour))});
+		}
+		
+	}
+	
 }

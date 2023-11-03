@@ -20,13 +20,34 @@ namespace ReikaKalseki.AqueousEngineering {
 		
 		private static readonly Vector3 mountainWreckLaserable = new Vector3(684.46F, -359.33F, 1218.44F);
 		private static readonly Vector3 mountainWreckBlock = new Vector3(686.81F, -364.29F, 1223.04F);
+		
+		private static BaseCell currentPlayerRoom;
+		private static float lastPlayerRoomCheckTime;
 	    
 	    static AEHooks() {
 	    	DIHooks.onWorldLoadedEvent += onWorldLoaded;
+	    	DIHooks.onConstructedEvent += onConstructionComplete;
 	    	DIHooks.constructabilityEvent += enforceACUBuildability;
 	    	DIHooks.onSkyApplierSpawnEvent += onSkyApplierSpawn;
+	    	DIHooks.onPlayerTickEvent += tickPlayer;
+	    	DIHooks.getFoodRateEvent += affectFoodRate;
+	    	DIHooks.onSleepEvent += onSleep;
 	    	//DIHooks.onRedundantScanEvent += ch => ch.preventNormalDrop = onRedundantScan();
 	    }
+		
+		public static void tickPlayer(Player ep) {
+			if (ep.currentSub && ep.currentSub.isBase) {
+				float time = DayNightCycle.main.timePassedAsFloat;
+				if (time-lastPlayerRoomCheckTime >= 0.5F) {
+					currentPlayerRoom = ObjectUtil.getBaseRoom((BaseRoot)ep.currentSub, ep.transform.position);
+					lastPlayerRoomCheckTime = time;
+				}
+			}
+		}
+		
+		public static BaseCell getCurrentPlayerRoom() {
+			return currentPlayerRoom;
+		}
 	    
 	    public static void onWorldLoaded() {	        
 	    	OutdoorPot.updateLocale();
@@ -125,5 +146,33 @@ namespace ReikaKalseki.AqueousEngineering {
 	   		if (pi && AqueousEngineeringMod.repa
 	   	}
 	   }*/
+	   
+	   public static float getReactorGeneration(float orig, MonoBehaviour reactor) { //either bio or nuclear
+	   	return BaseRoomSpecializationSystem.instance.getSavedType(reactor) == BaseRoomSpecializationSystem.RoomTypes.POWER ? orig*1.25F : orig;
+	   }
+	   
+	   public static void onSleep(Bed bed) {
+	   	if (BaseRoomSpecializationSystem.instance.getSavedType(bed) == BaseRoomSpecializationSystem.RoomTypes.LEISURE)
+	   		Player.main.liveMixin.AddHealth(15);
+	   }
+	   
+	   public static void affectFoodRate(DIHooks.FoodRateCalculation calc) {
+	   	BaseRoomSpecializationSystem.RoomTypes type = BaseRoomSpecializationSystem.instance.getPlayerRoomType(Player.main);
+	   	SNUtil.writeToChat("Current player room type: "+type);
+	   	if (type == BaseRoomSpecializationSystem.RoomTypes.LEISURE)
+	   		calc.rate *= 0.33F;
+	   	else if (type == BaseRoomSpecializationSystem.RoomTypes.WORK)
+	   		calc.rate *= 0.8F;
+	   }
+	   
+	   public static float getCrafterTime(float time, Crafter c) {
+	   	if (BaseRoomSpecializationSystem.instance.getSavedType(c) == BaseRoomSpecializationSystem.RoomTypes.WORK)
+	   		time /= 1.25F;
+	   	return time;
+	   }
+	   
+	   public static void onConstructionComplete(TechType item, Constructable c) {
+	   	BaseRoomSpecializationSystem.instance.updateRoom(c.gameObject);
+	   }
 	}
 }

@@ -18,6 +18,7 @@ namespace ReikaKalseki.AqueousEngineering {
 	public class ItemDisplay : CustomMachine<ItemDisplayLogic> {
 		
 		internal static readonly Dictionary<TechType, ItemDisplayRenderBehavior> renderPaths = new Dictionary<TechType, ItemDisplayRenderBehavior>();
+		internal static readonly Dictionary<TechType, float> specialDisplayValues = new Dictionary<TechType, float>();
 		
 		static ItemDisplay() {
 			/*
@@ -33,6 +34,14 @@ namespace ReikaKalseki.AqueousEngineering {
 			setRendererBehavior(TechType.Benzene, new ItemDisplayRenderBehavior(){sizeMultiplier = 2F});
 			setRendererBehavior(TechType.BloodOil, new ItemDisplayRenderBehavior(){sizeMultiplier = 0.25F});
 			setRendererBehavior(TechType.ReactorRod, ItemDisplayRenderBehavior.getDefaultButSpecificChild("model"));
+			
+			specialDisplayValues[TechType.PrecursorKey_Blue] = 2F;
+			specialDisplayValues[TechType.PrecursorKey_Red] = 2F;
+			specialDisplayValues[TechType.PrecursorKey_White] = 1.5F;
+			specialDisplayValues[TechType.PrecursorKey_Orange] = 1.5F;
+			specialDisplayValues[TechType.PrecursorKey_Purple] = 1.5F;
+			specialDisplayValues[TechType.PrecursorIonPowerCell] = 1.25F;
+			specialDisplayValues[TechType.Kyanite] = 1.5F;
 		}
 		
 		public static void setRendererBehavior(TechType tt, ItemDisplayRenderBehavior path) {
@@ -42,6 +51,10 @@ namespace ReikaKalseki.AqueousEngineering {
 		public static void setRendererBehavior(TechType tt, TechType copyOf) {
 			if (renderPaths.ContainsKey(copyOf))
 				renderPaths[tt] = renderPaths[copyOf];
+		}
+		
+		public static void setDisplayValue(TechType tt, float value) {
+			specialDisplayValues[tt] = value;
 		}
 		
 		internal ItemDisplayRenderBehavior getBehavior(TechType tt) {
@@ -118,6 +131,7 @@ namespace ReikaKalseki.AqueousEngineering {
 		private GameObject display;
 		private Renderer displayRender;
 		private SkyApplier displaySky;
+		private TechType displayType;
 		
 		private float additionalRenderSpace = 0.075F;
 		private float rotationSpeedScale = 1;
@@ -227,6 +241,10 @@ namespace ReikaKalseki.AqueousEngineering {
 			}
 		}
 		
+		public float getDecorativeBonus() {
+			return display ? (ItemDisplay.specialDisplayValues.ContainsKey(displayType) ? ItemDisplay.specialDisplayValues[displayType] : 1) : -0.5F;
+		}
+		
 		private void setDisplay(Pickupable pp) {
 			displayRender = null;
 			displaySky = null;
@@ -259,6 +277,7 @@ namespace ReikaKalseki.AqueousEngineering {
 			renderObj.transform.localScale = renderObj.transform.localScale*renderSizeScale;
 			displayRender = r;
 			displaySky = renderObj.GetComponentInChildren<SkyApplier>();
+			displayType = pp.GetTechType();
 		}
 		
 		private GameObject findRenderer(Pickupable pp, TechType tt, out Renderer ret) {

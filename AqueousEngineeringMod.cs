@@ -225,7 +225,7 @@ namespace ReikaKalseki.AqueousEngineering
     }
     
     [QModPostPatch]
-    public static void PostLoad() {
+    public static void PostLoad() {    	
 		Spawnable azurite = ItemRegistry.instance.getItem("VENT_CRYSTAL");
 		if (azurite != null) {
 			RecipeUtil.addIngredient(repellentBlock.TechType, azurite.TechType, 2);
@@ -323,6 +323,12 @@ namespace ReikaKalseki.AqueousEngineering
 		if (lavaShroom != null) {
 			ACUEcosystems.addFood(new ACUEcosystems.PlantFood(lavaShroom, 0.25F, BiomeRegions.RegionType.LavaZone));
 		}
+		
+    	BaseRoomSpecializationSystem.instance.registerModdedObject(acuBoosterBlock, 0, BaseRoomSpecializationSystem.RoomTypes.ACU);
+    	BaseRoomSpecializationSystem.instance.registerModdedObject(acuCleanerBlock, 0, BaseRoomSpecializationSystem.RoomTypes.ACU);
+    	BaseRoomSpecializationSystem.instance.registerModdedObject(ampeelAntennaBlock, 0, BaseRoomSpecializationSystem.RoomTypes.ACU);
+    	BaseRoomSpecializationSystem.instance.registerModdedObject(repairBlock, -0.1F, BaseRoomSpecializationSystem.RoomTypes.WORK);
+    	BaseRoomSpecializationSystem.instance.registerModdedObject(batteryBlock, 0, BaseRoomSpecializationSystem.RoomTypes.POWER);
     }
 
   }
