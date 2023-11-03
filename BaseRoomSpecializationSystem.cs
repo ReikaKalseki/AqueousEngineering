@@ -33,8 +33,8 @@ namespace ReikaKalseki.AqueousEngineering {
 			lockers.Add("775feb4c-dab9-4322-b4a5-a4289ca1cf6a");			
 			lockers.Add("cd34fecd-794c-4a0c-8012-dd81b77f2840");
 			
-			foreach (string s in lockers)
-				objectTypeMappings[s] = new RoomTypes[]{RoomTypes.STORAGE};
+			//foreach (string s in lockers)
+			//	objectTypeMappings[s] = new RoomTypes[]{RoomTypes.STORAGE};
 			
 			objectTypeMappings["d3bf649e-1eaa-4790-a113-8f73286af611"] = new RoomTypes[]{RoomTypes.AGRICULTURAL}; //indoor growbed
 			objectTypeMappings["769f9f44-30f6-46ed-aaf6-fbba358e1676"] = new RoomTypes[]{RoomTypes.POWER}; //bioreactor
@@ -54,9 +54,9 @@ namespace ReikaKalseki.AqueousEngineering {
 			objectTypeMappings["2f2d8419-c55b-49ac-9698-ecb431fffed2"] = new RoomTypes[]{RoomTypes.MECHANICAL}; //water filter			
 			objectTypeMappings["cdade216-3d4d-4adf-901c-3a91fb3b88c4"] = new RoomTypes[]{RoomTypes.WORK}; //centrifuge		
 			objectTypeMappings["bef7bc0b-149d-4342-bbb4-329047685578"] = new RoomTypes[]{RoomTypes.WORK}; //fragment analyzer
-			objectTypeMappings["c0175cf7-0b6a-4a1d-938f-dad0dbb6fa06"] = new RoomTypes[]{RoomTypes.WORK}; //medical cabinet
+			objectTypeMappings["c0175cf7-0b6a-4a1d-938f-dad0dbb6fa06"] = new RoomTypes[]{RoomTypes.WORK, RoomTypes.MECHANICAL, RoomTypes.LEISURE}; //medical cabinet
 			objectTypeMappings["c9bdcc4d-a8c6-43c0-8f7a-f86841cd4493"] = new RoomTypes[]{RoomTypes.WORK}; //specimen analyzer
-			objectTypeMappings["5c06baec-0539-4f26-817d-78443548cc52"] = new RoomTypes[]{RoomTypes.LEISURE, RoomTypes.WORK}; //radio			
+			objectTypeMappings["5c06baec-0539-4f26-817d-78443548cc52"] = new RoomTypes[]{RoomTypes.LEISURE, RoomTypes.WORK, RoomTypes.MECHANICAL}; //radio			
 			
 			decoRatings["26cdb865-efbd-403c-8873-92453bcfc935"] = 0.15F; //best chair	
 			decoRatings["cbeca4bd-cba4-4905-89fd-2470aaa204b1"] = 0.1F; //chair		
@@ -82,8 +82,8 @@ namespace ReikaKalseki.AqueousEngineering {
 			decoRatings["c5ae1472-0bdc-4203-8418-fb1f74c8edf5"] = 0.5F; //shelf
 			decoRatings["cf522a95-3038-4759-a53c-8dad1242c8ed"] = 0.5F; //desk
 			decoRatings["7370e7a0-ebc0-4c33-9997-7084c11a55b0"] = 0.25F; //counter
-			decoRatings["274bd60f-16c4-4810-911b-c5562fe7c2d8"] = 1.5F; //plant panel
-			decoRatings["b343166e-3a17-4a1c-85d1-05dee8ec1575"] = 0.25F; //sign
+			decoRatings["274bd60f-16c4-4810-911b-c5562fe7c2d8"] = 0.5F; //wall mounted plant shelf
+			//decoRatings["b343166e-3a17-4a1c-85d1-05dee8ec1575"] = 0.25F; //sign //made content sensitive
 			decoRatings["07a05a2f-de55-4c60-bfda-cedb3ab72b88"] = 0.25F; //jack eye
 			decoRatings["4b8cd269-6646-42d0-b8a0-9a40ef0c07d0"] = 0.5F; //toy car
 			decoRatings["7cdcbed0-7d20-43c4-beb4-f1ad539b2a76"] = 0.5F; //toy car
@@ -91,6 +91,8 @@ namespace ReikaKalseki.AqueousEngineering {
 			decoRatings["cb89366d-eac0-4011-8665-fafde75b215c"] = 0.25F; //markiplier
 			decoRatings["f7e26c44-bb28-4979-8f83-76ed529979fc"] = 0.25F; //markiplier
 			decoRatings["c96baff4-0993-4893-8345-adb8709901a7"] = 0.33F; //toy cat
+			
+			//decoRatings["****"] = 1.5F; //plant panel
 			
 			//foreach (string s in decoRatings.Keys)
 			//	objectTypeMappings[s] = RoomTypes.LEISURE;
@@ -141,6 +143,7 @@ namespace ReikaKalseki.AqueousEngineering {
 			itemDecoRatings[TechType.PurpleVegetable] = -0.1F;
 			itemDecoRatings[TechType.PurpleVasePlantSeed] = 0.4F;
 			itemDecoRatings[TechType.HangingFruit] = 0.5F;
+			itemDecoRatings[TechType.HangingFruitTree] = 0.5F;
 			itemDecoRatings[TechType.OrangeMushroomSpore] = -0.25F;
 			itemDecoRatings[TechType.OrangePetalsPlantSeed] = 0.05F;
 			itemDecoRatings[TechType.MelonSeed] = 0F;
@@ -170,34 +173,49 @@ namespace ReikaKalseki.AqueousEngineering {
 				decoRatings[pfb] = deco;
 		}
 		
-		internal RoomTypes getType(BaseCell bc, List<PrefabIdentifier> li) {
-			HashSet<RoomTypes> options = new HashSet<RoomTypes>();
+		internal RoomTypes getType(BaseCell bc, List<PrefabIdentifier> li, out float decoRating) {
+			HashSet<RoomTypes> options = new HashSet<RoomTypes>((IEnumerable<RoomTypes>)Enum.GetValues(typeof(RoomTypes)));
 			//if (bc.GetComponentInChildren<BaseNuclearReactor>() || bc.GetComponentInChildren<BaseBioReactor>())
 			//	options.Add(RoomTypes.POWER);
 			int lockerCount = 0;
-			float decoRating = 0;
+			decoRating = 0;
 			foreach (PrefabIdentifier pi in li) {
-				options.AddRange(getObjectType(pi));
+				RoomTypes[] obj = getObjectType(pi);
+				//if (obj.Length == 1)
+				//	options.AddRange(obj);
+				//else
+					options.IntersectWith(obj);
 				if (lockers.Contains(pi.ClassId))
 				    lockerCount++;
-				if (decoRatings.ContainsKey(pi.ClassId)) {
-					decoRating += decoRatings[pi.ClassId];
-				}
+				decoRating += getDecoRating(pi);
+				SNUtil.writeToChat("Cell "+bc.transform.position+": Object "+pi.name+" > "+getObjectType(pi).toDebugString()+" #"+getDecoRating(pi));
 			}
-			//SNUtil.writeToChat("Room at "+bc.transform.position+" has options "+options.toDebugString()+" & deco value "+decoRating);
-			if (lockerCount <= 2 && options.Count > 1)
-				options.Remove(RoomTypes.STORAGE);
-			if (decoRating < 8)
+			int plantPanels = ObjectUtil.getChildObjects(bc.gameObject, "BaseRoomPlanterSide(Clone)").Count;
+			int windows = ObjectUtil.getChildObjects(bc.gameObject, "BaseRoomWindowSide(Clone)").Count;
+			decoRating += plantPanels*1.5F; //plant panels, 1.5 each
+			if (windows > 0)
+				decoRating += windows*getWindowDecoValue(bc); //windows, rating is base location dependent
+			SNUtil.writeToChat("Room at "+bc.transform.position+" has options "+options.toDebugString()+" & deco value "+decoRating+" ("+plantPanels+"/"+windows+")");
+			if (decoRating < 10)
 				options.Remove(RoomTypes.LEISURE);
+			if (lockers >= 3)
+				options.Add(RoomTypes.STORAGE);
 			if (options.Count == 2 && options.Contains(RoomTypes.UNSPECIALIZED)) //if unspecialized + one thing, choose that one thing
 				options.Remove(RoomTypes.UNSPECIALIZED);
 			return options.Count == 1 ? options.First() : RoomTypes.UNSPECIALIZED;
 		}
 		
+		private float getWindowDecoValue(BaseCell bc) {
+			BiomeBase b = BiomeBase.getBiome(bc.transform.position);
+		}
+		
 		private float getDecoRating(PrefabIdentifier pi) {
 			PictureFrame pf = pi.GetComponent<PictureFrame>();
 			if (pf)
-				return pf.current == PictureFrame.State.Full ? 4 : -1;
+				return pf.current == PictureFrame.State.None ? -1 : 3;
+			Sign sg = pi.GetComponent<Sign>();
+			if (sg)
+				return string.IsNullOrEmpty(sg.text) || sg.text.Equals("sign", StringComparison.InvariantCultureIgnoreCase) ? 0 : 0.25F;
 			ItemDisplayLogic disp = pi.GetComponent<ItemDisplayLogic>();
 			if (disp)
 				return disp.getDecorativeBonus();
@@ -223,7 +241,9 @@ namespace ReikaKalseki.AqueousEngineering {
 		}
 		
 		private RoomTypes[] getObjectType(PrefabIdentifier pi) {
-			if (pi.GetComponent<Crafter>() || pi.GetComponent<Charger>())
+			if (pi.GetComponent<Charger>())
+				return new RoomTypes[]{RoomTypes.MECHANICAL};
+			if (pi.GetComponent<Crafter>())
 				return new RoomTypes[]{RoomTypes.WORK};
 			if (objectTypeMappings.ContainsKey(pi.ClassId))
 				return objectTypeMappings[pi.ClassId];
@@ -259,11 +279,12 @@ namespace ReikaKalseki.AqueousEngineering {
 			if (!cell)
 				return;
 			List<PrefabIdentifier> li = ObjectUtil.getBaseObjectsInRoom(bb, cell);
-			RoomTypes type = getType(cell, li);
-			SNUtil.writeToChat("Room at "+cell.transform.position+" is now type "+type);
-			cell.gameObject.EnsureComponent<RoomTypeTracker>().setType(type, null);
+			float deco;
+			RoomTypes type = getType(cell, li, out deco);
+			SNUtil.writeToChat("Room at "+cell.transform.position+" is now type "+type+"; decoration rating = "+deco.ToString("0.00"));
+			cell.gameObject.EnsureComponent<RoomTypeTracker>().setType(type, cell, null, deco);
 			foreach (PrefabIdentifier pi in li) {
-				pi.gameObject.EnsureComponent<RoomTypeTracker>().setType(type, pi);
+				pi.gameObject.EnsureComponent<RoomTypeTracker>().setType(type, cell, pi, deco);
 			}
 		}
 		
@@ -281,11 +302,18 @@ namespace ReikaKalseki.AqueousEngineering {
 		internal class RoomTypeTracker : MonoBehaviour {
 			
 			private RoomTypes roomType;
+			private PrefabIdentifier prefab;
+			private BaseCell room;
+			private float decoRating;
 			
-			internal void setType(RoomTypes type, PrefabIdentifier pi) {
-				if (roomType == type)
+			internal void setType(RoomTypes type, BaseCell bc, PrefabIdentifier pi, float deco) {
+				if (roomType == type && room)
 					return;
+				//SNUtil.writeToChat("Initializing "+(pi ? pi.name : "room")+" in room "+bc.transform+" to "+type);
 				roomType = type;
+				room = bc;
+				prefab = pi;
+				decoRating = deco;
 				applyTypeBonusesToObject(pi);
 			}
 			

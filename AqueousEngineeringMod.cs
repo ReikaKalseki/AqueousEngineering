@@ -327,7 +327,7 @@ namespace ReikaKalseki.AqueousEngineering
     	BaseRoomSpecializationSystem.instance.registerModdedObject(acuBoosterBlock, 0, BaseRoomSpecializationSystem.RoomTypes.ACU);
     	BaseRoomSpecializationSystem.instance.registerModdedObject(acuCleanerBlock, 0, BaseRoomSpecializationSystem.RoomTypes.ACU);
     	BaseRoomSpecializationSystem.instance.registerModdedObject(ampeelAntennaBlock, 0, BaseRoomSpecializationSystem.RoomTypes.ACU);
-    	BaseRoomSpecializationSystem.instance.registerModdedObject(repairBlock, -0.1F, BaseRoomSpecializationSystem.RoomTypes.WORK);
+    	BaseRoomSpecializationSystem.instance.registerModdedObject(repairBlock, -0.1F, BaseRoomSpecializationSystem.RoomTypes.MECHANICAL);
     	BaseRoomSpecializationSystem.instance.registerModdedObject(batteryBlock, 0, BaseRoomSpecializationSystem.RoomTypes.POWER);
     }
 
