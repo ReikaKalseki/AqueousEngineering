@@ -33,6 +33,7 @@ namespace ReikaKalseki.AqueousEngineering {
 	    	DIHooks.getFoodRateEvent += affectFoodRate;
 	    	DIHooks.onSleepEvent += onSleep;
 	    	//DIHooks.onRedundantScanEvent += ch => ch.preventNormalDrop = onRedundantScan();
+	    	CustomMachineLogic.getMachinePowerCostFactorEvent += getCustomMachinePowerCostMultiplier;
 	    }
 		
 		public static void tickPlayer(Player ep) {
@@ -148,17 +149,19 @@ namespace ReikaKalseki.AqueousEngineering {
 	   }*/
 	   
 	   public static float getReactorGeneration(float orig, MonoBehaviour reactor) { //either bio or nuclear
+	   	//SNUtil.writeToChat("Reactor gen "+orig+" in "+BaseRoomSpecializationSystem.instance.getSavedType(reactor));
 	   	return BaseRoomSpecializationSystem.instance.getSavedType(reactor) == BaseRoomSpecializationSystem.RoomTypes.POWER ? orig*1.25F : orig;
 	   }
 	   
 	   public static void onSleep(Bed bed) {
+	   	//SNUtil.writeToChat("Slept in "+BaseRoomSpecializationSystem.instance.getSavedType(bed));
 	   	if (BaseRoomSpecializationSystem.instance.getSavedType(bed) == BaseRoomSpecializationSystem.RoomTypes.LEISURE)
-	   		Player.main.liveMixin.AddHealth(15);
+	   		Player.main.gameObject.AddComponent<HealingOverTime>().setValues(15, bed.kSleepRealTimeDuration).activate();
 	   }
 	   
 	   public static void affectFoodRate(DIHooks.FoodRateCalculation calc) {
 	   	BaseRoomSpecializationSystem.RoomTypes type = BaseRoomSpecializationSystem.instance.getPlayerRoomType(Player.main);
-	   	SNUtil.writeToChat("Current player room type: "+type);
+	   	//SNUtil.writeToChat("Current player room type: "+type);
 	   	if (type == BaseRoomSpecializationSystem.RoomTypes.LEISURE)
 	   		calc.rate *= 0.33F;
 	   	else if (type == BaseRoomSpecializationSystem.RoomTypes.WORK)
@@ -166,13 +169,33 @@ namespace ReikaKalseki.AqueousEngineering {
 	   }
 	   
 	   public static float getCrafterTime(float time, Crafter c) {
+	   	//SNUtil.writeToChat("Crafter time "+time+" in "+BaseRoomSpecializationSystem.instance.getSavedType(c));
 	   	if (BaseRoomSpecializationSystem.instance.getSavedType(c) == BaseRoomSpecializationSystem.RoomTypes.WORK)
-	   		time /= 1.25F;
+	   		time /= 1.5F;
 	   	return time;
 	   }
 	   
 	   public static void onConstructionComplete(TechType item, Constructable c) {
 	   	BaseRoomSpecializationSystem.instance.updateRoom(c.gameObject);
+	   }
+	   
+	   public static float getWaterFilterPowerCost(float cost, FiltrationMachine c) {
+	   	//SNUtil.writeToChat("Waterfilter power cost "+cost+" in "+BaseRoomSpecializationSystem.instance.getSavedType(c));
+	   	if (BaseRoomSpecializationSystem.instance.getSavedType(c) == BaseRoomSpecializationSystem.RoomTypes.MECHANICAL)
+	   		cost *= 0.8F;
+	   	return cost;
+	   }
+	   
+	   public static float getChargerSpeed(float speed, Charger c) {
+	   	//SNUtil.writeToChat("Charger speed "+speed+" in "+BaseRoomSpecializationSystem.instance.getSavedType(c));
+	   	if (BaseRoomSpecializationSystem.instance.getSavedType(c) == BaseRoomSpecializationSystem.RoomTypes.MECHANICAL)
+	   		speed *= 1.5F;
+	   	return speed;
+	   }
+	   
+	   public static void getCustomMachinePowerCostMultiplier(CustomMachinePowerCostFactorCheck ch) {
+	   	if (BaseRoomSpecializationSystem.instance.getSavedType(ch.machine) == BaseRoomSpecializationSystem.RoomTypes.MECHANICAL)
+	   		ch.value *= 0.8F;
 	   }
 	}
 }

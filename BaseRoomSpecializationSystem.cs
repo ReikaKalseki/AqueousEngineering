@@ -18,7 +18,7 @@ using ReikaKalseki.AqueousEngineering;
 
 namespace ReikaKalseki.AqueousEngineering {
 	
-	public class BaseRoomSpecializationSystem {
+	public class BaseRoomSpecializationSystem { //TODO 2.0 handle large rooms
 		
 		private static readonly HashSet<string> lockers = new HashSet<string>();
 		private static readonly Dictionary<string, float> decoRatings = new Dictionary<string, float>();
@@ -36,7 +36,7 @@ namespace ReikaKalseki.AqueousEngineering {
 			//foreach (string s in lockers)
 			//	objectTypeMappings[s] = new RoomTypes[]{RoomTypes.STORAGE};
 			
-			objectTypeMappings["d3bf649e-1eaa-4790-a113-8f73286af611"] = new RoomTypes[]{RoomTypes.AGRICULTURAL}; //indoor growbed
+			objectTypeMappings["87f5d3e6-e00b-4cf3-be39-0a9c7e951b84"] = new RoomTypes[]{RoomTypes.AGRICULTURAL}; //indoor growbed			
 			objectTypeMappings["769f9f44-30f6-46ed-aaf6-fbba358e1676"] = new RoomTypes[]{RoomTypes.POWER}; //bioreactor
 			objectTypeMappings["864f7780-a4c3-4bf2-b9c7-f4296388b70f"] = new RoomTypes[]{RoomTypes.POWER}; //nuclear reactor
 			objectTypeMappings["51eba507-317c-46bf-adde-4459dc8e002e"] = new RoomTypes[]{RoomTypes.LEISURE}; //vending machine
@@ -113,46 +113,77 @@ namespace ReikaKalseki.AqueousEngineering {
 			
 			itemDecoRatings[TechType.CreepvineSeedCluster] = 0.1F;
 			itemDecoRatings[TechType.CreepvinePiece] = 0;
+			itemDecoRatings[TechType.Creepvine] = 0.05F;
 			itemDecoRatings[TechType.BloodOil] = -0.25F;
+			itemDecoRatings[TechType.BloodVine] = -0.25F;
 			itemDecoRatings[TechType.SnakeMushroomSpore] = 0.25F;
+			itemDecoRatings[TechType.SnakeMushroom] = 0.25F;
 			itemDecoRatings[TechType.EyesPlantSeed] = 0F;
+			itemDecoRatings[TechType.EyesPlant] = 0F;
 			itemDecoRatings[TechType.GabeSFeatherSeed] = 0.1F;
+			itemDecoRatings[TechType.GabeSFeather] = 0.1F;
 			itemDecoRatings[TechType.RedGreenTentacleSeed] = 0.1F;
+			itemDecoRatings[TechType.RedGreenTentacle] = 0.1F;
 			itemDecoRatings[TechType.SpikePlantSeed] = -0.2F;
+			itemDecoRatings[TechType.SpikePlant] = -0.2F;
 			itemDecoRatings[TechType.MembrainTreeSeed] = 0.2F;
+			itemDecoRatings[TechType.MembrainTree] = 0.2F;
 			itemDecoRatings[TechType.RedConePlantSeed] = 0.1F;
+			itemDecoRatings[TechType.RedConePlant] = 0.1F;
 			itemDecoRatings[TechType.KooshChunk] = 0F;
 			itemDecoRatings[TechType.SpottedLeavesPlantSeed] = 0F;
+			itemDecoRatings[TechType.SpottedLeavesPlant] = 0F;
 			itemDecoRatings[TechType.PurpleFanSeed] = 0F;
+			itemDecoRatings[TechType.PurpleFan] = 0F;
 			itemDecoRatings[TechType.PurpleBranchesSeed] = 0F;
+			itemDecoRatings[TechType.PurpleBranches] = 0F;
 			itemDecoRatings[TechType.PurpleStalkSeed] = 0.25F;
+			itemDecoRatings[TechType.PurpleStalk] = 0.25F;
 			itemDecoRatings[TechType.AcidMushroomSpore] = 0F;
 			itemDecoRatings[TechType.WhiteMushroomSpore] = 0F;
+			itemDecoRatings[TechType.AcidMushroom] = 0F;
+			itemDecoRatings[TechType.WhiteMushroom] = 0F;
 			itemDecoRatings[TechType.RedBasketPlantSeed] = 0.33F;
-			itemDecoRatings[TechType.ShellGrassSeed] = 0F;
+			itemDecoRatings[TechType.RedBasketPlant] = 0.33F;
+			itemDecoRatings[TechType.ShellGrassSeed] = 0.05F;
+			itemDecoRatings[TechType.ShellGrass] = 0.05F;
 			itemDecoRatings[TechType.RedRollPlantSeed] = 0.2F;
+			itemDecoRatings[TechType.RedRollPlant] = 0.2F;
 			itemDecoRatings[TechType.RedBushSeed] = 0.05F;
+			itemDecoRatings[TechType.RedBush] = 0.05F;
 			itemDecoRatings[TechType.SeaCrownSeed] = 0.15F;
+			itemDecoRatings[TechType.SeaCrown] = 0.15F;
 			itemDecoRatings[TechType.PurpleTentacleSeed] = 0.1F;
+			itemDecoRatings[TechType.PurpleTentacle] = 0.1F;
 			itemDecoRatings[TechType.BluePalmSeed] = 0.05F;
+			itemDecoRatings[TechType.BluePalm] = 0.05F;
 			itemDecoRatings[TechType.SmallFanSeed] = 0.05F;
+			itemDecoRatings[TechType.SmallFan] = 0.05F;
 			
 			itemDecoRatings[TechType.PinkFlowerSeed] = 0.1F;
+			itemDecoRatings[TechType.PinkFlower] = 0.1F;
 			itemDecoRatings[TechType.PurpleRattleSpore] = -0.05F;
+			itemDecoRatings[TechType.PurpleRattle] = -0.05F;
 			itemDecoRatings[TechType.PurpleVegetablePlant] = -0.1F;
 			itemDecoRatings[TechType.PurpleVegetable] = -0.1F;
 			itemDecoRatings[TechType.PurpleVasePlantSeed] = 0.4F;
+			itemDecoRatings[TechType.PurpleVasePlant] = 0.4F;
 			itemDecoRatings[TechType.HangingFruit] = 0.5F;
 			itemDecoRatings[TechType.HangingFruitTree] = 0.5F;
 			itemDecoRatings[TechType.OrangeMushroomSpore] = -0.25F;
+			itemDecoRatings[TechType.OrangeMushroom] = -0.25F;
 			itemDecoRatings[TechType.OrangePetalsPlantSeed] = 0.05F;
+			itemDecoRatings[TechType.OrangePetalsPlant] = 0.05F;
 			itemDecoRatings[TechType.MelonSeed] = 0F;
 			itemDecoRatings[TechType.SmallMelon] = 0F;
 			itemDecoRatings[TechType.Melon] = 0F;
 			itemDecoRatings[TechType.MelonPlant] = 0F;
 			itemDecoRatings[TechType.BulboTreePiece] = 0F;
+			itemDecoRatings[TechType.BulboTree] = 0F;
 			itemDecoRatings[TechType.JellyPlantSeed] = -0.2F;
+			itemDecoRatings[TechType.JellyPlant] = -0.2F;
 			itemDecoRatings[TechType.FernPalmSeed] = 0.1F;
+			itemDecoRatings[TechType.FernPalm] = 0.1F;
 		}
 		
 		public void registerModdedObject(ModPrefab pfb, float deco, params RoomTypes[] types) {
@@ -173,7 +204,7 @@ namespace ReikaKalseki.AqueousEngineering {
 				decoRatings[pfb] = deco;
 		}
 		
-		internal RoomTypes getType(BaseCell bc, List<PrefabIdentifier> li, out float decoRating) {
+		internal RoomTypes getType(BaseRoot bb, BaseCell bc, List<PrefabIdentifier> li, out float decoRating) {
 			HashSet<RoomTypes> options = new HashSet<RoomTypes>((IEnumerable<RoomTypes>)Enum.GetValues(typeof(RoomTypes)));
 			//if (bc.GetComponentInChildren<BaseNuclearReactor>() || bc.GetComponentInChildren<BaseBioReactor>())
 			//	options.Add(RoomTypes.POWER);
@@ -184,29 +215,99 @@ namespace ReikaKalseki.AqueousEngineering {
 				//if (obj.Length == 1)
 				//	options.AddRange(obj);
 				//else
+				if (obj.Length > 1 || obj[0] != RoomTypes.UNSPECIALIZED) //do not rule out all other room types just because of an unspecialized item
 					options.IntersectWith(obj);
 				if (lockers.Contains(pi.ClassId))
 				    lockerCount++;
 				decoRating += getDecoRating(pi);
-				SNUtil.writeToChat("Cell "+bc.transform.position+": Object "+pi.name+" > "+getObjectType(pi).toDebugString()+" #"+getDecoRating(pi));
+				//SNUtil.writeToChat("Cell "+bc.transform.position+": Object "+pi.name+" > "+getObjectType(pi).toDebugString()+" #"+getDecoRating(pi));
 			}
+			bool hasGlassRoof = ObjectUtil.getChildObject(bc.gameObject, "BaseRoomInteriorTopGlass") != null;
 			int plantPanels = ObjectUtil.getChildObjects(bc.gameObject, "BaseRoomPlanterSide(Clone)").Count;
 			int windows = ObjectUtil.getChildObjects(bc.gameObject, "BaseRoomWindowSide(Clone)").Count;
+			if (hasGlassRoof)
+				windows += 3; //counts as 3 windows
 			decoRating += plantPanels*1.5F; //plant panels, 1.5 each
 			if (windows > 0)
-				decoRating += windows*getWindowDecoValue(bc); //windows, rating is base location dependent
-			SNUtil.writeToChat("Room at "+bc.transform.position+" has options "+options.toDebugString()+" & deco value "+decoRating+" ("+plantPanels+"/"+windows+")");
-			if (decoRating < 10)
+				decoRating += windows*getWindowDecoValue(bb, bc, hasGlassRoof); //windows, rating is base location dependent
+			//SNUtil.writeToChat("Room at "+bc.transform.position+" has options "+options.toDebugString()+" & deco value "+decoRating+" ("+plantPanels+"/"+windows+"*"+getWindowDecoValue(bb, bc, hasGlassRoof)+")");
+			if (decoRating < 12)
 				options.Remove(RoomTypes.LEISURE);
-			if (lockers >= 3)
+			if (lockerCount >= 3)
 				options.Add(RoomTypes.STORAGE);
 			if (options.Count == 2 && options.Contains(RoomTypes.UNSPECIALIZED)) //if unspecialized + one thing, choose that one thing
 				options.Remove(RoomTypes.UNSPECIALIZED);
 			return options.Count == 1 ? options.First() : RoomTypes.UNSPECIALIZED;
 		}
 		
-		private float getWindowDecoValue(BaseCell bc) {
-			BiomeBase b = BiomeBase.getBiome(bc.transform.position);
+		private float getWindowDecoValue(BaseRoot bb, BaseCell bc, bool hasGlassRoof) {
+			Vector3 pos = bc.transform.position;
+			if (pos.y >= -1)
+				return 0.1F;
+			float depth = -pos.y;
+			BiomeBase b = BiomeBase.getBiome(pos);
+			float scenery = Mathf.Clamp(b.sceneryValue, -1, 2.5F);
+			if (scenery > 0 && scenery < 0.1F)
+				scenery = 0.1F;
+			if ((b == VanillaBiomes.REDGRASS || b == VanillaBiomes.MUSHROOM) && depth < 50) {
+				scenery = 0;
+			}
+			else if ((b == VanillaBiomes.KOOSH) && depth < 100) {
+				scenery = 0;
+			}
+			else if ((b == VanillaBiomes.CRAG || b == VanillaBiomes.SPARSE || b == VanillaBiomes.GRANDREEF) && depth < 150) {
+				scenery = 0;
+			}
+			else if ((b == VanillaBiomes.DUNES || b == VanillaBiomes.BLOODKELPNORTH) && depth < 200) {
+				scenery = 0;
+			}
+			else if ((b == VanillaBiomes.MOUNTAINS || b == VanillaBiomes.TREADER) && depth < 250) {
+				scenery = 0;
+			}
+			else if (b == VanillaBiomes.LOSTRIVER) {
+				string biome = WaterBiomeManager.main.GetBiome(pos, false).ToLowerInvariant();
+				if (biome.Contains("bonesfield"))
+					scenery = 1.5F;
+				else if (biome.Contains("ghosttree") || biome.Contains("junction"))
+					scenery = 1.0F;
+			}
+			if (scenery > 0) {
+				int objectsFound = 0;
+				int totalFound = 0;
+				
+				WorldUtil.getObjectsNear<GameObject>(pos, 100, go => {
+				if (go.activeInHierarchy && go.transform.position.y >= pos.y-50 && (hasGlassRoof || go.transform.position.y <= pos.y+50) && !ObjectUtil.isOnBase(bb, go.transform) && !go.FindAncestor<Player>()) {
+					totalFound++;
+					if (go.FindAncestor<PrefabIdentifier>())
+						objectsFound++;
+					}
+				});
+				if (totalFound <= 50) //basically nothing found, must be open water (will never be zero beacuse of ocean, occasional fish, etc)
+					scenery = 0;
+				else if (objectsFound <= 200) //terrain only, or terrain plus only a handful of things, still many because of things like grass
+					scenery *= 0.33F;
+				//SNUtil.writeToChat("Found near-room outdoor objects: "+objectsFound+"/"+totalFound);
+			}
+			float ret = 0.5F*scenery;
+			IEcoTarget tgt = EcoRegionManager.main.FindNearestTarget(EcoTargetType.Leviathan, pos, null, 8);
+			//SNUtil.writeToChat("Nearby leviathan: "+(tgt != null ? tgt.GetGameObject().name : "None"));
+			if (tgt != null) {
+				float dist = Vector3.Distance(tgt.GetPosition(), pos);
+				if (dist <= 250) {
+					Creature c = tgt.GetGameObject().GetComponent<Creature>();
+					float val = (c is ReaperLeviathan || c is GhostLeviatanVoid || c is GhostLeviathan || c is SeaDragon) ? 1.5F : 1;
+					ret += val*(float)MathUtil.linterpolate(dist, 80, 250, 1, 0, true);
+				}
+			}
+			tgt = EcoRegionManager.main.FindNearestTarget(EcoTargetType.HeatArea, pos, null, 4);
+			//SNUtil.writeToChat("Nearby heat area: "+(tgt != null ? tgt.GetGameObject().name : "None"));
+			if (tgt != null) {
+				float dist = Vector3.Distance(tgt.GetPosition(), pos);
+				if (dist <= 80) {
+					ret += tgt.GetGameObject().GetComponent<Geyser>() ? 1.5F : 0.5F;
+				}
+			}
+			return ret;
 		}
 		
 		private float getDecoRating(PrefabIdentifier pi) {
@@ -214,27 +315,30 @@ namespace ReikaKalseki.AqueousEngineering {
 			if (pf)
 				return pf.current == PictureFrame.State.None ? -1 : 3;
 			Sign sg = pi.GetComponent<Sign>();
-			if (sg)
-				return string.IsNullOrEmpty(sg.text) || sg.text.Equals("sign", StringComparison.InvariantCultureIgnoreCase) ? 0 : 0.25F;
+			if (sg) {
+				string text = sg.GetComponentInChildren<uGUI_SignInput>().text;
+				return string.IsNullOrEmpty(text) || text.Equals("sign", StringComparison.InvariantCultureIgnoreCase) ? 0 : 0.25F;
+			}
 			ItemDisplayLogic disp = pi.GetComponent<ItemDisplayLogic>();
 			if (disp)
 				return disp.getDecorativeBonus();
 			Planter p = pi.GetComponent<Planter>();
 			if (p)
-				return getInventoryDecoValue(p.GetComponentInChildren<StorageContainer>());
+				return getInventoryDecoValue(p.GetComponent<StorageContainer>());
 			Aquarium a = pi.GetComponent<Aquarium>();
 			if (a)
-				return 1+getInventoryDecoValue(a.GetComponentInChildren<StorageContainer>()); //even empty has some value
+				return 1+getInventoryDecoValue(a.GetComponent<StorageContainer>()); //even empty has some value
 			return decoRatings.ContainsKey(pi.ClassId) ? decoRatings[pi.ClassId] : 0;
 		}
 		
 		private float getInventoryDecoValue(StorageContainer sc) {
 			float ret = 0;
-			foreach (Pickupable pp in sc.storageRoot.GetComponentsInChildren<Pickupable>()) {
+			foreach (Pickupable pp in sc.storageRoot.GetComponentsInChildren<Pickupable>(true)) {
 				TechType tt = pp.GetTechType();
 				float val = itemDecoRatings.ContainsKey(tt) ? itemDecoRatings[tt] : 0;
 				if (tt == TechType.Peeper && pp.GetComponent<Peeper>().isHero)
 					val = 1.5F;
+				//SNUtil.writeToChat("Deco value of inv item "+pp+" ("+tt+"): "+val);
 				ret += val;
 			}
 			return ret;
@@ -273,14 +377,21 @@ namespace ReikaKalseki.AqueousEngineering {
 		
 		public void updateRoom(GameObject go) {
 			BaseRoot bb = go.FindAncestor<BaseRoot>();
-			if (!bb)
+			if (!bb) {
+				//SNUtil.writeToChat("No base for "+go+", queuing update for later");
+				//queueRoomUpdate(go);
 				return;
+			}
 			BaseCell cell = ObjectUtil.getBaseRoom(bb, go);
-			if (!cell)
+			if (!cell) {
+				//SNUtil.writeToChat("No room for "+go+", queuing update for later");
+				queueRoomUpdate(go);
 				return;
+			}
 			List<PrefabIdentifier> li = ObjectUtil.getBaseObjectsInRoom(bb, cell);
 			float deco;
-			RoomTypes type = getType(cell, li, out deco);
+			//SNUtil.writeToChat("Checking room type for "+go);
+			RoomTypes type = getType(bb, cell, li, out deco);
 			SNUtil.writeToChat("Room at "+cell.transform.position+" is now type "+type+"; decoration rating = "+deco.ToString("0.00"));
 			cell.gameObject.EnsureComponent<RoomTypeTracker>().setType(type, cell, null, deco);
 			foreach (PrefabIdentifier pi in li) {
@@ -288,15 +399,28 @@ namespace ReikaKalseki.AqueousEngineering {
 			}
 		}
 		
+		private void queueRoomUpdate(GameObject go) {
+			go.AddComponent<RoomUpdateQueue>().Invoke("recompute", 0.5F);
+		}
+		
 		public enum RoomTypes {
 			UNSPECIALIZED,
 			STORAGE, //storage +1 row and col
 			POWER, //generators +25%
-			MECHANICAL, //machine (AE, C2C, vanilla [eg medkit fab, battery charger]) speed +20% or power cost -20%
-			AGRICULTURAL, //crop growth speed +20%
-			WORK, //food and water rate -20%, fab speed +25%
+			MECHANICAL, //machine (AE, C2C, vanilla [water filter] etc) power cost -20%, charger speed +50%
+			AGRICULTURAL, //crop growth speed +20%? or maybe more harvests per plant; or maybe eatables obtained this way have +25% to food and water //TODO unimplemented
+			WORK, //food and water rate -20%, fab speed +50%
 			LEISURE, //food and water rate -67%, sleeping in regenerates 15 health
-			ACU, //breeding rate +10%
+			ACU, //creature capacity +5 (also affects ACU ecosystems) //TODO unimplemented
+		}
+		
+		class RoomUpdateQueue : MonoBehaviour {
+			
+			void recompute() {
+				instance.updateRoom(gameObject);
+				UnityEngine.Object.Destroy(this);
+			}
+			
 		}
 		
 		internal class RoomTypeTracker : MonoBehaviour {
@@ -326,9 +450,10 @@ namespace ReikaKalseki.AqueousEngineering {
 					return;
 				switch(roomType) {
 					case RoomTypes.STORAGE:
-						if (pi.ClassId == "367656d6-87d9-42a1-926c-3cf959ea1c85" || pi.ClassId == "5fc7744b-5a2c-4572-8e53-eebf990de434" || pi.ClassId == "775feb4c-dab9-4322-b4a5-a4289ca1cf6a") {
+						if (lockers.Contains(pi.ClassId)) {
 							StorageContainer sc = pi.GetComponentInChildren<StorageContainer>();
-							sc.Resize(sc.width+1, sc.height+1); //how to reset it? and does it need refresh on reload?
+							StorageContainer refSc = ObjectUtil.lookupPrefab(pi.ClassId).GetComponent<StorageContainer>();
+							sc.Resize(refSc.width+1, refSc.height+1); //TODO how to reset it? and does it need refresh on reload?
 						}
 						break;
 				}
