@@ -27,6 +27,8 @@ namespace ReikaKalseki.AqueousEngineering {
 		
 		public static readonly BaseRoomSpecializationSystem instance = new BaseRoomSpecializationSystem();
 		
+		public static readonly float LEISURE_DECO_THRESHOLD = AqueousEngineeringMod.config.getFloat(AEConfig.ConfigEntries.LEISUREDECO);
+		
 		private BaseRoomSpecializationSystem() {
 			lockers.Add("367656d6-87d9-42a1-926c-3cf959ea1c85");
 			lockers.Add("5fc7744b-5a2c-4572-8e53-eebf990de434");
@@ -355,6 +357,11 @@ namespace ReikaKalseki.AqueousEngineering {
 		}
 		
 		internal RoomTypes getSavedType(Component go) {
+			float deco;
+			return getSavedType(go, out deco);
+		}
+		
+		internal RoomTypes getSavedType(Component go, out float deco) {
 			RoomTypeTracker rt = go.gameObject.FindAncestor<RoomTypeTracker>(); //will find the one on the main GO, else BaseCell if possible
 			if (!rt) {
 				BaseRoot bb = go.GetComponentInParent<BaseRoot>();
@@ -364,18 +371,22 @@ namespace ReikaKalseki.AqueousEngineering {
 						rt = bc.GetComponent<RoomTypeTracker>();
 				}
 			}
+			deco = rt ? rt.getDecorationValue() : 0;
 			return rt ? rt.getType() : RoomTypes.UNSPECIALIZED;
 		}
 		
-		internal RoomTypes getPlayerRoomType(Player ep) {
+		internal RoomTypes getPlayerRoomType(Player ep, out float deco) {
 			BaseCell bc = AEHooks.getCurrentPlayerRoom();
-			if (!bc)
+			if (!bc) {
+				deco = 0;
 				return RoomTypes.UNSPECIALIZED;
+			}
 			RoomTypeTracker rt = bc.GetComponent<RoomTypeTracker>();
+			deco = rt ? rt.getDecorationValue() : 0;
 			return rt ? rt.getType() : RoomTypes.UNSPECIALIZED;
 		}
 		
-		public void updateRoom(GameObject go) {
+		public void updateRoom(GameObject go) { //TODO watch deconstruction as well, plus inv content change if can
 			BaseRoot bb = go.FindAncestor<BaseRoot>();
 			if (!bb) {
 				//SNUtil.writeToChat("No base for "+go+", queuing update for later");
@@ -410,7 +421,7 @@ namespace ReikaKalseki.AqueousEngineering {
 			MECHANICAL, //machine (AE, C2C, vanilla [water filter] etc) power cost -20%, charger speed +50%
 			AGRICULTURAL, //crop growth speed +20%? or maybe more harvests per plant; or maybe eatables obtained this way have +25% to food and water //TODO unimplemented
 			WORK, //food and water rate -20%, fab speed +50%
-			LEISURE, //food and water rate -67%, sleeping in regenerates 15 health
+			LEISURE, //food and water rate -67% to -80% (-2% per surplus deco), sleeping in regenerates 15-20 health (15 + surplus deco up to +5)
 			ACU, //creature capacity +5 (also affects ACU ecosystems) //TODO unimplemented
 		}
 		
@@ -443,6 +454,10 @@ namespace ReikaKalseki.AqueousEngineering {
 			
 			internal RoomTypes getType() {
 				return roomType;
+			}
+			
+			internal float getDecorationValue() {
+				return decoRating;
 			}
 		
 			private void applyTypeBonusesToObject(PrefabIdentifier pi) {

@@ -155,15 +155,17 @@ namespace ReikaKalseki.AqueousEngineering {
 	   
 	   public static void onSleep(Bed bed) {
 	   	//SNUtil.writeToChat("Slept in "+BaseRoomSpecializationSystem.instance.getSavedType(bed));
-	   	if (BaseRoomSpecializationSystem.instance.getSavedType(bed) == BaseRoomSpecializationSystem.RoomTypes.LEISURE)
-	   		Player.main.gameObject.AddComponent<HealingOverTime>().setValues(15, bed.kSleepRealTimeDuration).activate();
+	   	float deco;
+	   	if (BaseRoomSpecializationSystem.instance.getSavedType(bed, out deco) == BaseRoomSpecializationSystem.RoomTypes.LEISURE)
+	   		Player.main.gameObject.AddComponent<HealingOverTime>().setValues(Mathf.Min(20, 15+deco-BaseRoomSpecializationSystem.LEISURE_DECO_THRESHOLD), bed.kSleepRealTimeDuration).activate();
 	   }
 	   
 	   public static void affectFoodRate(DIHooks.FoodRateCalculation calc) {
-	   	BaseRoomSpecializationSystem.RoomTypes type = BaseRoomSpecializationSystem.instance.getPlayerRoomType(Player.main);
+	   	float deco;
+	   	BaseRoomSpecializationSystem.RoomTypes type = BaseRoomSpecializationSystem.instance.getPlayerRoomType(Player.main, out deco);
 	   	//SNUtil.writeToChat("Current player room type: "+type);
 	   	if (type == BaseRoomSpecializationSystem.RoomTypes.LEISURE)
-	   		calc.rate *= 0.33F;
+	   		calc.rate *= Mathf.Max(0.2F, 0.33F-0.02F*(deco-BaseRoomSpecializationSystem.LEISURE_DECO_THRESHOLD));
 	   	else if (type == BaseRoomSpecializationSystem.RoomTypes.WORK)
 	   		calc.rate *= 0.8F;
 	   }
