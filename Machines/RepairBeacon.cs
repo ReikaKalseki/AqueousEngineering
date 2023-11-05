@@ -87,7 +87,7 @@ namespace ReikaKalseki.AqueousEngineering {
 				if (lv && lv.health < lv.maxHealth && consumePower((RepairBeacon.POWER_COST_ACTIVE-RepairBeacon.POWER_COST)*seconds)) {
 					lv.AddHealth(seconds*12);
 					
-					if (DayNightCycle.main.timePassedAsFloat-lastSound >= 1.4F) {
+					if (DayNightCycle.main.timePassedAsFloat-lastSound >= 1.25F) {
 						lastSound = DayNightCycle.main.timePassedAsFloat;
 						SoundManager.playSoundAt(workingSound, transform.position);
 					}

@@ -212,6 +212,7 @@ namespace ReikaKalseki.AqueousEngineering {
 			internal int carnivoreCount;
 			internal int sparkleCount;
 			internal int cuddleCount;
+			internal float infectedTotal;
 			internal float stalkerToyValue;
 			
 			internal bool nextIsDebug = false;
@@ -318,8 +319,10 @@ namespace ReikaKalseki.AqueousEngineering {
 				carnivoreCount = 0;
 				int teeth = 0;
 				cuddleCount = 0;
+				infectedTotal = 0;
 				sparkleCount = 0;
 				//SNUtil.writeToChat("@@"+string.Join(",", possibleBiomes));
+				List<InfectedMixin> infectedFish = new List<InfectedMixin>();
 				List<WaterParkCreature> foodFish = new List<WaterParkCreature>();
 				List<Stalker> stalkers = new List<Stalker>();
 				stalkerToyValue = 0;
@@ -337,6 +340,14 @@ namespace ReikaKalseki.AqueousEngineering {
 						teeth++;
 					}
 					else if (wp is WaterParkCreature) {
+						InfectedMixin mix = wp.GetComponent<InfectedMixin>();
+						if (mix) {
+							float amt = mix.GetInfectedAmount();
+							if (amt > 0) {
+								infectedTotal += amt;
+								infectedFish.Add(mix);
+							}
+						}
 						Creature c = ACUEcosystems.handleCreature(this, dT, wp, tt, foodFish, plants, ref potentialBiomes);
 						if (tt == TechType.Stalker) {
 							stalkers.Add((Stalker)c);
@@ -368,6 +379,12 @@ namespace ReikaKalseki.AqueousEngineering {
 					}
 				}
 				boost += 5F*f0;
+				if (infectedTotal > 0) {
+					boost -= infectedTotal;
+					if (UnityEngine.Random.Range(0F, 1F) <= infectedTotal*0.005F*dT) {
+						infectedFish.GetRandom().GetComponent<LiveMixin>().Kill(DamageType.Starve);
+					}
+				}
 				if (boost > 0) {
 					boost *= dT;
 					foreach (WaterParkCreature wp in foodFish) {

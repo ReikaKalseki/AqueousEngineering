@@ -27,6 +27,8 @@ namespace ReikaKalseki.AqueousEngineering {
 	    static AEHooks() {
 	    	DIHooks.onWorldLoadedEvent += onWorldLoaded;
 	    	DIHooks.onConstructedEvent += onConstructionComplete;
+	    	DIHooks.inventoryClosedEvent += onInvClosed;
+	    	DIHooks.onBaseLoadedEvent += onBaseLoaded;
 	    	DIHooks.constructabilityEvent += enforceACUBuildability;
 	    	DIHooks.onSkyApplierSpawnEvent += onSkyApplierSpawn;
 	    	DIHooks.onPlayerTickEvent += tickPlayer;
@@ -177,8 +179,14 @@ namespace ReikaKalseki.AqueousEngineering {
 	   	return time;
 	   }
 	   
-	   public static void onConstructionComplete(TechType item, Constructable c) {
-	   	BaseRoomSpecializationSystem.instance.updateRoom(c.gameObject);
+	   public static void onConstructionComplete(Constructable c, bool complete) {
+	   	if (Player.main.currentSub && Player.main.currentSub.isBase)
+	   		BaseRoomSpecializationSystem.instance.updateRoom(c.gameObject);
+	   }
+	   
+	   public static void onInvClosed(StorageContainer sc) {
+	   	if (Player.main.currentSub && Player.main.currentSub.isBase)
+	   		BaseRoomSpecializationSystem.instance.updateRoom(sc.gameObject);
 	   }
 	   
 	   public static float getWaterFilterPowerCost(float cost, FiltrationMachine c) {
@@ -198,6 +206,10 @@ namespace ReikaKalseki.AqueousEngineering {
 	   public static void getCustomMachinePowerCostMultiplier(CustomMachinePowerCostFactorCheck ch) {
 	   	if (BaseRoomSpecializationSystem.instance.getSavedType(ch.machine) == BaseRoomSpecializationSystem.RoomTypes.MECHANICAL)
 	   		ch.value *= 0.8F;
+	   }
+	   
+	   public static void onBaseLoaded(BaseRoot root) {
+	   	BaseRoomSpecializationSystem.instance.recomputeBaseRooms(root);
 	   }
 	}
 }

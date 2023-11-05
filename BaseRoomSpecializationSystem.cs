@@ -63,7 +63,9 @@ namespace ReikaKalseki.AqueousEngineering {
 			decoRatings["26cdb865-efbd-403c-8873-92453bcfc935"] = 0.15F; //best chair	
 			decoRatings["cbeca4bd-cba4-4905-89fd-2470aaa204b1"] = 0.1F; //chair		
 			
-			decoRatings["5c06baec-0539-4f26-817d-78443548cc52"] = -0.25F; //radio		
+			decoRatings["5c06baec-0539-4f26-817d-78443548cc52"] = -0.25F; //radio	
+
+			decoRatings["775feb4c-dab9-4322-b4a5-a4289ca1cf6a"] = 0.1F; //standing locker			
 
 			decoRatings["cdb374fd-4f38-4bef-86a3-100cc87155b6"] = 0.25F; //double bed + extra sheet
 			decoRatings["c3994649-d0da-4f8c-bb77-1590f50838b9"] = 0.1F; //bed
@@ -98,6 +100,14 @@ namespace ReikaKalseki.AqueousEngineering {
 			
 			//foreach (string s in decoRatings.Keys)
 			//	objectTypeMappings[s] = RoomTypes.LEISURE;
+			
+			itemDecoRatings[TechType.PrecursorKey_Blue] = 2F;
+			itemDecoRatings[TechType.PrecursorKey_Red] = 2F;
+			itemDecoRatings[TechType.PrecursorKey_White] = 1.5F;
+			itemDecoRatings[TechType.PrecursorKey_Orange] = 1.5F;
+			itemDecoRatings[TechType.PrecursorKey_Purple] = 1.5F;
+			itemDecoRatings[TechType.PrecursorIonPowerCell] = 1.25F;
+			itemDecoRatings[TechType.Kyanite] = 1.5F;
 			
 			itemDecoRatings[TechType.Peeper] = 0.05F;
 			itemDecoRatings[TechType.Boomerang] = 0.05F;
@@ -188,6 +198,10 @@ namespace ReikaKalseki.AqueousEngineering {
 			itemDecoRatings[TechType.FernPalm] = 0.1F;
 		}
 		
+		public void setDisplayValue(TechType tt, float value) {
+			itemDecoRatings[tt] = value;
+		}
+		
 		public void registerModdedObject(ModPrefab pfb, float deco, params RoomTypes[] types) {
 			if (pfb == null)
 				return;
@@ -213,6 +227,11 @@ namespace ReikaKalseki.AqueousEngineering {
 			int lockerCount = 0;
 			decoRating = 0;
 			foreach (PrefabIdentifier pi in li) {
+				Constructable cc = pi.GetComponent<Constructable>();
+				if (cc && !cc.constructed) {
+					decoRating -= 2F;
+					continue;
+				}
 				RoomTypes[] obj = getObjectType(pi);
 				//if (obj.Length == 1)
 				//	options.AddRange(obj);
@@ -321,9 +340,11 @@ namespace ReikaKalseki.AqueousEngineering {
 				string text = sg.GetComponentInChildren<uGUI_SignInput>().text;
 				return string.IsNullOrEmpty(text) || text.Equals("sign", StringComparison.InvariantCultureIgnoreCase) ? 0 : 0.25F;
 			}
+			if (pi.ClassId == "775feb4c-dab9-4322-b4a5-a4289ca1cf6a" && QModManager.API.QModServices.Main.ModPresent("lockerMod")) //locker content display
+				return getInventoryDecoValue(pi.GetComponent<StorageContainer>())*0.2F; //20% value since it contains many many items, and they are small
 			ItemDisplayLogic disp = pi.GetComponent<ItemDisplayLogic>();
 			if (disp)
-				return disp.getDecorativeBonus();
+				return disp.getCurrentItem() == TechType.None ? -0.5F : getItemDecoValue(disp.getCurrentItem());
 			Planter p = pi.GetComponent<Planter>();
 			if (p)
 				return getInventoryDecoValue(p.GetComponent<StorageContainer>());
@@ -335,15 +356,22 @@ namespace ReikaKalseki.AqueousEngineering {
 		
 		private float getInventoryDecoValue(StorageContainer sc) {
 			float ret = 0;
-			foreach (Pickupable pp in sc.storageRoot.GetComponentsInChildren<Pickupable>(true)) {
-				TechType tt = pp.GetTechType();
-				float val = itemDecoRatings.ContainsKey(tt) ? itemDecoRatings[tt] : 0;
-				if (tt == TechType.Peeper && pp.GetComponent<Peeper>().isHero)
-					val = 1.5F;
-				//SNUtil.writeToChat("Deco value of inv item "+pp+" ("+tt+"): "+val);
-				ret += val;
-			}
+			foreach (Pickupable pp in sc.storageRoot.GetComponentsInChildren<Pickupable>(true))
+				ret += getItemDecoValue(pp);
 			return ret;
+		}
+		
+		private float getItemDecoValue(Pickupable pp) {
+			TechType tt = pp.GetTechType();
+			float ret = getItemDecoValue(tt);
+			if (tt == TechType.Peeper && pp.GetComponent<Peeper>().isHero)
+				ret = 1.5F;
+			//SNUtil.writeToChat("Deco value of inv item "+pp+" ("+tt+"): "+ret);
+			return ret;
+		}
+		
+		private float getItemDecoValue(TechType tt) {
+			return itemDecoRatings.ContainsKey(tt) ? itemDecoRatings[tt] : 0;
 		}
 		
 		private RoomTypes[] getObjectType(PrefabIdentifier pi) {
@@ -386,11 +414,10 @@ namespace ReikaKalseki.AqueousEngineering {
 			return rt ? rt.getType() : RoomTypes.UNSPECIALIZED;
 		}
 		
-		public void updateRoom(GameObject go) { //TODO watch deconstruction as well, plus inv content change if can
+		public void updateRoom(GameObject go) {
 			BaseRoot bb = go.FindAncestor<BaseRoot>();
 			if (!bb) {
-				//SNUtil.writeToChat("No base for "+go+", queuing update for later");
-				//queueRoomUpdate(go);
+				//SNUtil.writeToChat("No base for "+go+", not attempting room type update");
 				return;
 			}
 			BaseCell cell = ObjectUtil.getBaseRoom(bb, go);
@@ -399,11 +426,15 @@ namespace ReikaKalseki.AqueousEngineering {
 				queueRoomUpdate(go);
 				return;
 			}
+			recomputeBaseRoom(bb, cell);
+		}
+		
+		public void recomputeBaseRoom(BaseRoot bb, BaseCell cell) {
 			List<PrefabIdentifier> li = ObjectUtil.getBaseObjectsInRoom(bb, cell);
 			float deco;
 			//SNUtil.writeToChat("Checking room type for "+go);
 			RoomTypes type = getType(bb, cell, li, out deco);
-			SNUtil.writeToChat("Room at "+cell.transform.position+" is now type "+type+"; decoration rating = "+deco.ToString("0.00"));
+			//SNUtil.writeToChat("Room at "+cell.transform.position+" is now type "+type+"; decoration rating = "+deco.ToString("0.00"));
 			cell.gameObject.EnsureComponent<RoomTypeTracker>().setType(type, cell, null, deco);
 			foreach (PrefabIdentifier pi in li) {
 				pi.gameObject.EnsureComponent<RoomTypeTracker>().setType(type, cell, pi, deco);
@@ -414,7 +445,13 @@ namespace ReikaKalseki.AqueousEngineering {
 			go.AddComponent<RoomUpdateQueue>().Invoke("recompute", 0.5F);
 		}
 		
-		public enum RoomTypes {
+		public void recomputeBaseRooms(BaseRoot root) {
+			foreach (BaseCell cell in root.GetComponentsInChildren<BaseCell>()) {
+				recomputeBaseRoom(root, cell);
+			}
+		}
+		
+		public enum RoomTypes { //TODO make amounts of bonus configurable? 
 			UNSPECIALIZED,
 			STORAGE, //storage +1 row and col
 			POWER, //generators +25%
@@ -444,12 +481,13 @@ namespace ReikaKalseki.AqueousEngineering {
 			internal void setType(RoomTypes type, BaseCell bc, PrefabIdentifier pi, float deco) {
 				if (roomType == type && room)
 					return;
+				unApplyBonuses();
 				//SNUtil.writeToChat("Initializing "+(pi ? pi.name : "room")+" in room "+bc.transform+" to "+type);
 				roomType = type;
 				room = bc;
 				prefab = pi;
 				decoRating = deco;
-				applyTypeBonusesToObject(pi);
+				applyTypeBonusesToObject();
 			}
 			
 			internal RoomTypes getType() {
@@ -460,15 +498,29 @@ namespace ReikaKalseki.AqueousEngineering {
 				return decoRating;
 			}
 		
-			private void applyTypeBonusesToObject(PrefabIdentifier pi) {
-				if (!pi) //is basecell itself
+			private void applyTypeBonusesToObject() {
+				if (!prefab) //is basecell itself
 					return;
 				switch(roomType) {
 					case RoomTypes.STORAGE:
-						if (lockers.Contains(pi.ClassId)) {
-							StorageContainer sc = pi.GetComponentInChildren<StorageContainer>();
-							StorageContainer refSc = ObjectUtil.lookupPrefab(pi.ClassId).GetComponent<StorageContainer>();
-							sc.Resize(refSc.width+1, refSc.height+1); //TODO how to reset it? and does it need refresh on reload?
+						if (lockers.Contains(prefab.ClassId)) {
+							StorageContainer sc = prefab.GetComponentInChildren<StorageContainer>();
+							StorageContainer refSc = ObjectUtil.lookupPrefab(prefab.ClassId).GetComponent<StorageContainer>();
+							sc.Resize(refSc.width+1, refSc.height+1);
+						}
+						break;
+				}
+			}
+		
+			private void unApplyBonuses() {
+				if (!prefab) //is basecell itself
+					return;
+				switch(roomType) {
+					case RoomTypes.STORAGE:
+						if (lockers.Contains(prefab.ClassId)) {
+							StorageContainer sc = prefab.GetComponentInChildren<StorageContainer>();
+							StorageContainer refSc = ObjectUtil.lookupPrefab(prefab.ClassId).GetComponent<StorageContainer>();
+							sc.Resize(refSc.width, refSc.height);
 						}
 						break;
 				}
