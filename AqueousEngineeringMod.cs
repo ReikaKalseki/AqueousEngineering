@@ -179,6 +179,29 @@ namespace ReikaKalseki.AqueousEngineering
         //TechnologyUnlockSystem.instance.addDirectUnlock(TechType.StasisRifle, stasisBlock.TechType);
         
         ConsoleCommandsHandler.Main.RegisterConsoleCommand<Action>("debugACU", ACUCallbackSystem.instance.debugACU);
+        ConsoleCommandsHandler.Main.RegisterConsoleCommand<Action>("sunbeamModel", createSunbeamModel);
+    }
+    
+    private static void createSunbeamModel() {
+    	GameObject pfb = ObjectUtil.createWorldObject("c0d320d2-537e-4128-90ec-ab1466cfbbc3");
+    	pfb.transform.position = Player.main.transform.position+Camera.main.transform.forward*5;
+    	ParticleSystemRenderer r = ObjectUtil.getChildObject(VFXSunbeam.main.shipPrefab, "xShip").GetComponent<ParticleSystemRenderer>();
+    	Renderer r2 = UnityEngine.Object.Instantiate(r);
+    	Mesh m = r.mesh;
+    	MeshRenderer[] r0 = pfb.GetComponentsInChildren<MeshRenderer>();
+    	Transform mdl = r0[0].transform.parent;
+    	foreach (MeshRenderer rr in r0) {
+    		UnityEngine.Object.Destroy(rr.gameObject);
+    	}
+    	r2.transform.SetParent(mdl);
+    	r2.transform.localPosition = Vector3.zero;
+    	ParticleSystem pp = r2.GetComponent<ParticleSystem>();
+    	ParticleSystem.MainModule mm = pp.main;
+    	mm.startSizeMultiplier = 0.03F;
+    	pp.Play();
+    	r2.transform.localScale = Vector3.one*0.01F;
+    	ObjectUtil.removeComponent<VFXKeepAtDistance>(pfb);
+    	ObjectUtil.removeComponent<PrecursorGunTarget>(pfb);
     }
     
     class NaniteFragment : MonoBehaviour {

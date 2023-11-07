@@ -130,7 +130,7 @@ namespace ReikaKalseki.AqueousEngineering {
 			return li;
 		}
 		
-		internal static Creature handleCreature(ACUCallbackSystem.ACUCallback acu, float dT, WaterParkItem wp, TechType tt, List<WaterParkCreature> foodFish, PrefabIdentifier[] plants, ref HashSet<BiomeRegions.RegionType> possibleBiomes) {
+		internal static Creature handleCreature(ACUCallbackSystem.ACUCallback acu, float dT, WaterParkItem wp, TechType tt, List<WaterParkCreature> foodFish, PrefabIdentifier[] plants, bool acuRoom, ref HashSet<BiomeRegions.RegionType> possibleBiomes) {
 			if (edibleFish.ContainsKey(tt)) {
 				if (tt == TechType.Peeper && wp.gameObject.GetComponent<Peeper>().isHero)
 					acu.sparkleCount++;
@@ -163,7 +163,7 @@ namespace ReikaKalseki.AqueousEngineering {
 					c.Hunger.Add(dT*am.metabolismPerSecond*FOOD_SCALAR);
 					c.Hunger.Falloff = 0;
 					if (c.Hunger.Value >= 0.5F) {
-						eat(acu, wp, c, am, plants);
+						eat(acu, wp, c, am, plants, acuRoom);
 					}
 				}
 				return c;
@@ -190,11 +190,11 @@ namespace ReikaKalseki.AqueousEngineering {
 			return set;
 		}
 		
-		private static void eat(ACUCallbackSystem.ACUCallback acu, WaterParkItem wp, Creature c, ACUMetabolism am, PrefabIdentifier[] plants) {
+		private static void eat(ACUCallbackSystem.ACUCallback acu, WaterParkItem wp, Creature c, ACUMetabolism am, PrefabIdentifier[] plants, bool acuRoom) {
 			Food amt;
 			GameObject eaten;
 			if (tryEat(acu, c, am, plants, out amt, out eaten)) {
-				ACUEcosystems.onEaten(acu, wp, c, am, amt, eaten);
+				ACUEcosystems.onEaten(acu, wp, c, am, amt, eaten, acuRoom);
 			}
 		}
 		
@@ -239,8 +239,10 @@ namespace ReikaKalseki.AqueousEngineering {
 			return false;
 		}
 		
-		private static void onEaten(ACUCallbackSystem.ACUCallback acu, WaterParkItem wp, Creature c, ACUMetabolism am, Food amt, GameObject eaten) {
+		private static void onEaten(ACUCallbackSystem.ACUCallback acu, WaterParkItem wp, Creature c, ACUMetabolism am, Food amt, GameObject eaten, bool acuRoom) {
 			float food = amt.foodValue*FOOD_SCALAR*2.5F;
+			if (acuRoom)
+				food *= 1.2F;
 			if (amt.isRegion(am.primaryRegion)) {
 				food *= 3;
 			}
@@ -262,6 +264,8 @@ namespace ReikaKalseki.AqueousEngineering {
 				c.Hunger.Add(-food);
 				float f = am.normalizedPoopChance*amt.foodValue*Mathf.Pow(((WaterParkCreature)wp).age, 2F);
 				f *= AqueousEngineeringMod.config.getFloat(AEConfig.ConfigEntries.POO_RATE);
+				if (acuRoom)
+					f *= 1.5F;
 				//SNUtil.writeToChat(c+" ate > "+f);
 				amt.consume(c, acu, acu.sc, eaten);
 				if (f > 0 && UnityEngine.Random.Range(0F, 1F) < f) {

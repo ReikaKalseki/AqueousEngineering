@@ -326,6 +326,7 @@ namespace ReikaKalseki.AqueousEngineering {
 				List<WaterParkCreature> foodFish = new List<WaterParkCreature>();
 				List<Stalker> stalkers = new List<Stalker>();
 				stalkerToyValue = 0;
+				bool acuRoom = BaseRoomSpecializationSystem.instance.getSavedType(acu) == BaseRoomSpecializationSystem.RoomTypes.ACU;
 				foreach (WaterParkItem wp in new List<WaterParkItem>(acu.items)) {
 					if (!wp)
 						continue;
@@ -348,7 +349,7 @@ namespace ReikaKalseki.AqueousEngineering {
 								infectedFish.Add(mix);
 							}
 						}
-						Creature c = ACUEcosystems.handleCreature(this, dT, wp, tt, foodFish, plants, ref potentialBiomes);
+						Creature c = ACUEcosystems.handleCreature(this, dT, wp, tt, foodFish, plants, acuRoom, ref potentialBiomes);
 						if (tt == TechType.Stalker) {
 							stalkers.Add((Stalker)c);
 						}
@@ -357,7 +358,7 @@ namespace ReikaKalseki.AqueousEngineering {
 				HashSet<ACUEcosystems.PlantFood> plantTypes = ACUEcosystems.collectPlants(this, plants, ref potentialBiomes);
 				consistent = potentialBiomes.Count > 0 && plantCount > 0;
 				int max = potentialBiomes.Count == 1 ? ACUEcosystems.getPlantsForBiome(potentialBiomes.First<BiomeRegions.RegionType>()).Count : 99;
-				healthy = plantCount > 0 && plantTypes.Count >= Mathf.Min(2, max) && herbivoreCount > 0 && carnivoreCount > 0 && carnivoreCount <= Math.Max(1, herbivoreCount/Mathf.Max(1, 6-sparkleCount*0.5F)) && carnivoreCount <= acu.height*1.5F && herbivoreCount > 0 && herbivoreCount <= plantCount*(4+sparkleCount*0.5F);
+				healthy = plantCount > 0 && plantTypes.Count >= Mathf.Min(2, max) && herbivoreCount > 0 && carnivoreCount > 0 && carnivoreCount <= Math.Max(1, herbivoreCount/Mathf.Max(1, 6-sparkleCount*0.5F)) && carnivoreCount <= acu.height*(acuRoom ? 2F : 1.5F) && herbivoreCount > 0 && herbivoreCount <= plantCount*(4+sparkleCount*0.5F)*(acuRoom ? 1.5F : 1F);
 				float boost = 0;
 				if (consistent)
 					boost += 1F;

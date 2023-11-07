@@ -27,6 +27,8 @@ namespace ReikaKalseki.AqueousEngineering {
 	    static AEHooks() {
 	    	DIHooks.onWorldLoadedEvent += onWorldLoaded;
 	    	DIHooks.onConstructedEvent += onConstructionComplete;
+	    	DIHooks.onItemPickedUpEvent += onPickup;
+	    	DIHooks.knifeHarvestEvent += interceptItemHarvest;
 	    	DIHooks.inventoryClosedEvent += onInvClosed;
 	    	DIHooks.onBaseLoadedEvent += onBaseLoaded;
 	    	DIHooks.constructabilityEvent += enforceACUBuildability;
@@ -149,6 +151,27 @@ namespace ReikaKalseki.AqueousEngineering {
 	   		if (pi && AqueousEngineeringMod.repa
 	   	}
 	   }*/
+	    
+	    public static void interceptItemHarvest(DIHooks.KnifeHarvest h) {
+	    	if (h.hit && h.drops.Count > 0) {
+	   			Planter p = h.hit.FindAncestor<Planter>();
+		    	if (p && BaseRoomSpecializationSystem.instance.getSavedType(p) == BaseRoomSpecializationSystem.RoomTypes.AGRICULTURAL) {
+	   				if (UnityEngine.Random.Range(0F, 1F) < 0.33F)
+	    				h.drops[h.defaultDrop] = h.drops[h.defaultDrop]+1;
+		        }
+	    	}
+	    }
+	    
+	    public static void onPickup(Pickupable pp, Exosuit prawn, bool isKnife) {
+	   		if (BaseRoomSpecializationSystem.instance.getPlayerRoomType(Player.main) == BaseRoomSpecializationSystem.RoomTypes.AGRICULTURAL) {
+	   			Eatable ea = pp.GetComponent<Eatable>();
+		    	if (ea) {
+	   				//SNUtil.writeToChat(pp+" is edible, +25% to values since agri room");
+	   				ea.waterValue *= 1.25F;
+	   				ea.foodValue *= 1.25F;
+		        }
+	    	}
+	    }
 	   
 	   public static float getReactorGeneration(float orig, MonoBehaviour reactor) { //either bio or nuclear
 	   	//SNUtil.writeToChat("Reactor gen "+orig+" in "+BaseRoomSpecializationSystem.instance.getSavedType(reactor));

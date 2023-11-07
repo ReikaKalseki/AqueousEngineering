@@ -20,6 +20,7 @@ namespace ReikaKalseki.AqueousEngineering {
 	
 	public class BaseRoomSpecializationSystem { //TODO 2.0 handle large rooms
 		
+		private static readonly string ACU_PREFAB = "31662630-7cba-4583-8456-2fa1c4cc31aa";
 		private static readonly HashSet<string> lockers = new HashSet<string>();
 		private static readonly Dictionary<string, float> decoRatings = new Dictionary<string, float>();
 		private static readonly Dictionary<TechType, float> itemDecoRatings = new Dictionary<TechType, float>();
@@ -38,6 +39,7 @@ namespace ReikaKalseki.AqueousEngineering {
 			//foreach (string s in lockers)
 			//	objectTypeMappings[s] = new RoomTypes[]{RoomTypes.STORAGE};
 			
+			objectTypeMappings[ACU_PREFAB] = new RoomTypes[]{RoomTypes.ACU};
 			objectTypeMappings["87f5d3e6-e00b-4cf3-be39-0a9c7e951b84"] = new RoomTypes[]{RoomTypes.AGRICULTURAL}; //indoor growbed			
 			objectTypeMappings["769f9f44-30f6-46ed-aaf6-fbba358e1676"] = new RoomTypes[]{RoomTypes.POWER}; //bioreactor
 			objectTypeMappings["864f7780-a4c3-4bf2-b9c7-f4296388b70f"] = new RoomTypes[]{RoomTypes.POWER}; //nuclear reactor
@@ -225,6 +227,7 @@ namespace ReikaKalseki.AqueousEngineering {
 			//if (bc.GetComponentInChildren<BaseNuclearReactor>() || bc.GetComponentInChildren<BaseBioReactor>())
 			//	options.Add(RoomTypes.POWER);
 			int lockerCount = 0;
+			int agriCount = 0;
 			decoRating = 0;
 			foreach (PrefabIdentifier pi in li) {
 				Constructable cc = pi.GetComponent<Constructable>();
@@ -240,6 +243,8 @@ namespace ReikaKalseki.AqueousEngineering {
 					options.IntersectWith(obj);
 				if (lockers.Contains(pi.ClassId))
 				    lockerCount++;
+				if (options.Contains(RoomTypes.AGRICULTURAL))
+				    agriCount++;
 				decoRating += getDecoRating(pi);
 				//SNUtil.writeToChat("Cell "+bc.transform.position+": Object "+pi.name+" > "+getObjectType(pi).toDebugString()+" #"+getDecoRating(pi));
 			}
@@ -254,6 +259,8 @@ namespace ReikaKalseki.AqueousEngineering {
 			//SNUtil.writeToChat("Room at "+bc.transform.position+" has options "+options.toDebugString()+" & deco value "+decoRating+" ("+plantPanels+"/"+windows+"*"+getWindowDecoValue(bb, bc, hasGlassRoof)+")");
 			if (decoRating < 12)
 				options.Remove(RoomTypes.LEISURE);
+			if (agriCount < 3)
+				options.Remove(RoomTypes.AGRICULTURAL);
 			if (lockerCount >= 3)
 				options.Add(RoomTypes.STORAGE);
 			if (options.Count == 2 && options.Contains(RoomTypes.UNSPECIALIZED)) //if unspecialized + one thing, choose that one thing
@@ -403,6 +410,12 @@ namespace ReikaKalseki.AqueousEngineering {
 			return rt ? rt.getType() : RoomTypes.UNSPECIALIZED;
 		}
 		
+		internal RoomTypes getPlayerRoomType(Player ep) {
+			float deco;
+			RoomTypes ret = getPlayerRoomType(ep, out deco);
+			return ret;
+		}
+		
 		internal RoomTypes getPlayerRoomType(Player ep, out float deco) {
 			BaseCell bc = AEHooks.getCurrentPlayerRoom();
 			if (!bc) {
@@ -456,10 +469,10 @@ namespace ReikaKalseki.AqueousEngineering {
 			STORAGE, //storage +1 row and col
 			POWER, //generators +25%
 			MECHANICAL, //machine (AE, C2C, vanilla [water filter] etc) power cost -20%, charger speed +50%
-			AGRICULTURAL, //crop growth speed +20%? or maybe more harvests per plant; or maybe eatables obtained this way have +25% to food and water //TODO unimplemented
+			AGRICULTURAL, //+33% harvests per plant; eatables obtained this way have +25% to food and water
 			WORK, //food and water rate -20%, fab speed +50%
 			LEISURE, //food and water rate -67% to -80% (-2% per surplus deco), sleeping in regenerates 15-20 health (15 + surplus deco up to +5)
-			ACU, //creature capacity +5 (also affects ACU ecosystems) //TODO unimplemented
+			ACU, //creature capacity +5, ecosystems slightly more lenient, poo rate +50%
 		}
 		
 		class RoomUpdateQueue : MonoBehaviour {
@@ -504,9 +517,16 @@ namespace ReikaKalseki.AqueousEngineering {
 				switch(roomType) {
 					case RoomTypes.STORAGE:
 						if (lockers.Contains(prefab.ClassId)) {
-							StorageContainer sc = prefab.GetComponentInChildren<StorageContainer>();
+							StorageContainer sc = prefab.GetComponent<StorageContainer>();
 							StorageContainer refSc = ObjectUtil.lookupPrefab(prefab.ClassId).GetComponent<StorageContainer>();
 							sc.Resize(refSc.width+1, refSc.height+1);
+						}
+						break;
+					case RoomTypes.ACU:
+						if (prefab.ClassId == ACU_PREFAB) {
+							WaterPark wp = prefab.GetComponent<WaterPark>();
+							WaterPark refWp = ObjectUtil.lookupPrefab(prefab.ClassId).GetComponent<WaterPark>();
+							wp.wpPieceCapacity = refWp.wpPieceCapacity+5;
 						}
 						break;
 				}
@@ -518,9 +538,16 @@ namespace ReikaKalseki.AqueousEngineering {
 				switch(roomType) {
 					case RoomTypes.STORAGE:
 						if (lockers.Contains(prefab.ClassId)) {
-							StorageContainer sc = prefab.GetComponentInChildren<StorageContainer>();
+							StorageContainer sc = prefab.GetComponent<StorageContainer>();
 							StorageContainer refSc = ObjectUtil.lookupPrefab(prefab.ClassId).GetComponent<StorageContainer>();
 							sc.Resize(refSc.width, refSc.height);
+						}
+						break;
+					case RoomTypes.ACU:
+						if (prefab.ClassId == ACU_PREFAB) {
+							WaterPark wp = prefab.GetComponent<WaterPark>();
+							WaterPark refWp = ObjectUtil.lookupPrefab(prefab.ClassId).GetComponent<WaterPark>();
+							wp.wpPieceCapacity = refWp.wpPieceCapacity;
 						}
 						break;
 				}
