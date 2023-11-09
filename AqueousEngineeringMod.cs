@@ -61,6 +61,7 @@ namespace ReikaKalseki.AqueousEngineering
     public static readonly WorldgenDatabase worldgen = new WorldgenDatabase();
     
     public static readonly XMLLocale locale = new XMLLocale(modDLL, "XML/locale.xml");
+    public static readonly XMLLocale roomLocale = new XMLLocale(modDLL, "XML/rooms.xml");
 
     [QModPrePatch]
     public static void PreLoad() {
@@ -90,6 +91,7 @@ namespace ReikaKalseki.AqueousEngineering
         CustomPrefab.addPrefabNamespace("ReikaKalseki.AqueousEngineering");
         
         locale.load();
+        roomLocale.load();
         
         poo = new MiniPoo(locale.getEntry("MiniPoop"));
 	    poo.Patch();

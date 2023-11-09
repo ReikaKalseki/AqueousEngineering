@@ -1,0 +1,112 @@
+<Root>
+	<UNSPECIALIZED>
+		<name>
+			
+		</name>
+		<desc>
+			unspecialized
+		</desc>
+		<pda>
+			
+		</pda>
+	</UNSPECIALIZED>
+	<STORAGE>
+		<name>
+			
+		</name>
+		<desc>
+			a storage room
+		</desc>
+		<pda>
+			
+		</pda>
+	</STORAGE>
+	<POWER>
+		<name>
+			
+		</name>
+		<desc>
+			specialized towards power handling
+		</desc>
+		<pda>
+			
+		</pda>
+	</POWER>
+	<MECHANICAL>
+		<name>
+			
+		</name>
+		<desc>
+			a machine room
+		</desc>
+		<pda>
+			
+		</pda>
+	</MECHANICAL>
+	<AGRICULTURAL>
+		<name>
+			
+		</name>
+		<desc>
+			an agricultural center
+		</desc>
+		<pda>
+			
+		</pda>
+	</AGRICULTURAL>
+	<WORK>
+		<name>
+			
+		</name>
+		<desc>
+			a working and production room
+		</desc>
+		<pda>
+			
+		</pda>
+	</WORK>
+	<LEISURE>
+		<name>
+			
+		</name>
+		<desc>
+			a leisure space
+		</desc>
+		<pda>
+			
+		</pda>
+	</LEISURE>
+	<ACU>
+		<name>
+			
+		</name>
+		<desc>
+			centered around the ACU
+		</desc>
+		<pda>
+			
+		</pda>
+	</ACU>
+	<Name>
+		<name>
+			
+		</name>
+		<desc>
+			
+		</desc>
+		<pda>
+			
+		</pda>
+	</Name>
+	<Name>
+		<name>
+			
+		</name>
+		<desc>
+			
+		</desc>
+		<pda>
+			
+		</pda>
+	</Name>
+</Root>

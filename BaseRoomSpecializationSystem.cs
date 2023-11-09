@@ -28,13 +28,18 @@ namespace ReikaKalseki.AqueousEngineering {
 		
 		public static readonly BaseRoomSpecializationSystem instance = new BaseRoomSpecializationSystem();
 		
-		public static readonly float LEISURE_DECO_THRESHOLD = AqueousEngineeringMod.config.getFloat(AEConfig.ConfigEntries.LEISUREDECO);
+		//public static readonly float LEISURE_DECO_THRESHOLD = computeDecoThreshold();
 		
 		private BaseRoomSpecializationSystem() {
 			lockers.Add("367656d6-87d9-42a1-926c-3cf959ea1c85");
 			lockers.Add("5fc7744b-5a2c-4572-8e53-eebf990de434");
 			lockers.Add("775feb4c-dab9-4322-b4a5-a4289ca1cf6a");			
-			lockers.Add("cd34fecd-794c-4a0c-8012-dd81b77f2840");
+			lockers.Add("cd34fecd-794c-4a0c-8012-dd81b77f2840");		
+			lockers.Add("CabinetWide");	
+			lockers.Add("CabinetMediumTall");	
+			lockers.Add("CabinetTall");
+			lockers.Add("FCSCrewLocker");
+			
 			
 			//foreach (string s in lockers)
 			//	objectTypeMappings[s] = new RoomTypes[]{RoomTypes.STORAGE};
@@ -60,7 +65,48 @@ namespace ReikaKalseki.AqueousEngineering {
 			objectTypeMappings["bef7bc0b-149d-4342-bbb4-329047685578"] = new RoomTypes[]{RoomTypes.WORK}; //fragment analyzer
 			objectTypeMappings["c0175cf7-0b6a-4a1d-938f-dad0dbb6fa06"] = new RoomTypes[]{RoomTypes.WORK, RoomTypes.MECHANICAL, RoomTypes.LEISURE}; //medical cabinet
 			objectTypeMappings["c9bdcc4d-a8c6-43c0-8f7a-f86841cd4493"] = new RoomTypes[]{RoomTypes.WORK}; //specimen analyzer
-			objectTypeMappings["5c06baec-0539-4f26-817d-78443548cc52"] = new RoomTypes[]{RoomTypes.LEISURE, RoomTypes.WORK, RoomTypes.MECHANICAL}; //radio			
+			objectTypeMappings["5c06baec-0539-4f26-817d-78443548cc52"] = new RoomTypes[]{RoomTypes.LEISURE, RoomTypes.WORK, RoomTypes.MECHANICAL}; //radio		
+
+			//FCS
+			objectTypeMappings["CabinetTVStand"] = new RoomTypes[]{RoomTypes.LEISURE};	
+			objectTypeMappings["FCSToilet"] = new RoomTypes[]{RoomTypes.LEISURE};	
+			objectTypeMappings["fcsmicrowave"] = new RoomTypes[]{RoomTypes.LEISURE};	
+			objectTypeMappings["FCSCrewBunkBed"] = new RoomTypes[]{RoomTypes.LEISURE};	
+			objectTypeMappings["UniversalCharger"] = new RoomTypes[]{RoomTypes.MECHANICAL};	
+			objectTypeMappings["MiniMedBay"] = new RoomTypes[]{RoomTypes.LEISURE};	
+			objectTypeMappings["MiniFountainFilter"] = new RoomTypes[]{RoomTypes.LEISURE};	
+			objectTypeMappings["Seabreeze"] = new RoomTypes[]{RoomTypes.LEISURE, RoomTypes.STORAGE};	
+			objectTypeMappings["EnergyPillVendingMachine"] = new RoomTypes[]{RoomTypes.LEISURE, RoomTypes.MECHANICAL};	
+			//objectTypeMappings["neonShelf01"] = new RoomTypes[]{RoomTypes.LEISURE};	
+			//objectTypeMappings["neonShelf02"] = new RoomTypes[]{RoomTypes.LEISURE};	
+			//objectTypeMappings["neonShelf03"] = new RoomTypes[]{RoomTypes.LEISURE};	
+			objectTypeMappings["fcsCuringCabinet"] = new RoomTypes[]{RoomTypes.WORK};	
+			objectTypeMappings["AlterraGen"] = new RoomTypes[]{RoomTypes.POWER};	
+			objectTypeMappings["AlterraStorage"] = new RoomTypes[]{RoomTypes.STORAGE};	
+			objectTypeMappings["HydroponicHarvester"] = new RoomTypes[]{RoomTypes.AGRICULTURAL};	
+			objectTypeMappings["Replicator"] = new RoomTypes[]{RoomTypes.MECHANICAL};
+			objectTypeMappings["MatterAnalyzer"] = new RoomTypes[]{RoomTypes.WORK};	
+			objectTypeMappings["AutoCrafter"] = new RoomTypes[]{RoomTypes.MECHANICAL};	
+			objectTypeMappings["PeeperLoungeBar"] = new RoomTypes[]{RoomTypes.LEISURE};	
+			objectTypeMappings["FireExtinguisherRefueler"] = new RoomTypes[]{RoomTypes.MECHANICAL};	
+			objectTypeMappings["DSSFloorServerRack"] = new RoomTypes[]{RoomTypes.MECHANICAL};	
+			objectTypeMappings["QuantumPowerBankCharger"] = new RoomTypes[]{RoomTypes.MECHANICAL};	
+			//objectTypeMappings["QuantumTeleporter"] = new RoomTypes[]{RoomTypes.MECHANICAL};	
+			objectTypeMappings["FCSShower"] = new RoomTypes[]{RoomTypes.LEISURE};	
+			objectTypeMappings["FCSSink"] = new RoomTypes[]{RoomTypes.LEISURE};	
+			objectTypeMappings["FCSJukebox"] = new RoomTypes[]{RoomTypes.LEISURE};	
+			objectTypeMappings["FCSJukeboxSpeaker"] = new RoomTypes[]{RoomTypes.LEISURE};	
+			objectTypeMappings["FCSJukeBoxSubWoofer"] = new RoomTypes[]{RoomTypes.LEISURE};	
+			objectTypeMappings["FCSStove"] = new RoomTypes[]{RoomTypes.LEISURE, RoomTypes.WORK};	
+			objectTypeMappings["tableSmartTV"] = new RoomTypes[]{RoomTypes.LEISURE};	
+			objectTypeMappings["mountSmartTV"] = new RoomTypes[]{RoomTypes.LEISURE};	
+			objectTypeMappings["Sofa1"] = new RoomTypes[]{RoomTypes.LEISURE};	
+			objectTypeMappings["Sofa2"] = new RoomTypes[]{RoomTypes.LEISURE};	
+			objectTypeMappings["Sofa3"] = new RoomTypes[]{RoomTypes.LEISURE};	
+			objectTypeMappings["NeonBarStool"] = new RoomTypes[]{RoomTypes.LEISURE};	
+			objectTypeMappings["FCSCrewBunkBed"] = new RoomTypes[]{RoomTypes.LEISURE};	
+			objectTypeMappings["PatreonStatue"] = new RoomTypes[]{RoomTypes.LEISURE};
+			//
 			
 			decoRatings["26cdb865-efbd-403c-8873-92453bcfc935"] = 0.15F; //best chair	
 			decoRatings["cbeca4bd-cba4-4905-89fd-2470aaa204b1"] = 0.1F; //chair		
@@ -97,6 +143,43 @@ namespace ReikaKalseki.AqueousEngineering {
 			decoRatings["cb89366d-eac0-4011-8665-fafde75b215c"] = 0.25F; //markiplier
 			decoRatings["f7e26c44-bb28-4979-8f83-76ed529979fc"] = 0.25F; //markiplier
 			decoRatings["c96baff4-0993-4893-8345-adb8709901a7"] = 0.33F; //toy cat
+			
+			decoRatings["0fbf203a-a940-4b6e-ac63-0fe2737d84c2"] = 0.25F; //chic pot
+			
+			//FCS
+			decoRatings["NeonPlanter"] = 0.5F;
+			decoRatings["FireExtinguisherRefueler"] = -0.25F;
+			decoRatings["DSSFloorServerRack"] = 0.125F;
+			decoRatings["TrashReceptacle"] = -1;
+			decoRatings["Curtain"] = 0.33F;
+			decoRatings["QuantumPowerBankCharger"] = 0.67F;
+			decoRatings["QuantumTeleporter"] = 2.0F;
+			decoRatings["FCSStove"] = 0.1F;
+			decoRatings["FCSShower"] = 0.33F;
+			decoRatings["FCSSink"] = 0.1F;
+			decoRatings["FCSJukebox"] = 1.5F;
+			decoRatings["FCSJukeboxSpeaker"] = 0.25F;
+			decoRatings["FCSJukeBoxSubWoofer"] = 0.5F;
+			decoRatings["HologramPoster"] = 0.25F;
+			decoRatings["tableSmartTV"] = 0.75F;
+			decoRatings["mountSmartTV"] = 0.75F;
+			decoRatings["neonTable01"] = 1;
+			decoRatings["neonTable02"] = 1;
+			decoRatings["FCSRug"] = 0.33F;
+			decoRatings["FCSCrewLocker"] = 0.25F;
+			decoRatings["Sofa1"] = 0.25F;
+			decoRatings["Sofa2"] = 0.25F;
+			decoRatings["Sofa3"] = 0.25F;
+			decoRatings["NeonBarStool"] = 0.1F;
+			decoRatings["FCSCrewBunkBed"] = 0.1F;
+			decoRatings["DisplayBoard"] = 0.4F;
+			decoRatings["PatreonStatue"] = 0.25F;
+			decoRatings["ahsLeftCornerwGlassRailing"] = 0.1F;
+			decoRatings["ahsRightCornerwGlassRailing"] = 0.1F;
+			decoRatings["ahsrailingglass"] = 0.05F;
+			decoRatings["LedLightStickShort"] = 0.125F;
+			decoRatings["LedLightStickLong"] = 0.25F;			
+			//
 			
 			//decoRatings["****"] = 1.5F; //plant panel
 			
@@ -200,6 +283,21 @@ namespace ReikaKalseki.AqueousEngineering {
 			itemDecoRatings[TechType.FernPalm] = 0.1F;
 		}
 		
+		private float getDecoThreshold(BaseCell cell) {
+			float val = AqueousEngineeringMod.config.getFloat(AEConfig.ConfigEntries.LEISUREDECO);
+			if (QModManager.API.QModServices.Main.ModPresent("FCSAlterraHub"))
+				val *= 1.25F;
+			if (isLargeRoom(cell))
+				val *= 1.5F;
+			return val;
+		}
+		
+		private bool isLargeRoom(BaseCell cell) {
+			if (!cell)
+				return false;
+			return false; //TODO 2.0
+		}
+		
 		public void setDisplayValue(TechType tt, float value) {
 			itemDecoRatings[tt] = value;
 		}
@@ -208,10 +306,13 @@ namespace ReikaKalseki.AqueousEngineering {
 			if (pfb == null)
 				return;
 			registerModdedObject(pfb.ClassID, deco, types);
+			setDisplayValue(pfb.TechType, deco);
 			if (pfb is BasicCustomPlant) {
 				BasicCustomPlantSeed seed = ((BasicCustomPlant)pfb).seed;
-				if (seed != null)
+				if (seed != null) {
 					registerModdedObject(seed.ClassID, deco, types);
+					setDisplayValue(seed.TechType, deco);
+				}
 			}
 		}
 		
@@ -257,11 +358,12 @@ namespace ReikaKalseki.AqueousEngineering {
 			if (windows > 0)
 				decoRating += windows*getWindowDecoValue(bb, bc, hasGlassRoof); //windows, rating is base location dependent
 			//SNUtil.writeToChat("Room at "+bc.transform.position+" has options "+options.toDebugString()+" & deco value "+decoRating+" ("+plantPanels+"/"+windows+"*"+getWindowDecoValue(bb, bc, hasGlassRoof)+")");
-			if (decoRating < 12)
+			bool large = isLargeRoom(bc);
+			if (decoRating < getDecoThreshold(bc))
 				options.Remove(RoomTypes.LEISURE);
-			if (agriCount < 3)
+			if (agriCount < (large ? 5 : 3))
 				options.Remove(RoomTypes.AGRICULTURAL);
-			if (lockerCount >= 3)
+			if (lockerCount >= (large ? 6 : 3))
 				options.Add(RoomTypes.STORAGE);
 			if (options.Count == 2 && options.Contains(RoomTypes.UNSPECIALIZED)) //if unspecialized + one thing, choose that one thing
 				options.Remove(RoomTypes.UNSPECIALIZED);
@@ -353,12 +455,17 @@ namespace ReikaKalseki.AqueousEngineering {
 			if (disp)
 				return disp.getCurrentItem() == TechType.None ? -0.5F : getItemDecoValue(disp.getCurrentItem());
 			Planter p = pi.GetComponent<Planter>();
-			if (p)
-				return getInventoryDecoValue(p.GetComponent<StorageContainer>());
+			if (p) {
+				return getDecoRating(pi.ClassId)+getInventoryDecoValue(p.GetComponent<StorageContainer>());
+			}
 			Aquarium a = pi.GetComponent<Aquarium>();
 			if (a)
 				return 1+getInventoryDecoValue(a.GetComponent<StorageContainer>()); //even empty has some value
-			return decoRatings.ContainsKey(pi.ClassId) ? decoRatings[pi.ClassId] : 0;
+			return getDecoRating(pi.ClassId);
+		}
+		
+		private float getDecoRating(string classID) {
+			return decoRatings.ContainsKey(classID) ? decoRatings[classID] : 0;
 		}
 		
 		private float getInventoryDecoValue(StorageContainer sc) {
@@ -393,10 +500,11 @@ namespace ReikaKalseki.AqueousEngineering {
 		
 		internal RoomTypes getSavedType(Component go) {
 			float deco;
-			return getSavedType(go, out deco);
+			float decoThresh;
+			return getSavedType(go, out deco, out decoThresh);
 		}
 		
-		internal RoomTypes getSavedType(Component go, out float deco) {
+		internal RoomTypes getSavedType(Component go, out float deco, out float decoThresh) {
 			RoomTypeTracker rt = go.gameObject.FindAncestor<RoomTypeTracker>(); //will find the one on the main GO, else BaseCell if possible
 			if (!rt) {
 				BaseRoot bb = go.GetComponentInParent<BaseRoot>();
@@ -406,18 +514,20 @@ namespace ReikaKalseki.AqueousEngineering {
 						rt = bc.GetComponent<RoomTypeTracker>();
 				}
 			}
+			decoThresh = rt ? getDecoThreshold(rt.getRoom()) : 9999;
 			deco = rt ? rt.getDecorationValue() : 0;
 			return rt ? rt.getType() : RoomTypes.UNSPECIALIZED;
 		}
 		
 		internal RoomTypes getPlayerRoomType(Player ep) {
 			float deco;
-			RoomTypes ret = getPlayerRoomType(ep, out deco);
-			return ret;
+			float decoThresh;
+			return getPlayerRoomType(ep, out deco, out decoThresh);
 		}
 		
-		internal RoomTypes getPlayerRoomType(Player ep, out float deco) {
+		internal RoomTypes getPlayerRoomType(Player ep, out float deco, out float decoThresh) {
 			BaseCell bc = AEHooks.getCurrentPlayerRoom();
+			decoThresh = getDecoThreshold(bc);
 			if (!bc) {
 				deco = 0;
 				return RoomTypes.UNSPECIALIZED;
@@ -448,6 +558,8 @@ namespace ReikaKalseki.AqueousEngineering {
 			//SNUtil.writeToChat("Checking room type for "+go);
 			RoomTypes type = getType(bb, cell, li, out deco);
 			//SNUtil.writeToChat("Room at "+cell.transform.position+" is now type "+type+"; decoration rating = "+deco.ToString("0.00"));
+			string name = AqueousEngineeringMod.roomLocale.getEntry(Enum.GetName(typeof(RoomTypes), type)).desc;
+			SNUtil.writeToChat("This room is now "+name+", with a decoration rating of "+deco.ToString("0.00")+" ("+(deco*100F/getDecoThreshold(cell)).ToString("0.00")+"%)");
 			cell.gameObject.EnsureComponent<RoomTypeTracker>().setType(type, cell, null, deco);
 			foreach (PrefabIdentifier pi in li) {
 				pi.gameObject.EnsureComponent<RoomTypeTracker>().setType(type, cell, pi, deco);
@@ -509,6 +621,10 @@ namespace ReikaKalseki.AqueousEngineering {
 			
 			internal float getDecorationValue() {
 				return decoRating;
+			}
+			
+			internal BaseCell getRoom() {
+				return room;
 			}
 		
 			private void applyTypeBonusesToObject() {
