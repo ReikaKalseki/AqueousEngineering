@@ -192,7 +192,7 @@ namespace ReikaKalseki.AqueousEngineering {
 	   	if (type == BaseRoomSpecializationSystem.RoomTypes.LEISURE)
 	   		calc.rate *= Mathf.Max(0.2F, 0.33F-0.02F*(deco-BaseRoomSpecializationSystem.LEISURE_DECO_THRESHOLD));
 	   	else if (type == BaseRoomSpecializationSystem.RoomTypes.WORK)
-	   		calc.rate *= 0.8F;
+	   		calc.rate *= 0.8F-0.01F*Mathf.Min(5, deco);
 	   }
 	   
 	   public static float getCrafterTime(float time, Crafter c) {

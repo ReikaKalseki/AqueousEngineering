@@ -464,13 +464,13 @@ namespace ReikaKalseki.AqueousEngineering {
 			}
 		}
 		
-		public enum RoomTypes { //TODO make amounts of bonus configurable? 
+		public enum RoomTypes { 
 			UNSPECIALIZED,
 			STORAGE, //storage +1 row and col
 			POWER, //generators +25%
 			MECHANICAL, //machine (AE, C2C, vanilla [water filter] etc) power cost -20%, charger speed +50%
 			AGRICULTURAL, //+33% harvests per plant; eatables obtained this way have +25% to food and water
-			WORK, //food and water rate -20%, fab speed +50%
+			WORK, //food and water rate -20% to -25% (-1% per deco), fab speed +50%
 			LEISURE, //food and water rate -67% to -80% (-2% per surplus deco), sleeping in regenerates 15-20 health (15 + surplus deco up to +5)
 			ACU, //creature capacity +5, ecosystems slightly more lenient, poo rate +50%
 		}
