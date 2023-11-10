@@ -210,7 +210,7 @@ namespace ReikaKalseki.AqueousEngineering {
 	   }
 	   
 	   public static void onInvClosed(StorageContainer sc) {
-	   	if (Player.main.currentSub && Player.main.currentSub.isBase)
+	   	if (Player.main.currentSub && Player.main.currentSub.isBase && BaseRoomSpecializationSystem.instance.storageHasDecoValue(sc))
 	   		BaseRoomSpecializationSystem.instance.updateRoom(sc.gameObject);
 	   }
 	   

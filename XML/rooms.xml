@@ -1,7 +1,7 @@
 <Root>
 	<UNSPECIALIZED>
 		<name>
-			
+			Unspecialized
 		</name>
 		<desc>
 			unspecialized
@@ -12,7 +12,7 @@
 	</UNSPECIALIZED>
 	<STORAGE>
 		<name>
-			
+			Storage
 		</name>
 		<desc>
 			a storage room
@@ -23,7 +23,7 @@
 	</STORAGE>
 	<POWER>
 		<name>
-			
+			Power
 		</name>
 		<desc>
 			specialized towards power handling
@@ -34,7 +34,7 @@
 	</POWER>
 	<MECHANICAL>
 		<name>
-			
+			Mechanical
 		</name>
 		<desc>
 			a machine room
@@ -45,7 +45,7 @@
 	</MECHANICAL>
 	<AGRICULTURAL>
 		<name>
-			
+			Agricultural
 		</name>
 		<desc>
 			an agricultural center
@@ -56,7 +56,7 @@
 	</AGRICULTURAL>
 	<WORK>
 		<name>
-			
+			Working
 		</name>
 		<desc>
 			a working and production room
@@ -67,7 +67,7 @@
 	</WORK>
 	<LEISURE>
 		<name>
-			
+			Leisure
 		</name>
 		<desc>
 			a leisure space
@@ -78,7 +78,7 @@
 	</LEISURE>
 	<ACU>
 		<name>
-			
+			ACU
 		</name>
 		<desc>
 			centered around the ACU

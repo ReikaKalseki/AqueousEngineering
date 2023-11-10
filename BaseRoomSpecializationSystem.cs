@@ -21,6 +21,8 @@ namespace ReikaKalseki.AqueousEngineering {
 	public class BaseRoomSpecializationSystem { //TODO 2.0 handle large rooms
 		
 		private static readonly string ACU_PREFAB = "31662630-7cba-4583-8456-2fa1c4cc31aa";
+		private static readonly string STANDING_LOCKER_PREFAB = "775feb4c-dab9-4322-b4a5-a4289ca1cf6a";
+		
 		private static readonly HashSet<string> lockers = new HashSet<string>();
 		private static readonly Dictionary<string, float> decoRatings = new Dictionary<string, float>();
 		private static readonly Dictionary<TechType, float> itemDecoRatings = new Dictionary<TechType, float>();
@@ -113,7 +115,7 @@ namespace ReikaKalseki.AqueousEngineering {
 			
 			decoRatings["5c06baec-0539-4f26-817d-78443548cc52"] = -0.25F; //radio	
 
-			decoRatings["775feb4c-dab9-4322-b4a5-a4289ca1cf6a"] = 0.1F; //standing locker			
+			decoRatings[STANDING_LOCKER_PREFAB] = 0.1F;
 
 			decoRatings["cdb374fd-4f38-4bef-86a3-100cc87155b6"] = 0.25F; //double bed + extra sheet
 			decoRatings["c3994649-d0da-4f8c-bb77-1590f50838b9"] = 0.1F; //bed
@@ -344,7 +346,7 @@ namespace ReikaKalseki.AqueousEngineering {
 					options.IntersectWith(obj);
 				if (lockers.Contains(pi.ClassId))
 				    lockerCount++;
-				if (options.Contains(RoomTypes.AGRICULTURAL))
+				if (Array.IndexOf(obj, RoomTypes.AGRICULTURAL) >= 0)
 				    agriCount++;
 				decoRating += getDecoRating(pi);
 				//SNUtil.writeToChat("Cell "+bc.transform.position+": Object "+pi.name+" > "+getObjectType(pi).toDebugString()+" #"+getDecoRating(pi));
@@ -359,14 +361,21 @@ namespace ReikaKalseki.AqueousEngineering {
 				decoRating += windows*getWindowDecoValue(bb, bc, hasGlassRoof); //windows, rating is base location dependent
 			//SNUtil.writeToChat("Room at "+bc.transform.position+" has options "+options.toDebugString()+" & deco value "+decoRating+" ("+plantPanels+"/"+windows+"*"+getWindowDecoValue(bb, bc, hasGlassRoof)+")");
 			bool large = isLargeRoom(bc);
+			int lockerThresh = large ? 6 : 3;
+			if (lockerCount >= lockerThresh) { //do before leisure/agri are removed
+				options.Add(RoomTypes.STORAGE);
+				if (options.Count == Enum.GetValues(typeof(RoomTypes)).Length) { //if only lockers + other generics, will not have any filtering
+					options.Clear();
+					options.Add(RoomTypes.STORAGE);
+				}
+			}
 			if (decoRating < getDecoThreshold(bc))
 				options.Remove(RoomTypes.LEISURE);
 			if (agriCount < (large ? 5 : 3))
 				options.Remove(RoomTypes.AGRICULTURAL);
-			if (lockerCount >= (large ? 6 : 3))
-				options.Add(RoomTypes.STORAGE);
 			if (options.Count == 2 && options.Contains(RoomTypes.UNSPECIALIZED)) //if unspecialized + one thing, choose that one thing
 				options.Remove(RoomTypes.UNSPECIALIZED);
+			//SNUtil.writeToChat("Net options "+options.toDebugString()+" from "+lockerCount+"/"+agriCount);
 			return options.Count == 1 ? options.First() : RoomTypes.UNSPECIALIZED;
 		}
 		
@@ -449,7 +458,7 @@ namespace ReikaKalseki.AqueousEngineering {
 				string text = sg.GetComponentInChildren<uGUI_SignInput>().text;
 				return string.IsNullOrEmpty(text) || text.Equals("sign", StringComparison.InvariantCultureIgnoreCase) ? 0 : 0.25F;
 			}
-			if (pi.ClassId == "775feb4c-dab9-4322-b4a5-a4289ca1cf6a" && QModManager.API.QModServices.Main.ModPresent("lockerMod")) //locker content display
+			if (pi.ClassId == STANDING_LOCKER_PREFAB && QModManager.API.QModServices.Main.ModPresent("lockerMod")) //locker content display
 				return getInventoryDecoValue(pi.GetComponent<StorageContainer>())*0.2F; //20% value since it contains many many items, and they are small
 			ItemDisplayLogic disp = pi.GetComponent<ItemDisplayLogic>();
 			if (disp)
@@ -537,7 +546,16 @@ namespace ReikaKalseki.AqueousEngineering {
 			return rt ? rt.getType() : RoomTypes.UNSPECIALIZED;
 		}
 		
-		public void updateRoom(GameObject go) {
+		public bool storageHasDecoValue(StorageContainer sc) {
+			PrefabIdentifier pi = sc.GetComponent<PrefabIdentifier>();
+			if (pi && pi.ClassId == AqueousEngineeringMod.displayBlock.ClassID)
+				return true;
+			if (pi && pi.ClassId == STANDING_LOCKER_PREFAB && QModManager.API.QModServices.Main.ModPresent("lockerMod"))
+				return true;
+			return sc.GetComponent<Aquarium>() || sc.GetComponent<Planter>();
+		}
+		
+		public void updateRoom(GameObject go, bool notify = true) {
 			BaseRoot bb = go.FindAncestor<BaseRoot>();
 			if (!bb) {
 				//SNUtil.writeToChat("No base for "+go+", not attempting room type update");
@@ -549,17 +567,25 @@ namespace ReikaKalseki.AqueousEngineering {
 				queueRoomUpdate(go);
 				return;
 			}
-			recomputeBaseRoom(bb, cell);
+			recomputeBaseRoom(bb, cell, notify);
 		}
 		
-		public void recomputeBaseRoom(BaseRoot bb, BaseCell cell) {
+		public void recomputeBaseRoom(BaseRoot bb, BaseCell cell, bool notify) {
+			RoomTypeTracker tr = cell.GetComponent<RoomTypeTracker>();
+			RoomTypes prev = tr ? tr.getType() : RoomTypes.UNSPECIALIZED;
+			float prevD = tr ? tr.getDecorationValue() : 0;
 			List<PrefabIdentifier> li = ObjectUtil.getBaseObjectsInRoom(bb, cell);
 			float deco;
 			//SNUtil.writeToChat("Checking room type for "+go);
 			RoomTypes type = getType(bb, cell, li, out deco);
 			//SNUtil.writeToChat("Room at "+cell.transform.position+" is now type "+type+"; decoration rating = "+deco.ToString("0.00"));
 			string name = AqueousEngineeringMod.roomLocale.getEntry(Enum.GetName(typeof(RoomTypes), type)).desc;
-			SNUtil.writeToChat("This room is now "+name+", with a decoration rating of "+deco.ToString("0.00")+" ("+(deco*100F/getDecoThreshold(cell)).ToString("0.00")+"%)");
+			if (notify && (prev != type || !Mathf.Approximately(prevD, deco))) {
+				string msg = "This room is now "+name+", with a decoration rating of "+deco.ToString("0.00");
+				if (deco > 0)
+					msg += " ("+(deco*100F/getDecoThreshold(cell)).ToString("0.00")+"%)";
+				SNUtil.writeToChat(msg);
+			}
 			cell.gameObject.EnsureComponent<RoomTypeTracker>().setType(type, cell, null, deco);
 			foreach (PrefabIdentifier pi in li) {
 				pi.gameObject.EnsureComponent<RoomTypeTracker>().setType(type, cell, pi, deco);
@@ -572,7 +598,7 @@ namespace ReikaKalseki.AqueousEngineering {
 		
 		public void recomputeBaseRooms(BaseRoot root) {
 			foreach (BaseCell cell in root.GetComponentsInChildren<BaseCell>()) {
-				recomputeBaseRoom(root, cell);
+				recomputeBaseRoom(root, cell, false);
 			}
 		}
 		
@@ -604,14 +630,14 @@ namespace ReikaKalseki.AqueousEngineering {
 			private float decoRating;
 			
 			internal void setType(RoomTypes type, BaseCell bc, PrefabIdentifier pi, float deco) {
-				if (roomType == type && room)
+				decoRating = deco;
+				if (roomType == type && room == bc && prefab == pi)
 					return;
 				unApplyBonuses();
 				//SNUtil.writeToChat("Initializing "+(pi ? pi.name : "room")+" in room "+bc.transform+" to "+type);
 				roomType = type;
 				room = bc;
 				prefab = pi;
-				decoRating = deco;
 				applyTypeBonusesToObject();
 			}
 			

@@ -45,6 +45,7 @@ namespace ReikaKalseki.AqueousEngineering
     public static BaseControlPanel controlsBlock;
     public static BaseDrillableGrinder grinderBlock;
     public static RepairBeacon repairBlock;
+    public static RoomDataDisplay roomDataBlock;
     
     public static OutdoorPot outdoorBasicPot;
     public static OutdoorPot outdoorChicPot;
@@ -119,6 +120,7 @@ namespace ReikaKalseki.AqueousEngineering
 	    stasisBlock = createMachine<BaseStasisTurret, BaseStasisTurretLogic>("BaseStasisTurret");
 	    controlsBlock = createMachine<BaseControlPanel, BaseControlPanelLogic>("BaseControlPanel");
 	    grinderBlock = createMachine<BaseDrillableGrinder, BaseDrillableGrinderLogic>("BaseDrillableGrinder");
+	    roomDataBlock = createMachine<RoomDataDisplay, RoomDataDisplayLogic>("BaseRoomDataDisplay");
 	    string[] li = VanillaFlora.MUSHROOM_BUMP.getPrefabs(true, true).ToArray();
 	    repairBeaconFragments = new TechnologyFragment[li.Length-2];
 	    for (int i = 1; i < li.Length-1; i++) { //only idx 1,2,3 since 0 is rotated and tall and 4 has a light and is just 3 anyway

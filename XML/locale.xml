@@ -291,17 +291,17 @@
 			Broken Hull Repair Nanites
 		</frag>
 	</BaseRepairBeacon>
-	<Name>
+	<BaseRoomDataDisplay>
 		<name>
-			
+			Room Info Panel
 		</name>
 		<desc>
-			
+			Displays information about the current seabase room.
 		</desc>
 		<pda>
 			
 		</pda>
-	</Name>
+	</BaseRoomDataDisplay>
 	<Name>
 		<name>
 			
