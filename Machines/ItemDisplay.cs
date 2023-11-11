@@ -139,6 +139,7 @@ namespace ReikaKalseki.AqueousEngineering {
 		}
 		
 		protected override void initStorage(StorageContainer sc) {
+			base.initStorage(sc);
 			sc.container.onAddItem += updateStoredItem;
 			sc.container.onRemoveItem += ii => setDisplay(null);
 			sc.container.isAllowedToAdd = new IsAllowedToAdd((pp, vb) => getStorage().container.GetItemTypes().Count == 0);

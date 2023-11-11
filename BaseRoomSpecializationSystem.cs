@@ -580,7 +580,7 @@ namespace ReikaKalseki.AqueousEngineering {
 			RoomTypes type = getType(bb, cell, li, out deco);
 			//SNUtil.writeToChat("Room at "+cell.transform.position+" is now type "+type+"; decoration rating = "+deco.ToString("0.00"));
 			string name = AqueousEngineeringMod.roomLocale.getEntry(Enum.GetName(typeof(RoomTypes), type)).desc;
-			if (notify && (prev != type || !Mathf.Approximately(prevD, deco))) {
+			if (notify && AqueousEngineeringMod.config.getBoolean(AEConfig.ConfigEntries.ROOMCHAT) && (prev != type || !Mathf.Approximately(prevD, deco))) {
 				string msg = "This room is now "+name+", with a decoration rating of "+deco.ToString("0.00");
 				if (deco > 0)
 					msg += " ("+(deco*100F/getDecoThreshold(cell)).ToString("0.00")+"%)";
