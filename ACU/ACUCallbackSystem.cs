@@ -6,6 +6,7 @@ using System.Linq;
 using System.IO;
 using System.Reflection;
 using System.Xml;
+using System.Text;
 
 using UnityEngine;
 using UnityEngine.UI;
@@ -212,8 +213,12 @@ namespace ReikaKalseki.AqueousEngineering {
 			internal int carnivoreCount;
 			internal int sparkleCount;
 			internal int cuddleCount;
-			internal float infectedTotal;
+			
+			internal float infectedTotal;			
+			internal float currentBonus;	
 			internal float stalkerToyValue;
+			
+			private readonly List<string> currentWarnings = new List<string>();
 			
 			internal bool nextIsDebug = false;
 			
@@ -296,6 +301,57 @@ namespace ReikaKalseki.AqueousEngineering {
 			public void boost() {
 				cache.lastPlanktonBoost = DayNightCycle.main.timePassedAsFloat;
 			}
+			
+			internal void printTerminalInfo() {/*
+				SNUtil.writeToChat("Biome Archetype: "+currentTheme);
+				SNUtil.writeToChat("Plant Count: "+plantCount);
+				SNUtil.writeToChat("Herbivore Count: "+herbivoreCount);
+				SNUtil.writeToChat("Carnivore Count: "+carnivoreCount);
+				
+				SNUtil.writeToChat("Stalker Toy Rating: "+stalkerToyValue.ToString("0.0"));*/
+    			Dictionary<string, object> values = new Dictionary<string, object>();
+    			values["contents"] = generateContentList();
+    			values["biome"] = currentTheme;
+    			values["plants"] = plantCount;
+    			values["herbivores"] = herbivoreCount;
+    			values["carnivores"] = carnivoreCount;
+    			values["sparkles"] = sparkleCount;
+    			values["infected"] = infectedTotal.ToString("0.00");
+    			values["bonus"] = (currentBonus*100).ToString("0.00");
+    			values["stalkerToy"] = stalkerToyValue.ToString("0.0");
+    			values["alerts"] = string.Join("\n", currentWarnings);
+				
+				XMLLocale.LocaleEntry e = AqueousEngineeringMod.acuMonitorBlock.locale;
+				PDAManager.PDAPage pp = PDAManager.getPage(e.key+"PDA");
+				pp.unlock();
+				pp.setPlaceholderValues(e.pda, values, true);
+				pp.show();
+			}
+			
+			private string generateContentList() {
+				Dictionary<TechType, int> counts = new Dictionary<TechType, int>();
+				foreach (WaterParkItem wp in new List<WaterParkItem>(acu.items)) {
+					if (!wp)
+						continue;
+					Pickupable pp = wp.gameObject.GetComponentInChildren<Pickupable>();
+					TechType tt = pp ? pp.GetTechType() : TechType.None;
+					if (tt != TechType.None) {
+						if (counts.ContainsKey(tt))
+							counts[tt] = counts[tt]+1;
+						else
+							counts[tt] = 1;
+					}
+				}
+				StringBuilder sb = new StringBuilder();
+				foreach (KeyValuePair<TechType, int> kvp in counts) {
+					sb.Append("  ");
+					sb.Append(Language.main.Get(kvp.Key));
+					sb.Append(": ");
+					sb.Append(kvp.Value);
+					sb.Append("\n");
+				}
+				return sb.ToString();
+			}
 		
 			public void tick() {
 				if (!floor || !lowestSegment) {
@@ -310,6 +366,7 @@ namespace ReikaKalseki.AqueousEngineering {
 				//SNUtil.writeToChat(dT+" s");
 				bool healthy = false;
 				bool consistent = true;
+				currentWarnings.Clear();
 				potentialBiomes.Clear();
 				potentialBiomes.AddRange((IEnumerable<BiomeRegions.RegionType>)Enum.GetValues(typeof(BiomeRegions.RegionType)));
 				//SNUtil.writeToChat("SC:"+sc);
@@ -358,16 +415,38 @@ namespace ReikaKalseki.AqueousEngineering {
 				HashSet<ACUEcosystems.PlantFood> plantTypes = ACUEcosystems.collectPlants(this, plants, ref potentialBiomes);
 				consistent = potentialBiomes.Count > 0 && plantCount > 0;
 				int max = potentialBiomes.Count == 1 ? ACUEcosystems.getPlantsForBiome(potentialBiomes.First<BiomeRegions.RegionType>()).Count : 99;
-				healthy = plantCount > 0 && plantTypes.Count >= Mathf.Min(2, max) && herbivoreCount > 0 && carnivoreCount > 0 && carnivoreCount <= Math.Max(1, herbivoreCount/Mathf.Max(1, 6-sparkleCount*0.5F)) && carnivoreCount <= acu.height*(acuRoom ? 2F : 1.5F) && herbivoreCount > 0 && herbivoreCount <= plantCount*(4+sparkleCount*0.5F)*(acuRoom ? 1.5F : 1F);
-				float boost = 0;
+				bool plantVar = plantTypes.Count >= Mathf.Min(2, max);
+				bool tooManyCarnisPrey = carnivoreCount > Math.Max(1, herbivoreCount/Mathf.Max(1, 6-sparkleCount*0.5F));
+				bool tooManyCarnisSpace = carnivoreCount > acu.height*(acuRoom ? 2F : 1.5F);
+				bool tooManyHerbis = herbivoreCount > plantCount*(4+sparkleCount*0.5F)*(acuRoom ? 1.5F : 1F);
+				bool hasPlants = plantCount > 0;
+				bool hasHerbis = herbivoreCount > 0;
+				bool hasCarnis = carnivoreCount > 0;
+				healthy = hasPlants && hasHerbis && hasCarnis && !tooManyCarnisPrey && !tooManyCarnisSpace && !tooManyHerbis;
+				if (!hasPlants)
+					currentWarnings.Add("Plants absent");
+				if (!plantVar && hasPlants)
+					currentWarnings.Add("Insufficient plant variety");
+				if (!hasHerbis)
+					currentWarnings.Add("Herbivores absent");
+				if (!hasCarnis)
+					currentWarnings.Add("Carnivores absent");
+				if (tooManyCarnisPrey)
+					currentWarnings.Add("Too many carnivores for the available prey");
+				if (tooManyCarnisSpace)
+					currentWarnings.Add("Too many carnivores for the available space");
+				if (tooManyHerbis && hasHerbis)
+					currentWarnings.Add("Too many herbivores for the available plants");
+					
+				currentBonus = 0;
 				if (consistent)
-					boost += 1F;
+					currentBonus += 1F;
 				if (healthy)
-					boost += 2F;
+					currentBonus += 2F;
 				if (sparkleCount > 0)
-					boost *= 1+sparkleCount*0.5F;
+					currentBonus *= 1+sparkleCount*0.5F;
 				if (nextIsDebug)
-					SNUtil.writeToChat(plantCount+"/"+herbivoreCount+"/"+carnivoreCount+"$"+sparkleCount+" & "+string.Join(", ", potentialBiomes)+" > "+healthy+" & "+consistent+" > "+boost);
+					SNUtil.writeToChat(plantCount+"/"+herbivoreCount+"/"+carnivoreCount+"$"+sparkleCount+" & "+string.Join(", ", potentialBiomes)+" > "+healthy+" & "+consistent+" > "+currentBonus);
 				float f0 = getBoostStrength(time);
 				if (ventBubbleEmitters != null) {
 					foreach (ParticleSystem p in ventBubbleEmitters) {
@@ -379,15 +458,15 @@ namespace ReikaKalseki.AqueousEngineering {
 						}					
 					}
 				}
-				boost += 5F*f0;
+				currentBonus += 5F*f0;
 				if (infectedTotal > 0) {
-					boost -= infectedTotal;
+					currentBonus -= infectedTotal;
 					if (UnityEngine.Random.Range(0F, 1F) <= infectedTotal*0.005F*dT) {
 						infectedFish.GetRandom().GetComponent<LiveMixin>().Kill(DamageType.Starve);
 					}
 				}
-				if (boost > 0) {
-					boost *= dT;
+				if (currentBonus > 0) {
+					float boost = currentBonus*dT;
 					foreach (WaterParkCreature wp in foodFish) {
 						//SNUtil.writeToChat(wp+" > "+boost+" > "+wp.matureTime+"/"+wp.timeNextBreed);
 						if (wp.canBreed) {
@@ -401,10 +480,10 @@ namespace ReikaKalseki.AqueousEngineering {
 						}
 					}
 				}
-				if (teeth < 10 && consistent && healthy && potentialBiomes.Contains(BiomeRegions.RegionType.Kelp)) {
+				if (teeth < 6 && consistent && healthy && potentialBiomes.Contains(BiomeRegions.RegionType.Kelp)) {
 					foreach (Stalker s in stalkers) {
-						float f = dT*stalkerToyValue*0.006F*s.Happy.Value;
-						//SNUtil.writeToChat(s.Happy.Value+" x "+stalkerToys.Count+" > "+f);
+						float f = dT*stalkerToyValue*0.00012F*(1+2*s.Happy.Value);
+						//SNUtil.writeToChat(s.Happy.Value+" x "+stalkerToyValue+" > "+f);
 						if (UnityEngine.Random.Range(0F, 1F) < f) {
 							//do not use, so can have ref to GO; reimplement // s.LoseTooth();
 							GameObject go = UnityEngine.Object.Instantiate<GameObject>(s.toothPrefab);
@@ -430,6 +509,9 @@ namespace ReikaKalseki.AqueousEngineering {
 					bool changed = theme != currentTheme;
 					currentTheme = theme;
 					ACUTheming.updateACUTheming(this, theme, time, changed || time-lastThemeUpdate > 5);
+				}
+				else {
+					currentWarnings.Add("No consistent biome theme");
 				}
 				nextIsDebug = false;
 			}

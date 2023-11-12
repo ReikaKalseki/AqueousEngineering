@@ -32,6 +32,7 @@ namespace ReikaKalseki.AqueousEngineering
     public static BaseBeacon beaconBlock;
     public static AmpeelAntenna ampeelAntennaBlock;
     public static ACUCleaner acuCleanerBlock;
+    public static ACUMonitor acuMonitorBlock;
     public static Autofarmer farmerBlock;
     public static RemoteCameraAntenna cameraAntennaBlock;
     public static ACUBooster acuBoosterBlock;
@@ -111,6 +112,7 @@ namespace ReikaKalseki.AqueousEngineering
 	    ampeelAntennaBlock = createMachine<AmpeelAntenna, AmpeelAntennaLogic>("BaseAmpeelAntenna");
 	    farmerBlock = createMachine<Autofarmer, AutofarmerLogic>("BaseFarmer");
 	    acuCleanerBlock = createMachine<ACUCleaner, ACUCleanerLogic>("BaseACUCleaner");
+	    acuMonitorBlock = createMachine<ACUMonitor, ACUMonitorLogic>("BaseACUMonitor");
 	    cameraAntennaBlock = createMachine<RemoteCameraAntenna, RemoteCameraAntennaLogic>("BaseRemoteCamera");
 	    batteryBlock = createMachine<BaseBattery, BaseBatteryLogic>("BaseBattery");
 	    //ionCubeBlock = createMachine<IonCubeBurner, IonCubeBurnerLogic>("IonCubeBurner");
@@ -179,8 +181,13 @@ namespace ReikaKalseki.AqueousEngineering
         TechnologyUnlockSystem.instance.addDirectUnlock(TechType.Shocker, ampeelAntennaBlock.TechType);
         TechnologyUnlockSystem.instance.addDirectUnlock(TechType.Beacon, beaconBlock.TechType);
         TechnologyUnlockSystem.instance.addDirectUnlock(poo.TechType, acuCleanerBlock.TechType);
+        TechnologyUnlockSystem.instance.addDirectUnlock(TechType.BaseWaterPark, acuMonitorBlock.TechType);
         TechnologyUnlockSystem.instance.addDirectUnlock(TechType.BaseMapRoom, cameraAntennaBlock.TechType);
         //TechnologyUnlockSystem.instance.addDirectUnlock(TechType.StasisRifle, stasisBlock.TechType);
+        
+        XMLLocale.LocaleEntry e = locale.getEntry("BaseACUMonitor");
+        PDAManager.PDAPage page = PDAManager.createPage(e.key+"PDA", e.getField<string>("pdatitle"), e.pda, e.getField<string>("category"));
+        page.register();
         
         ConsoleCommandsHandler.Main.RegisterConsoleCommand<Action>("debugACU", ACUCallbackSystem.instance.debugACU);
         ConsoleCommandsHandler.Main.RegisterConsoleCommand<Action>("sunbeamModel", createSunbeamModel);
@@ -353,6 +360,7 @@ namespace ReikaKalseki.AqueousEngineering
 		
     	BaseRoomSpecializationSystem.instance.registerModdedObject(acuBoosterBlock, 0, BaseRoomSpecializationSystem.RoomTypes.ACU);
     	BaseRoomSpecializationSystem.instance.registerModdedObject(acuCleanerBlock, 0, BaseRoomSpecializationSystem.RoomTypes.ACU);
+    	BaseRoomSpecializationSystem.instance.registerModdedObject(acuMonitorBlock, 0, BaseRoomSpecializationSystem.RoomTypes.ACU);
     	BaseRoomSpecializationSystem.instance.registerModdedObject(ampeelAntennaBlock, 0, BaseRoomSpecializationSystem.RoomTypes.ACU);
     	BaseRoomSpecializationSystem.instance.registerModdedObject(repairBlock, -0.1F, BaseRoomSpecializationSystem.RoomTypes.MECHANICAL);
     	BaseRoomSpecializationSystem.instance.registerModdedObject(batteryBlock, 0, BaseRoomSpecializationSystem.RoomTypes.POWER);

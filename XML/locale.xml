@@ -302,6 +302,52 @@
 			
 		</pda>
 	</BaseRoomDataDisplay>
+	<BaseACUMonitor>
+		<name>
+			ACU Status Terminal
+		</name>
+		<desc>
+			Can provide information regarding the status of the attached ACU.
+		</desc>
+		<pdatitle>
+			ACU Status
+		</pdatitle>
+		<pda>
+			Contents
+			--------------
+			$contents
+			
+			Ecosystem Data
+			--------------
+			Biome Archetype: $biome
+			Plant Count: $plants
+			Total Herbivore 'Units': $herbivores
+			Total Carnivore 'Units': $carnivores
+			
+			Ecosystem Details
+			--------------
+			Kharaa Infection Load: $infected
+			Enzyme Host Peepers: $sparkles
+			Productivity Factor: +$bonus%
+			
+			Ecosystem Alerts
+			--------------
+			$alerts
+			
+			Misc Data
+			--------------
+			Stalker Toy Value: $stalkerToy
+		</pda>
+		<category>
+			DownloadedData
+		</category>
+		<noacu>
+			No connected ACU
+		</noacu>
+		<tooltip>
+			See ACU information
+		</tooltip>
+	</BaseACUMonitor>
 	<Name>
 		<name>
 			

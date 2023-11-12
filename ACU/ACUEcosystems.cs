@@ -260,7 +260,7 @@ namespace ReikaKalseki.AqueousEngineering {
 				c.gameObject.EnsureComponent<InfectedMixin>().IncreaseInfectedAmount(0.2F);
 			}
 			if (c.Hunger.Value >= food) {
-				c.Happy.Add(0.25F);
+				c.Happy.Add(1F);
 				c.Hunger.Add(-food);
 				float f = am.normalizedPoopChance*amt.foodValue*Mathf.Pow(((WaterParkCreature)wp).age, 2F);
 				f *= AqueousEngineeringMod.config.getFloat(AEConfig.ConfigEntries.POO_RATE);

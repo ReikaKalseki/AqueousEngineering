@@ -14,7 +14,7 @@ using ReikaKalseki.DIAlterra;
 
 namespace ReikaKalseki.AqueousEngineering {
 	
-	public class PlanktonFeeder : CustomMachine<PlanktonFeederLogic>, MultiTexturePrefab<StringPrefabContainer> {
+	public class PlanktonFeeder : CustomMachine<PlanktonFeederLogic>, MultiTexturePrefab {
 		
 		internal static readonly float POWER_COST = 0.125F; //per second
 		internal static readonly float CONSUMPTION_RATE = 1F/240F; //per second

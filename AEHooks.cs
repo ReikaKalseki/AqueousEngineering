@@ -115,6 +115,8 @@ namespace ReikaKalseki.AqueousEngineering {
 				return true;
 			if (AqueousEngineeringMod.acuCleanerBlock != null && Builder.constructableTechType == AqueousEngineeringMod.acuCleanerBlock.TechType)
 				return true;
+			if (AqueousEngineeringMod.acuMonitorBlock != null && Builder.constructableTechType == AqueousEngineeringMod.acuMonitorBlock.TechType)
+				return true;
 			return false;
 		}
 		/*
