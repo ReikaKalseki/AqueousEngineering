@@ -310,9 +310,13 @@
 			Can provide information regarding the status of the attached ACU.
 		</desc>
 		<pdatitle>
-			ACU Status
+			ACU Status:
 		</pdatitle>
 		<pda>
+			Time
+			--------------
+			Day $time
+			
 			Contents
 			--------------
 			$contents
@@ -320,7 +324,7 @@
 			Ecosystem Data
 			--------------
 			Biome Archetype: $biome
-			Plant Count: $plants
+			Total Plant 'Units': $plants
 			Total Herbivore 'Units': $herbivores
 			Total Carnivore 'Units': $carnivores
 			

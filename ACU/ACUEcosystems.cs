@@ -183,11 +183,24 @@ namespace ReikaKalseki.AqueousEngineering {
 						if (acu.nextIsDebug)
 							SNUtil.writeToChat(pi+" > "+pf+" & "+string.Join(",", pf.regionType)+" > "+string.Join(",", possibleBiomes));
 						set.Add(pf);
-						acu.plantCount++;
+						acu.plantCount += getPlantValue(pi);
 					}
 				}
 			}
 			return set;
+		}
+		
+		private static float getPlantValue(PrefabIdentifier pi) {
+			if (VanillaFlora.WRITHING_WEED.includes(pi.ClassId) || VanillaFlora.GELSACK.includes(pi.ClassId))
+				return 0.5F;
+			if (VanillaFlora.ACID_MUSHROOM.includes(pi.ClassId) || VanillaFlora.DEEP_MUSHROOM.includes(pi.ClassId))
+				return 0.33F;
+			if (VanillaFlora.BLOOD_KELP.includes(pi.ClassId) || VanillaFlora.CREEPVINE.includes(pi.ClassId) || VanillaFlora.CREEPVINE_FERTILE.includes(pi.ClassId))
+				return 2.5F;
+			BasicCustomPlant bp = BasicCustomPlant.getPlant(pi.ClassId);
+			if (bp != null)
+				return bp.getSize() == Plantable.PlantSize.Large ? 1 : 0.5F;
+			return 1;
 		}
 		
 		private static void eat(ACUCallbackSystem.ACUCallback acu, WaterParkItem wp, Creature c, ACUMetabolism am, PrefabIdentifier[] plants, bool acuRoom) {
@@ -309,6 +322,10 @@ namespace ReikaKalseki.AqueousEngineering {
 			
 			internal readonly TechType item;
 			
+			public AnimalFood(Spawnable s, params BiomeRegions.RegionType[] r) : this(s.TechType, r) {
+				
+			}
+			
 			internal AnimalFood(TechType tt, params BiomeRegions.RegionType[] r) : base(calculateFoodValue(tt), r) {
 				item = tt;
 			}
@@ -334,7 +351,7 @@ namespace ReikaKalseki.AqueousEngineering {
 				
 			}
 			
-			internal PlantFood(Spawnable sp, float f, params BiomeRegions.RegionType[] r) : this(new List<string>{sp.ClassID}, f, r) {
+			public PlantFood(Spawnable sp, float f, params BiomeRegions.RegionType[] r) : this(new List<string>{sp.ClassID}, f, r) {
 				
 			}
 			

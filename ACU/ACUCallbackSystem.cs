@@ -196,6 +196,17 @@ namespace ReikaKalseki.AqueousEngineering {
 			}
 		}
 		
+		internal enum ACUWarnings {
+			NOTHEME,
+			NOPLANTS,
+			SAMEPLANT,
+			NOHERBS,
+			NOCARNS,
+			CARNPREY,
+			CARNSPACE,
+			HERBFOOD,
+		}
+		
 		internal class ACUCallback : MonoBehaviour {
 			
 			internal WaterPark acu;
@@ -208,9 +219,9 @@ namespace ReikaKalseki.AqueousEngineering {
 			
 			internal HashSet<BiomeRegions.RegionType> potentialBiomes = new HashSet<BiomeRegions.RegionType>();
 			internal BiomeRegions.RegionType currentTheme = BiomeRegions.RegionType.Shallows;
-			internal int plantCount;
-			internal int herbivoreCount;
-			internal int carnivoreCount;
+			internal float plantCount;
+			internal float herbivoreCount;
+			internal float carnivoreCount;
 			internal int sparkleCount;
 			internal int cuddleCount;
 			
@@ -218,7 +229,7 @@ namespace ReikaKalseki.AqueousEngineering {
 			internal float currentBonus;	
 			internal float stalkerToyValue;
 			
-			private readonly List<string> currentWarnings = new List<string>();
+			private readonly List<ACUWarnings> currentWarnings = new List<ACUWarnings>();
 			
 			internal bool nextIsDebug = false;
 			
@@ -310,16 +321,21 @@ namespace ReikaKalseki.AqueousEngineering {
 				
 				SNUtil.writeToChat("Stalker Toy Rating: "+stalkerToyValue.ToString("0.0"));*/
     			Dictionary<string, object> values = new Dictionary<string, object>();
+    			double day = DayNightCycle.main.GetDay();
+    			int dday = (int)day;
+    			double frac = day-dday;
+    			values["day"] = dday;
+    			values["time"] = (int)(frac*1200)+"s";
     			values["contents"] = generateContentList();
     			values["biome"] = currentTheme;
-    			values["plants"] = plantCount;
-    			values["herbivores"] = herbivoreCount;
-    			values["carnivores"] = carnivoreCount;
+    			values["plants"] = plantCount.ToString("0.0");
+    			values["herbivores"] = herbivoreCount.ToString("0.0");
+    			values["carnivores"] = carnivoreCount.ToString("0.0");
     			values["sparkles"] = sparkleCount;
     			values["infected"] = infectedTotal.ToString("0.00");
     			values["bonus"] = (currentBonus*100).ToString("0.00");
     			values["stalkerToy"] = stalkerToyValue.ToString("0.0");
-    			values["alerts"] = string.Join("\n", currentWarnings);
+    			values["alerts"] = currentWarnings.Count == 0 ? "[None]" : string.Join("\n", currentWarnings.Select<ACUWarnings, string>(w => AqueousEngineeringMod.acuLocale.getEntry(w.ToString()).desc));
 				
 				XMLLocale.LocaleEntry e = AqueousEngineeringMod.acuMonitorBlock.locale;
 				PDAManager.PDAPage pp = PDAManager.getPage(e.key+"PDA");
@@ -424,19 +440,19 @@ namespace ReikaKalseki.AqueousEngineering {
 				bool hasCarnis = carnivoreCount > 0;
 				healthy = hasPlants && hasHerbis && hasCarnis && !tooManyCarnisPrey && !tooManyCarnisSpace && !tooManyHerbis;
 				if (!hasPlants)
-					currentWarnings.Add("Plants absent");
+					currentWarnings.Add(ACUWarnings.NOPLANTS);
 				if (!plantVar && hasPlants)
-					currentWarnings.Add("Insufficient plant variety");
+					currentWarnings.Add(ACUWarnings.SAMEPLANT);
 				if (!hasHerbis)
-					currentWarnings.Add("Herbivores absent");
+					currentWarnings.Add(ACUWarnings.NOHERBS);
 				if (!hasCarnis)
-					currentWarnings.Add("Carnivores absent");
+					currentWarnings.Add(ACUWarnings.NOCARNS);
 				if (tooManyCarnisPrey)
-					currentWarnings.Add("Too many carnivores for the available prey");
+					currentWarnings.Add(ACUWarnings.CARNPREY);
 				if (tooManyCarnisSpace)
-					currentWarnings.Add("Too many carnivores for the available space");
+					currentWarnings.Add(ACUWarnings.CARNSPACE);
 				if (tooManyHerbis && hasHerbis)
-					currentWarnings.Add("Too many herbivores for the available plants");
+					currentWarnings.Add(ACUWarnings.HERBFOOD);
 					
 				currentBonus = 0;
 				if (consistent)
@@ -511,9 +527,21 @@ namespace ReikaKalseki.AqueousEngineering {
 					ACUTheming.updateACUTheming(this, theme, time, changed || time-lastThemeUpdate > 5);
 				}
 				else {
-					currentWarnings.Add("No consistent biome theme");
+					currentWarnings.Add(ACUWarnings.NOTHEME);
 				}
 				nextIsDebug = false;
+				
+				checkUpdateText();
+			}
+		
+			private void checkUpdateText() {
+				if (DIHooks.isWorldLoaded()) {
+					uGUI_EncyclopediaTab tab = ((uGUI_EncyclopediaTab)Player.main.GetPDA().ui.tabs[PDATab.Encyclopedia]);
+					if (tab) {
+						if (tab.activeEntry && tab.activeEntry.key == AqueousEngineeringMod.acuMonitorBlock.locale.key+"PDA")
+							printTerminalInfo();
+					}
+				}
 			}
 		}
 		

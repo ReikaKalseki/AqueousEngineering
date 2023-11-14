@@ -64,6 +64,7 @@ namespace ReikaKalseki.AqueousEngineering
     
     public static readonly XMLLocale locale = new XMLLocale(modDLL, "XML/locale.xml");
     public static readonly XMLLocale roomLocale = new XMLLocale(modDLL, "XML/rooms.xml");
+    public static readonly XMLLocale acuLocale = new XMLLocale(modDLL, "XML/acu.xml");
 
     [QModPrePatch]
     public static void PreLoad() {
@@ -94,6 +95,7 @@ namespace ReikaKalseki.AqueousEngineering
         
         locale.load();
         roomLocale.load();
+        acuLocale.load();
         
         poo = new MiniPoo(locale.getEntry("MiniPoop"));
 	    poo.Patch();
@@ -347,15 +349,6 @@ namespace ReikaKalseki.AqueousEngineering
 		}
 		else {
 			SNUtil.log("Plankton item not found.");
-		}
-		
-		Spawnable glowShroom = ItemRegistry.instance.getItem("GLOWSHROOM");
-		if (glowShroom != null) {
-			ACUEcosystems.addFood(new ACUEcosystems.PlantFood(glowShroom, 0.25F, BiomeRegions.RegionType.Other));
-		}
-		Spawnable lavaShroom = ItemRegistry.instance.getItem("LAVASHROOM");
-		if (lavaShroom != null) {
-			ACUEcosystems.addFood(new ACUEcosystems.PlantFood(lavaShroom, 0.25F, BiomeRegions.RegionType.LavaZone));
 		}
 		
     	BaseRoomSpecializationSystem.instance.registerModdedObject(acuBoosterBlock, 0, BaseRoomSpecializationSystem.RoomTypes.ACU);

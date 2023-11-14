@@ -1,0 +1,101 @@
+<Root>
+	<NOPLANTS>
+		<name>
+			
+		</name>
+		<desc>
+			Plants absent
+		</desc>
+		<pda>
+			
+		</pda>
+	</NOPLANTS>
+	<SAMEPLANT>
+		<name>
+			
+		</name>
+		<desc>
+			Insufficient plant variety
+		</desc>
+		<pda>
+			
+		</pda>
+	</SAMEPLANT>
+	<NOHERBS>
+		<name>
+			
+		</name>
+		<desc>
+			Herbivores absent
+		</desc>
+		<pda>
+			
+		</pda>
+	</NOHERBS>
+	<NOCARNS>
+		<name>
+			
+		</name>
+		<desc>
+			Carnivores absent
+		</desc>
+		<pda>
+			
+		</pda>
+	</NOCARNS>
+	<CARNPREY>
+		<name>
+			
+		</name>
+		<desc>
+			Too many carnivores for the available prey
+		</desc>
+		<pda>
+			
+		</pda>
+	</CARNPREY>
+	<CARNSPACE>
+		<name>
+			
+		</name>
+		<desc>
+			Too many carnivores for the available space
+		</desc>
+		<pda>
+			
+		</pda>
+	</CARNSPACE>
+	<HERBFOOD>
+		<name>
+			
+		</name>
+		<desc>
+			Too many herbivores for the available plants
+		</desc>
+		<pda>
+			
+		</pda>
+	</HERBFOOD>
+	<NOTHEME>
+		<name>
+			
+		</name>
+		<desc>
+			No consistent biome theme
+		</desc>
+		<pda>
+			
+		</pda>
+	</NOTHEME>
+	<Name>
+		<name>
+			
+		</name>
+		<desc>
+			
+		</desc>
+		<pda>
+			
+		</pda>
+	</Name>
+</Root>
