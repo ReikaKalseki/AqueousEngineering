@@ -23,69 +23,78 @@ namespace ReikaKalseki.AqueousEngineering {
 		internal static readonly string ACU_DECO_SLOT_NAME = "ACUDecoHolder";
 		
 		private static readonly Dictionary<BiomeRegions.RegionType, WeightedRandom<ACUPropDefinition>> propTypes = new Dictionary<BiomeRegions.RegionType, WeightedRandom<ACUPropDefinition>>();
+	  	private static readonly Dictionary<BiomeRegions.RegionType, Texture2D> floorTextures = new Dictionary<BiomeRegions.RegionType, Texture2D>();
 	   
 		private static readonly Dictionary<string, MaterialPropertyDefinition> terrainGrassTextures = new Dictionary<string, MaterialPropertyDefinition>();
 		
 		private static readonly string rootCachePath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "GrassTex");
 		
 		static ACUTheming() {
-			registerGrassProp(BiomeRegions.RegionType.Kelp, null, 25, 0.5F);
-			registerGrassProp(BiomeRegions.RegionType.RedGrass, "Coral_reef_red_seaweed_03", 25, 0.5F);
-			registerGrassProp(BiomeRegions.RegionType.RedGrass, "Coral_reef_red_seaweed_02", 25, 0.5F);
-			registerGrassProp(BiomeRegions.RegionType.Koosh, "Coral_reef_small_deco_03_billboards", 15, 0.5F);
-			registerGrassProp(BiomeRegions.RegionType.Koosh, "coral_reef_grass_03_02", 15, 0.5F);
-			//registerGrassProp(BiomeRegions.RegionType.GrandReef, "coral_reef_grass_11_02_gr", 25, 0.5F);
-			registerGrassProp(BiomeRegions.RegionType.GrandReef, "coral_reef_grass_11_02", 12, 0.5F);
-			registerGrassProp(BiomeRegions.RegionType.GrandReef, "coral_reef_grass_07", 25, 0.5F);
-			//registerGrassProp(BiomeRegions.RegionType.GrandReef, "coral_reef_grass_07_gr", 25, 0.5F);
-			//registerGrassProp(BiomeRegions.RegionType.GrandReef, "coral_reef_grass_10_gr", 25, 0.5F);
-			registerGrassProp(BiomeRegions.RegionType.BloodKelp, "coral_reef_grass_07_bk", 25, 0.5F);
-			registerGrassProp(BiomeRegions.RegionType.LostRiver, "coral_reef_grass_11_03_lr", 25, 0.5F);
-			registerGrassProp(BiomeRegions.RegionType.LavaZone, "coral_reef_grass_10_lava", 25, 0.5F);
+			foreach (FieldInfo f in typeof(BiomeRegions).GetFields()) {
+				if (f.IsStatic && f.FieldType == typeof(BiomeRegions.RegionType)) {
+					BiomeRegions.RegionType r = (BiomeRegions.RegionType)f.GetValue(null);
+					Texture2D tex = TextureManager.getTexture(AqueousEngineeringMod.modDLL, "Textures/ACUFloor/"+r.ID);
+					setFloorTexture(r, tex);
+				}
+			}
+			
+			registerGrassProp(BiomeRegions.Kelp, null, 25, 0.5F);
+			registerGrassProp(BiomeRegions.RedGrass, "Coral_reef_red_seaweed_03", 25, 0.5F);
+			registerGrassProp(BiomeRegions.RedGrass, "Coral_reef_red_seaweed_02", 25, 0.5F);
+			registerGrassProp(BiomeRegions.Koosh, "Coral_reef_small_deco_03_billboards", 15, 0.5F);
+			registerGrassProp(BiomeRegions.Koosh, "coral_reef_grass_03_02", 15, 0.5F);
+			//registerGrassProp(BiomeRegions.GrandReef, "coral_reef_grass_11_02_gr", 25, 0.5F);
+			registerGrassProp(BiomeRegions.GrandReef, "coral_reef_grass_11_02", 12, 0.5F);
+			registerGrassProp(BiomeRegions.GrandReef, "coral_reef_grass_07", 25, 0.5F);
+			//registerGrassProp(BiomeRegions.GrandReef, "coral_reef_grass_07_gr", 25, 0.5F);
+			//registerGrassProp(BiomeRegions.GrandReef, "coral_reef_grass_10_gr", 25, 0.5F);
+			registerGrassProp(BiomeRegions.BloodKelp, "coral_reef_grass_07_bk", 25, 0.5F);
+			registerGrassProp(BiomeRegions.LostRiver, "coral_reef_grass_11_03_lr", 25, 0.5F);
+			registerGrassProp(BiomeRegions.LavaZone, "coral_reef_grass_10_lava", 25, 0.5F);
 				
-			//registerProp(BiomeRegions.RegionType.Koosh, "eb5ea858-930d-4272-91b5-e9ebe2286ca8", 25, 0.5F);
+			//registerProp(BiomeRegions.Koosh, "eb5ea858-930d-4272-91b5-e9ebe2286ca8", 25, 0.5F);
 			
 			//foreach (string pfb in VanillaFlora.BLOOD_GRASS.getPrefabs(false, true))
-			//	registerProp(BiomeRegions.RegionType.RedGrass, pfb, 15);
+			//	registerProp(BiomeRegions.RedGrass, pfb, 15);
 			
-			registerProp(BiomeRegions.RegionType.Mushroom, "961194a9-e88b-40d7-900d-a48c5b739352", 5, false, 0.4F);
-			registerProp(BiomeRegions.RegionType.Mushroom, "fe145621-5b25-4000-a3dd-74c1aaa961e2", 5, false, 0.4F);
-			registerProp(BiomeRegions.RegionType.Mushroom, "f3de21af-550b-4901-a6e8-e45e31c1509d", 5, false, 0.4F);
-			registerProp(BiomeRegions.RegionType.Mushroom, "5086a02a-ea6d-41ba-90c3-ea74d97cf6b5", 5, false, 0.4F);
-			registerProp(BiomeRegions.RegionType.Mushroom, "7c7e0e95-8311-4ee0-80dd-30a61b151161", 5, false, 0.4F);
+			registerProp(BiomeRegions.Mushroom, "961194a9-e88b-40d7-900d-a48c5b739352", 5, false, 0.4F);
+			registerProp(BiomeRegions.Mushroom, "fe145621-5b25-4000-a3dd-74c1aaa961e2", 5, false, 0.4F);
+			registerProp(BiomeRegions.Mushroom, "f3de21af-550b-4901-a6e8-e45e31c1509d", 5, false, 0.4F);
+			registerProp(BiomeRegions.Mushroom, "5086a02a-ea6d-41ba-90c3-ea74d97cf6b5", 5, false, 0.4F);
+			registerProp(BiomeRegions.Mushroom, "7c7e0e95-8311-4ee0-80dd-30a61b151161", 5, false, 0.4F);
 			
-			registerProp(BiomeRegions.RegionType.BloodKelp, "7bfe0629-a008-43b8-bd16-d69ad056769f", 15, true, prepareBloodTendril);
-			registerProp(BiomeRegions.RegionType.BloodKelp, "e291d076-bf95-4cdd-9dd9-6acd37566cf6", 15, true, prepareBloodTendril);
-			registerProp(BiomeRegions.RegionType.BloodKelp, "2bfcbaf4-1ae6-4628-9816-28a6a26ff340", 15, true, prepareBloodTendril);
-			registerProp(BiomeRegions.RegionType.BloodKelp, "2ab96dc4-5201-4a41-aa5c-908f0a9a0da8", 15, true, prepareBloodTendril);
-			registerProp(BiomeRegions.RegionType.BloodKelp, "18229b4b-3ed3-4b35-ae30-43b1c31a6d8d", 25, true, 0.4F, 0.165F); //blood oil
+			registerProp(BiomeRegions.BloodKelp, "7bfe0629-a008-43b8-bd16-d69ad056769f", 15, true, prepareBloodTendril);
+			registerProp(BiomeRegions.BloodKelp, "e291d076-bf95-4cdd-9dd9-6acd37566cf6", 15, true, prepareBloodTendril);
+			registerProp(BiomeRegions.BloodKelp, "2bfcbaf4-1ae6-4628-9816-28a6a26ff340", 15, true, prepareBloodTendril);
+			registerProp(BiomeRegions.BloodKelp, "2ab96dc4-5201-4a41-aa5c-908f0a9a0da8", 15, true, prepareBloodTendril);
+			registerProp(BiomeRegions.BloodKelp, "18229b4b-3ed3-4b35-ae30-43b1c31a6d8d", 25, true, 0.4F, 0.165F); //blood oil
 			/* too finicky
 			foreach (string pfb in VanillaFlora.DEEP_MUSHROOM.getPrefabs(false, true)) {
 				Action<GameObject> a = go => {
 					go.transform.localScale = Vector3.one*0.33F;
 					go.transform.localRotation = Quaternion.Euler(UnityEngine.Random.Range(260F, 280F), UnityEngine.Random.Range(0F, 360F)*0, 0);
 				};
-				registerProp(BiomeRegions.RegionType.BloodKelp, pfb, 5, true, a);
-				//registerProp(BiomeRegions.RegionType.LostRiver, pfb, 5, a); is a native flora here
-				//registerProp(BiomeRegions.RegionType.LavaZone, pfb, 5, a); and here
+				registerProp(BiomeRegions.BloodKelp, pfb, 5, true, a);
+				//registerProp(BiomeRegions.LostRiver, pfb, 5, a); is a native flora here
+				//registerProp(BiomeRegions.LavaZone, pfb, 5, a); and here
 			}*/
 			
 			foreach (string pfb in VanillaFlora.JELLYSHROOM_TINY.getPrefabs(true, true))
-				registerProp(BiomeRegions.RegionType.Jellyshroom, pfb, 5, false);
+				registerProp(BiomeRegions.Jellyshroom, pfb, 5, false);
 			
 			foreach (string pfb in VanillaFlora.TREE_LEECH.getPrefabs(false, true))
-				registerProp(BiomeRegions.RegionType.Mushroom, pfb, 5, false, 0.25F);
+				registerProp(BiomeRegions.Mushroom, pfb, 5, false, 0.25F);
 			foreach (string pfb in VanillaFlora.GRUE_CLUSTER.getPrefabs(true, true))
-				registerProp(BiomeRegions.RegionType.Mushroom, pfb, 5, false, 0.00004F); //why the hell is this thing so huge in native scale and vanilla scales it to 0.0001F
+				registerProp(BiomeRegions.Mushroom, pfb, 5, false, 0.00004F); //why the hell is this thing so huge in native scale and vanilla scales it to 0.0001F
 			
-			registerProp(BiomeRegions.RegionType.LostRiver, VanillaFlora.BRINE_LILY.getRandomPrefab(false), 10, false, 0.25F);
+			registerProp(BiomeRegions.LostRiver, VanillaFlora.BRINE_LILY.getRandomPrefab(false), 10, false, 0.25F);
 			foreach (string pfb in VanillaFlora.CLAW_KELP.getPrefabs(true, true))
-				registerProp(BiomeRegions.RegionType.LostRiver, pfb, 5, true, 0.1F, 0, go => go.transform.rotation = Quaternion.Euler(270, 0, 0));
+				registerProp(BiomeRegions.LostRiver, pfb, 5, true, 0.1F, 0, go => go.transform.rotation = Quaternion.Euler(270, 0, 0));
 			
-			registerProp(BiomeRegions.RegionType.GrandReef, VanillaFlora.ANCHOR_POD_SMALL1.getRandomPrefab(false), 10, true, 0.1F);
-			registerProp(BiomeRegions.RegionType.GrandReef, VanillaFlora.ANCHOR_POD_SMALL2.getRandomPrefab(false), 10, true, 0.1F);
+			registerProp(BiomeRegions.GrandReef, VanillaFlora.ANCHOR_POD_SMALL1.getRandomPrefab(false), 10, true, 0.1F);
+			registerProp(BiomeRegions.GrandReef, VanillaFlora.ANCHOR_POD_SMALL2.getRandomPrefab(false), 10, true, 0.1F);
 			
-			registerProp(BiomeRegions.RegionType.LavaZone, "077ebe13-eb45-4ee4-8f6f-f566cfe11ab2", 10, false, 0.5F);
+			registerProp(BiomeRegions.LavaZone, "077ebe13-eb45-4ee4-8f6f-f566cfe11ab2", 10, false, 0.5F);
 			
 			if (Directory.Exists(rootCachePath)) {
 				foreach (string folder in Directory.EnumerateDirectories(rootCachePath)) {
@@ -107,6 +116,11 @@ namespace ReikaKalseki.AqueousEngineering {
 			}
 		}
 		
+		public static void setFloorTexture(BiomeRegions.RegionType r, Texture2D tex) {
+			if (tex && !floorTextures.ContainsKey(r))
+				floorTextures[r] = tex;
+		}
+		
 		public static void cacheGrassMaterial(Material m) {
 			string n = m.mainTexture.name.Replace(" (Instance)", "");
 			if (!terrainGrassTextures.ContainsKey(n)) {
@@ -123,7 +137,7 @@ namespace ReikaKalseki.AqueousEngineering {
 			go.transform.rotation = Quaternion.identity;
 		}
 		
-		private static void registerGrassProp(BiomeRegions.RegionType r, string texture, double wt, float scale, float voff = 0) {
+		public static void registerGrassProp(BiomeRegions.RegionType r, string texture, double wt, float scale, float voff = 0) {
 			Action<GameObject> a = go => {
 			    go.transform.localScale = Vector3.one*UnityEngine.Random.Range(scale*0.95F, scale*1.05F);
 				go.transform.position = go.transform.position+Vector3.up*voff;
@@ -139,8 +153,8 @@ namespace ReikaKalseki.AqueousEngineering {
 			registerProp(r, "bac42c90-8995-439f-be2f-29a6d164c82a", wt*0.25F, false, a);
 		}
 		
-		private static void registerProp(BiomeRegions.RegionType r, string s, double wt, bool up, float scale, float voff = 0, Action<GameObject> a = null) {
-			registerProp(r, s, wt, up, go => {
+		public static void registerProp(BiomeRegions.RegionType r, string pfb, double wt, bool up, float scale, float voff = 0, Action<GameObject> a = null) {
+			registerProp(r, pfb, wt, up, go => {
 			    go.transform.localScale = Vector3.one*UnityEngine.Random.Range(scale*0.95F, scale*1.05F);
 				go.transform.position = go.transform.position+Vector3.up*voff;
 				if (a != null)
@@ -148,9 +162,9 @@ namespace ReikaKalseki.AqueousEngineering {
 			});
 		}
 		
-		private static void registerProp(BiomeRegions.RegionType r, string s, double wt, bool up, Action<GameObject> a = null) {
+		private static void registerProp(BiomeRegions.RegionType r, string pfb, double wt, bool up, Action<GameObject> a = null) {
 			WeightedRandom<ACUPropDefinition> wr = propTypes.ContainsKey(r) ? propTypes[r] : new WeightedRandom<ACUPropDefinition>();
-			wr.addEntry(new ACUPropDefinition(s, wt, up, a), wt);
+			wr.addEntry(new ACUPropDefinition(pfb, wt, up, a), wt);
 			propTypes[r] = wr;
 		}
 		
@@ -187,7 +201,7 @@ namespace ReikaKalseki.AqueousEngineering {
 						slot.transform.position = t.position;
 						slot.transform.rotation = t.rotation;
 						//slot.transform.rotation = Quaternion.identity;
-						addProp(t.gameObject, slot, BiomeRegions.RegionType.Shallows);
+						addProp(t.gameObject, slot, BiomeRegions.Shallows);
 						acu.decoHolders.Add(slot);
 					}
 				}
@@ -198,7 +212,7 @@ namespace ReikaKalseki.AqueousEngineering {
 				bool found = false;
 				foreach (Transform bt in slot.transform) {
 					GameObject biomeSlot = bt.gameObject;
-					bool match = biomeSlot.name == Enum.GetName(typeof(BiomeRegions.RegionType), theme);
+					bool match = biomeSlot.name == theme.ID;
 					biomeSlot.SetActive(match);
 					if (match) {
 						found = true;
@@ -221,17 +235,13 @@ namespace ReikaKalseki.AqueousEngineering {
 			
 			acu.lastThemeUpdate = time;
 				
-			string floorTex = Enum.GetName(typeof(BiomeRegions.RegionType), theme);
-			if (!string.IsNullOrEmpty(floorTex)) {
+			if (floorTextures.ContainsKey(theme)) {
 				Renderer r = acu.floor.GetComponentInChildren<Renderer>();
-				Texture2D tex = TextureManager.getTexture(AqueousEngineeringMod.modDLL, "Textures/ACUFloor/"+floorTex);
-				if (tex)
-					r.material.mainTexture = tex;
+				r.material.mainTexture = floorTextures[theme];
 			}
-			BiomeRegions.Biome b = BiomeRegions.getAttr(theme);
 			//SNUtil.writeToChat("::"+b);
-			if (b != null) {
-				mset.Sky biomeSky = WorldUtil.getSkybox(b.biomeName);
+			if (theme.baseBiome != null) {
+				mset.Sky biomeSky = WorldUtil.getSkybox(theme.baseBiome);
 				if (biomeSky) {
 					foreach (WaterParkPiece wp in acu.column) {
 						GameObject glass = ObjectUtil.getChildObject(wp.gameObject, "model/Large_Aquarium_generic_room_glass_01");
@@ -249,8 +259,8 @@ namespace ReikaKalseki.AqueousEngineering {
 						m.SetFloat("_Fresnel", 0.5F);
 						m.SetFloat("_Shininess", 7.5F);
 						m.SetFloat("_SpecInt", 0.75F);
-						m.SetColor("_Color", b.waterColor);
-						m.SetColor("_SpecColor", b.waterColor);
+						m.SetColor("_Color", theme.waterColor);
+						m.SetColor("_SpecColor", theme.waterColor);
 						//m.SetInt("_ZWrite", 1);
 					}
 					foreach (WaterParkItem wp in acu.acu.items) {
@@ -265,7 +275,7 @@ namespace ReikaKalseki.AqueousEngineering {
 		}
 		
 		private static void addProp(GameObject go, GameObject slot, BiomeRegions.RegionType r, GameObject rSlot = null) {
-			string rname = Enum.GetName(typeof(BiomeRegions.RegionType), r);
+			string rname = r.ID;
 			if (!rSlot)
 				rSlot = ObjectUtil.getChildObject(slot, rname);
 			if (!rSlot) {

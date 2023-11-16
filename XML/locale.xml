@@ -315,7 +315,7 @@
 		<pda>
 			Time
 			--------------
-			Day $time
+			Day $day, Time $time
 			
 			Contents
 			--------------
@@ -340,6 +340,8 @@
 			
 			Misc Data
 			--------------
+			ACU Stack Height: $height
+			Occupancy: $count/$capacity
 			Stalker Toy Value: $stalkerToy
 		</pda>
 		<category>

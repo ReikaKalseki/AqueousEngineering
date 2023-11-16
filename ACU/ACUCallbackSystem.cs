@@ -205,6 +205,7 @@ namespace ReikaKalseki.AqueousEngineering {
 			CARNPREY,
 			CARNSPACE,
 			HERBFOOD,
+			MIXEDTHEME,
 		}
 		
 		internal class ACUCallback : MonoBehaviour {
@@ -218,7 +219,7 @@ namespace ReikaKalseki.AqueousEngineering {
 			internal List<GameObject> decoHolders;
 			
 			internal HashSet<BiomeRegions.RegionType> potentialBiomes = new HashSet<BiomeRegions.RegionType>();
-			internal BiomeRegions.RegionType currentTheme = BiomeRegions.RegionType.Shallows;
+			internal BiomeRegions.RegionType currentTheme = BiomeRegions.Shallows;
 			internal float plantCount;
 			internal float herbivoreCount;
 			internal float carnivoreCount;
@@ -327,7 +328,7 @@ namespace ReikaKalseki.AqueousEngineering {
     			values["day"] = dday;
     			values["time"] = (int)(frac*1200)+"s";
     			values["contents"] = generateContentList();
-    			values["biome"] = currentTheme;
+    			values["biome"] = currentTheme.getName();
     			values["plants"] = plantCount.ToString("0.0");
     			values["herbivores"] = herbivoreCount.ToString("0.0");
     			values["carnivores"] = carnivoreCount.ToString("0.0");
@@ -335,6 +336,9 @@ namespace ReikaKalseki.AqueousEngineering {
     			values["infected"] = infectedTotal.ToString("0.00");
     			values["bonus"] = (currentBonus*100).ToString("0.00");
     			values["stalkerToy"] = stalkerToyValue.ToString("0.0");
+    			values["height"] = acu.height;
+    			values["count"] = acu.usedSpace;
+    			values["capacity"] = acu.wpPieceCapacity*acu.height;
     			values["alerts"] = currentWarnings.Count == 0 ? "[None]" : string.Join("\n", currentWarnings.Select<ACUWarnings, string>(w => AqueousEngineeringMod.acuLocale.getEntry(w.ToString()).desc));
 				
 				XMLLocale.LocaleEntry e = AqueousEngineeringMod.acuMonitorBlock.locale;
@@ -346,12 +350,14 @@ namespace ReikaKalseki.AqueousEngineering {
 			
 			private string generateContentList() {
 				Dictionary<TechType, int> counts = new Dictionary<TechType, int>();
+				Dictionary<TechType, int> sizes = new Dictionary<TechType, int>();
 				foreach (WaterParkItem wp in new List<WaterParkItem>(acu.items)) {
 					if (!wp)
 						continue;
 					Pickupable pp = wp.gameObject.GetComponentInChildren<Pickupable>();
 					TechType tt = pp ? pp.GetTechType() : TechType.None;
 					if (tt != TechType.None) {
+						sizes[tt] = wp.GetSize();
 						if (counts.ContainsKey(tt))
 							counts[tt] = counts[tt]+1;
 						else
@@ -360,11 +366,12 @@ namespace ReikaKalseki.AqueousEngineering {
 				}
 				StringBuilder sb = new StringBuilder();
 				foreach (KeyValuePair<TechType, int> kvp in counts) {
-					sb.Append("  ");
 					sb.Append(Language.main.Get(kvp.Key));
 					sb.Append(": ");
 					sb.Append(kvp.Value);
-					sb.Append("\n");
+					sb.Append(" (");
+					sb.Append(sizes[kvp.Key]);
+					sb.Append(" occupancy slots each)\n");
 				}
 				return sb.ToString();
 			}
@@ -384,7 +391,7 @@ namespace ReikaKalseki.AqueousEngineering {
 				bool consistent = true;
 				currentWarnings.Clear();
 				potentialBiomes.Clear();
-				potentialBiomes.AddRange((IEnumerable<BiomeRegions.RegionType>)Enum.GetValues(typeof(BiomeRegions.RegionType)));
+				potentialBiomes.AddRange(BiomeRegions.getAllBiomes());
 				//SNUtil.writeToChat("SC:"+sc);
 				PrefabIdentifier[] plants = sc.GetComponentsInChildren<PrefabIdentifier>();
 				plantCount = 0;
@@ -422,13 +429,13 @@ namespace ReikaKalseki.AqueousEngineering {
 								infectedFish.Add(mix);
 							}
 						}
-						Creature c = ACUEcosystems.handleCreature(this, dT, wp, tt, foodFish, plants, acuRoom, ref potentialBiomes);
+						Creature c = ACUEcosystems.handleCreature(this, dT, wp, tt, foodFish, plants, acuRoom, potentialBiomes);
 						if (tt == TechType.Stalker) {
 							stalkers.Add((Stalker)c);
 						}
 					}
 		   	 	}
-				HashSet<ACUEcosystems.PlantFood> plantTypes = ACUEcosystems.collectPlants(this, plants, ref potentialBiomes);
+				HashSet<ACUEcosystems.PlantFood> plantTypes = ACUEcosystems.collectPlants(this, plants, potentialBiomes);
 				consistent = potentialBiomes.Count > 0 && plantCount > 0;
 				int max = potentialBiomes.Count == 1 ? ACUEcosystems.getPlantsForBiome(potentialBiomes.First<BiomeRegions.RegionType>()).Count : 99;
 				bool plantVar = plantTypes.Count >= Mathf.Min(2, max);
@@ -457,6 +464,8 @@ namespace ReikaKalseki.AqueousEngineering {
 				currentBonus = 0;
 				if (consistent)
 					currentBonus += 1F;
+				else
+					currentWarnings.Add(ACUWarnings.NOTHEME);
 				if (healthy)
 					currentBonus += 2F;
 				if (sparkleCount > 0)
@@ -496,9 +505,10 @@ namespace ReikaKalseki.AqueousEngineering {
 						}
 					}
 				}
-				if (teeth < 6 && consistent && healthy && potentialBiomes.Contains(BiomeRegions.RegionType.Kelp)) {
+				if (teeth < 6 && consistent && healthy && potentialBiomes.Contains(BiomeRegions.Kelp)) {
+					bool single = potentialBiomes.Count == 1;
 					foreach (Stalker s in stalkers) {
-						float f = dT*stalkerToyValue*0.00012F*(1+2*s.Happy.Value);
+						float f = dT*Mathf.Min(8, stalkerToyValue)*0.00012F*(1+2*s.Happy.Value)*(single ? 1 : 0.2F);
 						//SNUtil.writeToChat(s.Happy.Value+" x "+stalkerToyValue+" > "+f);
 						if (UnityEngine.Random.Range(0F, 1F) < f) {
 							//do not use, so can have ref to GO; reimplement // s.LoseTooth();
@@ -520,14 +530,14 @@ namespace ReikaKalseki.AqueousEngineering {
 					SNUtil.writeToChat("Final biome set: ["+string.Join(", ", potentialBiomes)+"]");
 				if (potentialBiomes.Count == 1) {
 					BiomeRegions.RegionType theme = potentialBiomes.First<BiomeRegions.RegionType>();
-					if (theme == BiomeRegions.RegionType.Other)
-						theme = BiomeRegions.RegionType.Shallows;
+					if (theme == BiomeRegions.Other)
+						theme = BiomeRegions.Shallows;
 					bool changed = theme != currentTheme;
 					currentTheme = theme;
 					ACUTheming.updateACUTheming(this, theme, time, changed || time-lastThemeUpdate > 5);
 				}
-				else {
-					currentWarnings.Add(ACUWarnings.NOTHEME);
+				else if (potentialBiomes.Count > 1) {
+					currentWarnings.Add(ACUWarnings.MIXEDTHEME);
 				}
 				nextIsDebug = false;
 				
@@ -535,7 +545,7 @@ namespace ReikaKalseki.AqueousEngineering {
 			}
 		
 			private void checkUpdateText() {
-				if (DIHooks.isWorldLoaded()) {
+				if (DIHooks.isWorldLoaded() && Player.main.GetPDA().isOpen) {
 					uGUI_EncyclopediaTab tab = ((uGUI_EncyclopediaTab)Player.main.GetPDA().ui.tabs[PDATab.Encyclopedia]);
 					if (tab) {
 						if (tab.activeEntry && tab.activeEntry.key == AqueousEngineeringMod.acuMonitorBlock.locale.key+"PDA")

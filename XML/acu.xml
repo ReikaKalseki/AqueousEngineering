@@ -81,12 +81,23 @@
 			
 		</name>
 		<desc>
-			No consistent biome theme
+			No biome shared by all contained species
 		</desc>
 		<pda>
 			
 		</pda>
 	</NOTHEME>
+	<MIXEDTHEME>
+		<name>
+			
+		</name>
+		<desc>
+			Contained species not consistent with a single biome
+		</desc>
+		<pda>
+			
+		</pda>
+	</MIXEDTHEME>
 	<Name>
 		<name>
 			

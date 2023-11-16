@@ -26,70 +26,70 @@ namespace ReikaKalseki.AqueousEngineering {
 		private static readonly Dictionary<string, PlantFood> ediblePlants = new Dictionary<string, PlantFood>();
 		
 		 private static readonly Dictionary<TechType, ACUMetabolism> metabolisms = new Dictionary<TechType, ACUMetabolism>() {
-			{TechType.RabbitRay, new ACUMetabolism(0.2F, 0.2F, false, BiomeRegions.RegionType.Shallows)},
-			{TechType.Biter, new ACUMetabolism(0.2F, 0.4F, true, BiomeRegions.RegionType.RedGrass, BiomeRegions.RegionType.Other)},
-			{TechType.Blighter, new ACUMetabolism(0.1F, 0.2F, true, BiomeRegions.RegionType.BloodKelp)},
-			{TechType.Gasopod, new ACUMetabolism(1F, 0.8F, false, BiomeRegions.RegionType.Shallows, BiomeRegions.RegionType.Other)},
-			{TechType.Jellyray, new ACUMetabolism(0.8F, 0.6F, false, BiomeRegions.RegionType.Mushroom)},
-	    	{TechType.Stalker, new ACUMetabolism(1F, 1F, true, BiomeRegions.RegionType.Kelp)},
-	    	{TechType.Sandshark, new ACUMetabolism(0.6F, 1.2F, true, BiomeRegions.RegionType.RedGrass)},
-	    	{TechType.BoneShark, new ACUMetabolism(0.6F, 1.6F, true, BiomeRegions.RegionType.Koosh, BiomeRegions.RegionType.Mushroom, BiomeRegions.RegionType.Other)},
-	    	{TechType.Shocker, new ACUMetabolism(2F, 1F, true, BiomeRegions.RegionType.Koosh, BiomeRegions.RegionType.BloodKelp)},
-	    	{TechType.Crabsnake, new ACUMetabolism(1.6F, 2F, true, BiomeRegions.RegionType.Jellyshroom)},
-	    	{TechType.CrabSquid, new ACUMetabolism(3F, 2F, true, BiomeRegions.RegionType.BloodKelp, BiomeRegions.RegionType.LostRiver, BiomeRegions.RegionType.GrandReef)},
-	    	{TechType.LavaLizard, new ACUMetabolism(1F, 1F, true, BiomeRegions.RegionType.LavaZone)},
-	    	{TechType.SpineEel, new ACUMetabolism(0.6F, 3F, true, BiomeRegions.RegionType.LostRiver)},
-			{TechType.GhostRayBlue, new ACUMetabolism(0.67F, 0.6F, false, BiomeRegions.RegionType.LostRiver)},
-			{TechType.GhostRayRed, new ACUMetabolism(1.25F, 0.6F, false, BiomeRegions.RegionType.LavaZone)},
-			{TechType.Mesmer, new ACUMetabolism(0.1F, 0.7F, true, BiomeRegions.RegionType.Koosh, BiomeRegions.RegionType.LostRiver)},
+			{TechType.RabbitRay, new ACUMetabolism(2F, 0.2F, 0.2F, false, BiomeRegions.Shallows)},
+			{TechType.Biter, new ACUMetabolism(0.5F, 0.2F, 0.4F, true, BiomeRegions.RedGrass, BiomeRegions.Other)},
+			{TechType.Blighter, new ACUMetabolism(0.33F, 0.1F, 0.2F, true, BiomeRegions.BloodKelp)},
+			{TechType.Gasopod, new ACUMetabolism(4F, 1F, 0.8F, false, BiomeRegions.Shallows, BiomeRegions.Other)},
+			{TechType.Jellyray, new ACUMetabolism(2.5F, 0.8F, 0.6F, false, BiomeRegions.Mushroom)},
+	    	{TechType.Stalker, new ACUMetabolism(0.75F, 1F, 1F, true, BiomeRegions.Kelp)},
+	    	{TechType.Sandshark, new ACUMetabolism(0.67F, 0.6F, 1.2F, true, BiomeRegions.RedGrass)},
+	    	{TechType.BoneShark, new ACUMetabolism(1.5F, 0.6F, 1.6F, true, BiomeRegions.Koosh, BiomeRegions.Mushroom, BiomeRegions.Other)},
+	    	{TechType.Shocker, new ACUMetabolism(1F, 2F, 1F, true, BiomeRegions.Koosh, BiomeRegions.BloodKelp)},
+	    	{TechType.Crabsnake, new ACUMetabolism(1.25F, 1.6F, 2F, true, BiomeRegions.Jellyshroom)},
+	    	{TechType.CrabSquid, new ACUMetabolism(1.5F, 3F, 2F, true, BiomeRegions.BloodKelp, BiomeRegions.LostRiver, BiomeRegions.GrandReef)},
+	    	{TechType.LavaLizard, new ACUMetabolism(1F, 1F, 1F, true, BiomeRegions.LavaZone)},
+	    	{TechType.SpineEel, new ACUMetabolism(0.75F, 0.6F, 3F, true, BiomeRegions.LostRiver)},
+			{TechType.GhostRayBlue, new ACUMetabolism(3F, 0.67F, 0.6F, false, BiomeRegions.LostRiver)},
+			{TechType.GhostRayRed, new ACUMetabolism(3F, 1.25F, 0.6F, false, BiomeRegions.LavaZone)},
+			{TechType.Mesmer, new ACUMetabolism(0.5F, 0.1F, 0.7F, true, BiomeRegions.Koosh, BiomeRegions.LostRiver)},
 	    };
 		
 		static ACUEcosystems() {
-			addFood(new AnimalFood(TechType.Reginald, BiomeRegions.RegionType.RedGrass, BiomeRegions.RegionType.BloodKelp, BiomeRegions.RegionType.LostRiver, BiomeRegions.RegionType.GrandReef, BiomeRegions.RegionType.Other));
-			addFood(new AnimalFood(TechType.Peeper, BiomeRegions.RegionType.Shallows, BiomeRegions.RegionType.RedGrass, BiomeRegions.RegionType.Mushroom, BiomeRegions.RegionType.GrandReef, BiomeRegions.RegionType.Koosh, BiomeRegions.RegionType.Other));
-			addFood(new AnimalFood(TechType.HoleFish, BiomeRegions.RegionType.Shallows));
-			addFood(new AnimalFood(TechType.Oculus, BiomeRegions.RegionType.Jellyshroom));
-			addFood(new AnimalFood(TechType.GarryFish, BiomeRegions.RegionType.Shallows, BiomeRegions.RegionType.Other));
-			addFood(new AnimalFood(TechType.Boomerang, BiomeRegions.RegionType.Shallows, BiomeRegions.RegionType.RedGrass, BiomeRegions.RegionType.Koosh, BiomeRegions.RegionType.GrandReef, BiomeRegions.RegionType.Other));
-			addFood(new AnimalFood(TechType.Spadefish, BiomeRegions.RegionType.RedGrass, BiomeRegions.RegionType.GrandReef, BiomeRegions.RegionType.Mushroom, BiomeRegions.RegionType.Other));
-			addFood(new AnimalFood(TechType.Bladderfish, BiomeRegions.RegionType.Shallows, BiomeRegions.RegionType.RedGrass, BiomeRegions.RegionType.Mushroom, BiomeRegions.RegionType.GrandReef, BiomeRegions.RegionType.LostRiver, BiomeRegions.RegionType.Other));
-			addFood(new AnimalFood(TechType.Eyeye, BiomeRegions.RegionType.Jellyshroom, BiomeRegions.RegionType.GrandReef, BiomeRegions.RegionType.Koosh));
-			addFood(new AnimalFood(TechType.LavaEyeye, BiomeRegions.RegionType.LavaZone));
-			addFood(new AnimalFood(TechType.LavaBoomerang, BiomeRegions.RegionType.LavaZone));
-			addFood(new AnimalFood(TechType.Hoopfish, BiomeRegions.RegionType.Kelp, BiomeRegions.RegionType.Koosh, BiomeRegions.RegionType.GrandReef, BiomeRegions.RegionType.Other));
-			addFood(new AnimalFood(TechType.Spinefish, BiomeRegions.RegionType.BloodKelp, BiomeRegions.RegionType.LostRiver));
-			addFood(new AnimalFood(TechType.Hoverfish, BiomeRegions.RegionType.Kelp));
+			addFood(new AnimalFood(TechType.Reginald, BiomeRegions.RedGrass, BiomeRegions.BloodKelp, BiomeRegions.LostRiver, BiomeRegions.GrandReef, BiomeRegions.Other));
+			addFood(new AnimalFood(TechType.Peeper, BiomeRegions.Shallows, BiomeRegions.RedGrass, BiomeRegions.Mushroom, BiomeRegions.GrandReef, BiomeRegions.Koosh, BiomeRegions.Other));
+			addFood(new AnimalFood(TechType.HoleFish, BiomeRegions.Shallows));
+			addFood(new AnimalFood(TechType.Oculus, BiomeRegions.Jellyshroom));
+			addFood(new AnimalFood(TechType.GarryFish, BiomeRegions.Shallows, BiomeRegions.Other));
+			addFood(new AnimalFood(TechType.Boomerang, BiomeRegions.Shallows, BiomeRegions.RedGrass, BiomeRegions.Koosh, BiomeRegions.GrandReef, BiomeRegions.Other));
+			addFood(new AnimalFood(TechType.Spadefish, BiomeRegions.RedGrass, BiomeRegions.GrandReef, BiomeRegions.Mushroom, BiomeRegions.Other));
+			addFood(new AnimalFood(TechType.Bladderfish, BiomeRegions.Shallows, BiomeRegions.RedGrass, BiomeRegions.Mushroom, BiomeRegions.GrandReef, BiomeRegions.LostRiver, BiomeRegions.Other));
+			addFood(new AnimalFood(TechType.Eyeye, BiomeRegions.Jellyshroom, BiomeRegions.GrandReef, BiomeRegions.Koosh));
+			addFood(new AnimalFood(TechType.LavaEyeye, BiomeRegions.LavaZone));
+			addFood(new AnimalFood(TechType.LavaBoomerang, BiomeRegions.LavaZone));
+			addFood(new AnimalFood(TechType.Hoopfish, BiomeRegions.Kelp, BiomeRegions.Koosh, BiomeRegions.GrandReef, BiomeRegions.Other));
+			addFood(new AnimalFood(TechType.Spinefish, BiomeRegions.BloodKelp, BiomeRegions.LostRiver));
+			addFood(new AnimalFood(TechType.Hoverfish, BiomeRegions.Kelp));
 			
-			addFood(new PlantFood(VanillaFlora.CREEPVINE, 0.15F, BiomeRegions.RegionType.Kelp));
-			addFood(new PlantFood(VanillaFlora.CREEPVINE_FERTILE, 0.25F, BiomeRegions.RegionType.Kelp));
-			addFood(new PlantFood(VanillaFlora.BLOOD_KELP, 0.25F, BiomeRegions.RegionType.BloodKelp));
-			addFood(new PlantFood(VanillaFlora.JELLYSHROOM, 0.25F, BiomeRegions.RegionType.Jellyshroom));
-			addFood(new PlantFood(VanillaFlora.EYE_STALK, 0.15F, BiomeRegions.RegionType.Other));
-			addFood(new PlantFood(VanillaFlora.GABE_FEATHER, 0.15F, BiomeRegions.RegionType.BloodKelp, BiomeRegions.RegionType.Other));
-			addFood(new PlantFood(VanillaFlora.GHOSTWEED, 0.25F, BiomeRegions.RegionType.LostRiver));
-			addFood(new PlantFood(VanillaFlora.HORNGRASS, 0.05F, BiomeRegions.RegionType.Other));
-			addFood(new PlantFood(VanillaFlora.KOOSH, 0.15F, BiomeRegions.RegionType.Koosh));
-			addFood(new PlantFood(VanillaFlora.MEMBRAIN, 0.3F, BiomeRegions.RegionType.GrandReef));
-			addFood(new PlantFood(VanillaFlora.PAPYRUS, 0.15F, BiomeRegions.RegionType.RedGrass, BiomeRegions.RegionType.Jellyshroom, BiomeRegions.RegionType.Other));
-			addFood(new PlantFood(VanillaFlora.VIOLET_BEAU, 0.2F, BiomeRegions.RegionType.Jellyshroom, BiomeRegions.RegionType.RedGrass, BiomeRegions.RegionType.Koosh, BiomeRegions.RegionType.Other));
-			addFood(new PlantFood(VanillaFlora.CAVE_BUSH, 0.05F, BiomeRegions.RegionType.Koosh, BiomeRegions.RegionType.Jellyshroom, BiomeRegions.RegionType.Other));
-			addFood(new PlantFood(VanillaFlora.REGRESS, 0.2F, BiomeRegions.RegionType.GrandReef, BiomeRegions.RegionType.Other));
-			addFood(new PlantFood(VanillaFlora.REDWORT, 0.15F, BiomeRegions.RegionType.RedGrass, BiomeRegions.RegionType.Koosh, BiomeRegions.RegionType.Other));
-			addFood(new PlantFood(VanillaFlora.ROUGE_CRADLE, 0.05F, BiomeRegions.RegionType.RedGrass, BiomeRegions.RegionType.Other));
-			addFood(new PlantFood(VanillaFlora.SEACROWN, 0.4F, BiomeRegions.RegionType.Koosh, BiomeRegions.RegionType.RedGrass));
-			addFood(new PlantFood(VanillaFlora.SPOTTED_DOCKLEAF, 0.25F, BiomeRegions.RegionType.Koosh, BiomeRegions.RegionType.Other));
-			addFood(new PlantFood(VanillaFlora.VEINED_NETTLE, 0.15F, BiomeRegions.RegionType.Shallows));
-			addFood(new PlantFood(VanillaFlora.WRITHING_WEED, 0.15F, BiomeRegions.RegionType.Shallows, BiomeRegions.RegionType.Mushroom));
-			addFood(new PlantFood(VanillaFlora.BLUE_PALM, 0.25F, BiomeRegions.RegionType.Shallows, BiomeRegions.RegionType.Mushroom));
-			addFood(new PlantFood(VanillaFlora.PYGMY_FAN, 0.33F, BiomeRegions.RegionType.Mushroom));
-			addFood(new PlantFood(VanillaFlora.TIGER, 0.5F, BiomeRegions.RegionType.RedGrass));
-			addFood(new PlantFood(VanillaFlora.DEEP_MUSHROOM, 0.1F, BiomeRegions.RegionType.LostRiver, BiomeRegions.RegionType.LavaZone));
+			addFood(new PlantFood(VanillaFlora.CREEPVINE, 0.15F, BiomeRegions.Kelp));
+			addFood(new PlantFood(VanillaFlora.CREEPVINE_FERTILE, 0.25F, BiomeRegions.Kelp));
+			addFood(new PlantFood(VanillaFlora.BLOOD_KELP, 0.25F, BiomeRegions.BloodKelp));
+			addFood(new PlantFood(VanillaFlora.JELLYSHROOM, 0.25F, BiomeRegions.Jellyshroom));
+			addFood(new PlantFood(VanillaFlora.EYE_STALK, 0.15F, BiomeRegions.Other));
+			addFood(new PlantFood(VanillaFlora.GABE_FEATHER, 0.15F, BiomeRegions.BloodKelp, BiomeRegions.Other));
+			addFood(new PlantFood(VanillaFlora.GHOSTWEED, 0.25F, BiomeRegions.LostRiver));
+			addFood(new PlantFood(VanillaFlora.HORNGRASS, 0.05F, BiomeRegions.Other));
+			addFood(new PlantFood(VanillaFlora.KOOSH, 0.15F, BiomeRegions.Koosh));
+			addFood(new PlantFood(VanillaFlora.MEMBRAIN, 0.3F, BiomeRegions.GrandReef));
+			addFood(new PlantFood(VanillaFlora.PAPYRUS, 0.15F, BiomeRegions.RedGrass, BiomeRegions.Jellyshroom, BiomeRegions.Other));
+			addFood(new PlantFood(VanillaFlora.VIOLET_BEAU, 0.2F, BiomeRegions.Jellyshroom, BiomeRegions.RedGrass, BiomeRegions.Koosh, BiomeRegions.Other));
+			addFood(new PlantFood(VanillaFlora.CAVE_BUSH, 0.05F, BiomeRegions.Koosh, BiomeRegions.Jellyshroom, BiomeRegions.Other));
+			addFood(new PlantFood(VanillaFlora.REGRESS, 0.2F, BiomeRegions.GrandReef, BiomeRegions.Other));
+			addFood(new PlantFood(VanillaFlora.REDWORT, 0.15F, BiomeRegions.RedGrass, BiomeRegions.Koosh, BiomeRegions.Other));
+			addFood(new PlantFood(VanillaFlora.ROUGE_CRADLE, 0.05F, BiomeRegions.RedGrass, BiomeRegions.Other));
+			addFood(new PlantFood(VanillaFlora.SEACROWN, 0.4F, BiomeRegions.Koosh, BiomeRegions.RedGrass));
+			addFood(new PlantFood(VanillaFlora.SPOTTED_DOCKLEAF, 0.25F, BiomeRegions.Koosh, BiomeRegions.Other));
+			addFood(new PlantFood(VanillaFlora.VEINED_NETTLE, 0.15F, BiomeRegions.Shallows));
+			addFood(new PlantFood(VanillaFlora.WRITHING_WEED, 0.15F, BiomeRegions.Shallows, BiomeRegions.Mushroom));
+			addFood(new PlantFood(VanillaFlora.BLUE_PALM, 0.25F, BiomeRegions.Shallows, BiomeRegions.Mushroom));
+			addFood(new PlantFood(VanillaFlora.PYGMY_FAN, 0.33F, BiomeRegions.Mushroom));
+			addFood(new PlantFood(VanillaFlora.TIGER, 0.5F, BiomeRegions.RedGrass));
+			addFood(new PlantFood(VanillaFlora.DEEP_MUSHROOM, 0.1F, BiomeRegions.LostRiver, BiomeRegions.LavaZone));
 		}
 		
-		public static void addPredatorType(TechType tt, float metaRate, float pooChance, bool carn, params BiomeRegions.RegionType[] rr) {
+		public static void addPredatorType(TechType tt, float relativeValue, float metaRate, float pooChance, bool carn, params BiomeRegions.RegionType[] rr) {
 			List<BiomeRegions.RegionType> li = rr.ToList();
 			li.RemoveAt(0);
-			ACUMetabolism am = new ACUMetabolism(metaRate, pooChance, carn, rr[0], li);
+			ACUMetabolism am = new ACUMetabolism(relativeValue, metaRate, pooChance, carn, rr[0], li);
 			metabolisms[tt] = am;
 		}
 		
@@ -101,6 +101,18 @@ namespace ReikaKalseki.AqueousEngineering {
 				foreach (string s in ((PlantFood)f).classIDs)
 					ediblePlants[s] = (PlantFood)f;
 			}
+		}
+		
+		public static ACUMetabolism getMetabolismForAnimal(TechType tt) {
+			return metabolisms.ContainsKey(tt) ? metabolisms[tt] : null;
+		}
+		
+		public static AnimalFood getAnimalFood(TechType tt) {
+			return edibleFish.ContainsKey(tt) ? edibleFish[tt] : null;
+		}
+		
+		public static PlantFood getPlantFood(string pfb) {
+			return ediblePlants.ContainsKey(pfb) ? ediblePlants[pfb] : null;
 		}
 		
 		public static List<PlantFood> getPlantsForBiome(BiomeRegions.RegionType r) {
@@ -130,14 +142,14 @@ namespace ReikaKalseki.AqueousEngineering {
 			return li;
 		}
 		
-		internal static Creature handleCreature(ACUCallbackSystem.ACUCallback acu, float dT, WaterParkItem wp, TechType tt, List<WaterParkCreature> foodFish, PrefabIdentifier[] plants, bool acuRoom, ref HashSet<BiomeRegions.RegionType> possibleBiomes) {
+		internal static Creature handleCreature(ACUCallbackSystem.ACUCallback acu, float dT, WaterParkItem wp, TechType tt, List<WaterParkCreature> foodFish, PrefabIdentifier[] plants, bool acuRoom, HashSet<BiomeRegions.RegionType> possibleBiomes) {
 			if (edibleFish.ContainsKey(tt)) {
 				if (tt == TechType.Peeper && wp.gameObject.GetComponent<Peeper>().isHero)
 					acu.sparkleCount++;
 				else if (tt == TechType.Cutefish)
 					acu.cuddleCount++;
 				else //sparkle peepers and cuddlefish are always valid
-					possibleBiomes = new HashSet<BiomeRegions.RegionType>(possibleBiomes.Intersect(edibleFish[tt].regionType));
+					possibleBiomes.IntersectWith(edibleFish[tt].regionType);
 				//if (possibleBiomes.Count <= 0)
 				//	SNUtil.writeToChat("Biome list empty after "+tt+" > "+edibleFish[tt]);
 				if (acu.nextIsDebug)
@@ -148,12 +160,12 @@ namespace ReikaKalseki.AqueousEngineering {
 			else if (metabolisms.ContainsKey(tt)) {
 				ACUMetabolism am = metabolisms[tt];
 				if (am.isCarnivore)
-					acu.carnivoreCount++;
+					acu.carnivoreCount += am.relativeValue;
 				else
-					acu.herbivoreCount += tt == TechType.Gasopod ? 4 : (tt == TechType.GhostRayRed || tt == TechType.GhostRayBlue ? 3 : 2);
+					acu.herbivoreCount += am.relativeValue;
 				List<BiomeRegions.RegionType> li = new List<BiomeRegions.RegionType>(am.additionalRegions);
 				li.Add(am.primaryRegion);
-				possibleBiomes = new HashSet<BiomeRegions.RegionType>(possibleBiomes.Intersect(li));
+				possibleBiomes.IntersectWith(li);
 				if (acu.nextIsDebug)
 					SNUtil.writeToChat(tt+" > "+am+" > "+string.Join(",", possibleBiomes));
 				//if (possibleBiomes.Count <= 0)
@@ -171,13 +183,13 @@ namespace ReikaKalseki.AqueousEngineering {
 			return null;
 		}
 		
-		internal static HashSet<PlantFood> collectPlants(ACUCallbackSystem.ACUCallback acu, PrefabIdentifier[] plants, ref HashSet<BiomeRegions.RegionType> possibleBiomes) {
+		internal static HashSet<PlantFood> collectPlants(ACUCallbackSystem.ACUCallback acu, PrefabIdentifier[] plants, HashSet<BiomeRegions.RegionType> possibleBiomes) {
 			HashSet<PlantFood> set = new HashSet<PlantFood>();
 			foreach (PrefabIdentifier pi in plants) {
 				if (pi) {
 					if (ediblePlants.ContainsKey(pi.ClassId)) {
 						PlantFood pf = ediblePlants[pi.ClassId];
-						possibleBiomes = new HashSet<BiomeRegions.RegionType>(possibleBiomes.Intersect(pf.regionType));
+						possibleBiomes.IntersectWith(pf.regionType);
 						//if (possibleBiomes.Count <= 0)
 						//	SNUtil.writeToChat("Biome list empty after "+vf+" > "+pf);
 						if (acu.nextIsDebug)
@@ -298,7 +310,7 @@ namespace ReikaKalseki.AqueousEngineering {
 		
 		public abstract class Food {
 			
-			internal readonly float foodValue;
+			public readonly float foodValue;
 			internal readonly HashSet<BiomeRegions.RegionType> regionType = new HashSet<BiomeRegions.RegionType>();
 			
 			internal Food(float f, params BiomeRegions.RegionType[] r) {
@@ -306,13 +318,17 @@ namespace ReikaKalseki.AqueousEngineering {
 				regionType.AddRange(r.ToList());
 			}
 			
-			internal bool isRegion(BiomeRegions.RegionType r) {
+			public bool isRegion(BiomeRegions.RegionType r) {
 				return regionType.Contains(r);
 			}
 			
 			public override string ToString()
 			{
 				return string.Format("[Food FoodValue={0}, BiomeRegions.RegionType=[{1}]]", foodValue, string.Join(",", regionType));
+			}
+			
+			public void addBiome(BiomeRegions.RegionType r) {
+				regionType.Add(r);
 			}
 			
 			internal abstract void consume(Creature c, ACUCallbackSystem.ACUCallback acu, StorageContainer sc, GameObject go);
@@ -330,10 +346,14 @@ namespace ReikaKalseki.AqueousEngineering {
 				item = tt;
 			}
 			
-			static float calculateFoodValue(TechType tt) {
+			public AnimalFood(Spawnable s, float f, params BiomeRegions.RegionType[] r) : base(f, r) {
+				item = s.TechType;
+			}
+			
+			public static float calculateFoodValue(TechType tt) {
 				GameObject go = ObjectUtil.lookupPrefab(SNUtil.getTechType("Cooked"+tt));
 				Eatable ea = go.GetComponent<Eatable>();
-				return ea.foodValue*0.01F; //so a reginald is ~40%
+				return ea ? ea.foodValue*0.01F : 0.2F; //so a reginald is ~40%
 			}
 			
 			internal override void consume(Creature c, ACUCallbackSystem.ACUCallback acu, StorageContainer sc, GameObject go) {
@@ -371,19 +391,21 @@ namespace ReikaKalseki.AqueousEngineering {
 			
 		}
 		
-		private class ACUMetabolism {
+		public class ACUMetabolism {
 			
-			internal readonly bool isCarnivore;
-			internal readonly float metabolismPerSecond;
-			internal readonly float normalizedPoopChance;
-			internal readonly BiomeRegions.RegionType primaryRegion;
+			public readonly float relativeValue;
+			public readonly bool isCarnivore;
+			public readonly float metabolismPerSecond;
+			public readonly float normalizedPoopChance;
+			public readonly BiomeRegions.RegionType primaryRegion;
 			internal readonly HashSet<BiomeRegions.RegionType> additionalRegions = new HashSet<BiomeRegions.RegionType>();
 			
-			internal ACUMetabolism(float mf, float pp, bool isc, BiomeRegions.RegionType r, params BiomeRegions.RegionType[] rr) : this(mf, pp, isc, r, rr.ToList()) {
+			internal ACUMetabolism(float v, float mf, float pp, bool isc, BiomeRegions.RegionType r, params BiomeRegions.RegionType[] rr) : this(v, mf, pp, isc, r, rr.ToList()) {
 				
 			}
 			
-			internal ACUMetabolism(float mf, float pp, bool isc, BiomeRegions.RegionType r, List<BiomeRegions.RegionType> rr) {
+			internal ACUMetabolism(float v, float mf, float pp, bool isc, BiomeRegions.RegionType r, List<BiomeRegions.RegionType> rr) {
+				relativeValue = v;
 				normalizedPoopChance = pp*6;
 				metabolismPerSecond = mf*0.0003F;
 				isCarnivore = isc;
@@ -391,8 +413,12 @@ namespace ReikaKalseki.AqueousEngineering {
 				additionalRegions.AddRange(rr);
 			}
 			
-			internal bool isRegion(BiomeRegions.RegionType r, bool primaryOnly) {
+			public bool isRegion(BiomeRegions.RegionType r, bool primaryOnly) {
 				return r == primaryRegion || (!primaryOnly && additionalRegions.Contains(r));
+			}
+			
+			public void addBiome(BiomeRegions.RegionType r) {
+				additionalRegions.Add(r);
 			}
 			
 			public override string ToString()
