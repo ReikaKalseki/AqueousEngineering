@@ -238,5 +238,11 @@ namespace ReikaKalseki.AqueousEngineering {
 	   public static void onBaseLoaded(BaseRoot root) {
 	   	BaseRoomSpecializationSystem.instance.recomputeBaseRooms(root);
 	   }
+	   /*
+	   public static void onPDAClosed() {
+			XMLLocale.LocaleEntry e = AqueousEngineeringMod.acuMonitorBlock.locale;
+			PDAManager.PDAPage pp = PDAManager.getPage(e.key+"PDA");
+			pp.relock();
+	   }*/
 	}
 }

@@ -241,6 +241,14 @@ namespace ReikaKalseki.AqueousEngineering {
 			
 			private CachedACUData cache;
 			
+			private bool initialized = false;
+			/*
+			void Update() {
+				if (!initialized && acu) {
+					tick();
+				}
+			}*/
+			
 			internal void setACU(WaterPark w) {
 				if (acu != w) {
 					
@@ -345,7 +353,7 @@ namespace ReikaKalseki.AqueousEngineering {
 				PDAManager.PDAPage pp = PDAManager.getPage(e.key+"PDA");
 				pp.unlock();
 				pp.setPlaceholderValues(e.pda, values, true);
-				pp.show();
+				pp.show(pda => pp.update(AqueousEngineeringMod.acuLocale.getEntry("NotTerminalPDA").desc, true, false));
 			}
 			
 			private string generateContentList() {
@@ -377,6 +385,7 @@ namespace ReikaKalseki.AqueousEngineering {
 			}
 		
 			public void tick() {
+				initialized = true;
 				if (!floor || !lowestSegment) {
 					setACU(null);
 					return;
@@ -540,18 +549,6 @@ namespace ReikaKalseki.AqueousEngineering {
 					currentWarnings.Add(ACUWarnings.MIXEDTHEME);
 				}
 				nextIsDebug = false;
-				
-				checkUpdateText();
-			}
-		
-			private void checkUpdateText() {
-				if (DIHooks.isWorldLoaded() && Player.main.GetPDA().isOpen) {
-					uGUI_EncyclopediaTab tab = ((uGUI_EncyclopediaTab)Player.main.GetPDA().ui.tabs[PDATab.Encyclopedia]);
-					if (tab) {
-						if (tab.activeEntry && tab.activeEntry.key == AqueousEngineeringMod.acuMonitorBlock.locale.key+"PDA")
-							printTerminalInfo();
-					}
-				}
 			}
 		}
 		

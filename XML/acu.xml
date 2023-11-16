@@ -1,4 +1,17 @@
 <Root>
+	<NotTerminalPDA>
+		<name>
+			
+		</name>
+		<desc>
+			&lt;b&gt;No Data Found.&lt;/b&gt;
+			
+			Open a data terminal attached to an ACU to view ACU Status information.
+		</desc>
+		<pda>
+			
+		</pda>
+	</NotTerminalPDA>
 	<NOPLANTS>
 		<name>
 			
