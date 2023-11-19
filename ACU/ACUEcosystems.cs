@@ -27,6 +27,7 @@ namespace ReikaKalseki.AqueousEngineering {
 		
 		 private static readonly Dictionary<TechType, ACUMetabolism> metabolisms = new Dictionary<TechType, ACUMetabolism>() {
 			{TechType.RabbitRay, new ACUMetabolism(2F, 0.2F, 0.2F, false, BiomeRegions.Shallows)},
+			{TechType.Crash, new ACUMetabolism(1.0F, 0.1F, 0.8F, true, BiomeRegions.Shallows)},
 			{TechType.Biter, new ACUMetabolism(0.5F, 0.2F, 0.4F, true, BiomeRegions.RedGrass, BiomeRegions.Other)},
 			{TechType.Blighter, new ACUMetabolism(0.33F, 0.1F, 0.2F, true, BiomeRegions.BloodKelp)},
 			{TechType.Gasopod, new ACUMetabolism(4F, 1F, 0.8F, false, BiomeRegions.Shallows, BiomeRegions.Other)},

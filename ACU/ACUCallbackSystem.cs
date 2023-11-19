@@ -27,9 +27,11 @@ namespace ReikaKalseki.AqueousEngineering {
 		private static readonly Dictionary<TechType, float> toyValues = new Dictionary<TechType, float>();
 		
 		static ACUCallbackSystem() {
-			addStalkerToy(TechType.Titanium, 0.5F);
-			addStalkerToy(TechType.ScrapMetal, 1F);
-			addStalkerToy(TechType.Silver, 2F);
+			addStalkerToy(TechType.Titanium, 0.1F);
+			addStalkerToy(TechType.ScrapMetal, 0.25F);
+			addStalkerToy(TechType.Silver, 0.5F);
+			addStalkerToy(TechType.Gold, 0.75F);
+			addStalkerToy(AqueousEngineeringMod.toy.TechType, 1.5F);
 		}
 		
 		public static void addStalkerToy(TechType tt, float amt) {
@@ -235,19 +237,12 @@ namespace ReikaKalseki.AqueousEngineering {
 			internal bool nextIsDebug = false;
 			
 			internal float lastThemeUpdate;
+			internal bool appliedTheme;
 			
 			private GameObject bubbleVents;
 			private ParticleSystem[] ventBubbleEmitters;
 			
 			private CachedACUData cache;
-			
-			private bool initialized = false;
-			/*
-			void Update() {
-				if (!initialized && acu) {
-					tick();
-				}
-			}*/
 			
 			internal void setACU(WaterPark w) {
 				if (acu != w) {
@@ -385,7 +380,6 @@ namespace ReikaKalseki.AqueousEngineering {
 			}
 		
 			public void tick() {
-				initialized = true;
 				if (!floor || !lowestSegment) {
 					setACU(null);
 					return;
@@ -415,6 +409,7 @@ namespace ReikaKalseki.AqueousEngineering {
 				List<WaterParkCreature> foodFish = new List<WaterParkCreature>();
 				List<Stalker> stalkers = new List<Stalker>();
 				stalkerToyValue = 0;
+				bool hasStalkerToy = false;
 				bool acuRoom = BaseRoomSpecializationSystem.instance.getSavedType(acu) == BaseRoomSpecializationSystem.RoomTypes.ACU;
 				foreach (WaterParkItem wp in new List<WaterParkItem>(acu.items)) {
 					if (!wp)
@@ -422,6 +417,7 @@ namespace ReikaKalseki.AqueousEngineering {
 					Pickupable pp = wp.gameObject.GetComponentInChildren<Pickupable>();
 					TechType tt = pp ? pp.GetTechType() : TechType.None;
 					if (isStalkerToy(tt)) {
+						hasStalkerToy |= tt == AqueousEngineeringMod.toy.TechType;
 						stalkerToyValue += toyValues[tt];
 						pp.gameObject.transform.localScale = Vector3.one*0.5F;
 					}
@@ -514,24 +510,28 @@ namespace ReikaKalseki.AqueousEngineering {
 						}
 					}
 				}
-				if (teeth < 6 && consistent && healthy && potentialBiomes.Contains(BiomeRegions.Kelp)) {
+				if (consistent && healthy && potentialBiomes.Contains(BiomeRegions.Kelp)) {
 					bool single = potentialBiomes.Count == 1;
 					foreach (Stalker s in stalkers) {
-						float f = dT*Mathf.Min(8, stalkerToyValue)*0.00012F*(1+2*s.Happy.Value)*(single ? 1 : 0.2F);
-						//SNUtil.writeToChat(s.Happy.Value+" x "+stalkerToyValue+" > "+f);
-						if (UnityEngine.Random.Range(0F, 1F) < f) {
-							//do not use, so can have ref to GO; reimplement // s.LoseTooth();
-							GameObject go = UnityEngine.Object.Instantiate<GameObject>(s.toothPrefab);
-							//SNUtil.writeToChat(s+" > "+go);
-							go.transform.position = s.loseToothDropLocation.transform.position;
-							go.transform.rotation = s.loseToothDropLocation.transform.rotation;
-							if (go.activeSelf && s.isActiveAndEnabled) {
-								foreach (Collider c in go.GetComponentsInChildren<Collider>())
-									Physics.IgnoreCollision(s.stalkerBodyCollider, c);
+						if (hasStalkerToy)
+							s.Happy.Add(dT*0.05F);
+						if (teeth < 6) {
+							float f = dT*Mathf.Min(8, stalkerToyValue)*0.00012F*(1+2*s.Happy.Value)*(single ? 1 : 0.2F);
+							//SNUtil.writeToChat(s.Happy.Value+" x "+stalkerToyValue+" > "+f);
+							if (UnityEngine.Random.Range(0F, 1F) < f) {
+								//do not use, so can have ref to GO; reimplement // s.LoseTooth();
+								GameObject go = UnityEngine.Object.Instantiate<GameObject>(s.toothPrefab);
+								//SNUtil.writeToChat(s+" > "+go);
+								go.transform.position = s.loseToothDropLocation.transform.position;
+								go.transform.rotation = s.loseToothDropLocation.transform.rotation;
+								if (go.activeSelf && s.isActiveAndEnabled) {
+									foreach (Collider c in go.GetComponentsInChildren<Collider>())
+										Physics.IgnoreCollision(s.stalkerBodyCollider, c);
+								}
+								Utils.PlayFMODAsset(s.loseToothSound, go.transform, 8f);
+								LargeWorldEntity.Register(go);
+								acu.AddItem(go.GetComponent<Pickupable>());
 							}
-							Utils.PlayFMODAsset(s.loseToothSound, go.transform, 8f);
-							LargeWorldEntity.Register(go);
-							acu.AddItem(go.GetComponent<Pickupable>());
 						}
 					}
 				}
@@ -543,7 +543,7 @@ namespace ReikaKalseki.AqueousEngineering {
 						theme = BiomeRegions.Shallows;
 					bool changed = theme != currentTheme;
 					currentTheme = theme;
-					ACUTheming.updateACUTheming(this, theme, time, changed || time-lastThemeUpdate > 5);
+					ACUTheming.updateACUTheming(this, theme, time, changed || time-lastThemeUpdate > 5 || !appliedTheme);
 				}
 				else if (potentialBiomes.Count > 1) {
 					currentWarnings.Add(ACUWarnings.MIXEDTHEME);

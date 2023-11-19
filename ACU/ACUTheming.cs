@@ -234,6 +234,7 @@ namespace ReikaKalseki.AqueousEngineering {
 				return;
 			
 			acu.lastThemeUpdate = time;
+			acu.appliedTheme = true;
 				
 			if (floorTextures.ContainsKey(theme)) {
 				Renderer r = acu.floor.GetComponentInChildren<Renderer>();

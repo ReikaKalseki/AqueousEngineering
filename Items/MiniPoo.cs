@@ -15,7 +15,7 @@ namespace ReikaKalseki.AqueousEngineering {
 	
 	public class MiniPoo : Spawnable {
 		
-		public MiniPoo(XMLLocale.LocaleEntry e) : base("MiniPoop", e.name, e.desc) {
+		public MiniPoo(XMLLocale.LocaleEntry e) : base(e.key, e.name, e.desc) {
 			OnFinishedPatching += () => {ItemRegistry.instance.addItem(this);};
 		}
 		

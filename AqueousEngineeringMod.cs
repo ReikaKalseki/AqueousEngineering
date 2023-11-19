@@ -53,6 +53,7 @@ namespace ReikaKalseki.AqueousEngineering
     public static OutdoorPot outdoorCompositePot;
     
     public static MiniPoo poo;
+    public static StalkerToy toy;
     
     public static HolographicControl seabaseStasisControl;
     public static HolographicControl seabaseSonarControl;
@@ -62,7 +63,8 @@ namespace ReikaKalseki.AqueousEngineering
     
     public static readonly WorldgenDatabase worldgen = new WorldgenDatabase();
     
-    public static readonly XMLLocale locale = new XMLLocale(modDLL, "XML/locale.xml");
+    public static readonly XMLLocale itemLocale = new XMLLocale(modDLL, "XML/items.xml");
+    public static readonly XMLLocale machineLocale = new XMLLocale(modDLL, "XML/machines.xml");
     public static readonly XMLLocale roomLocale = new XMLLocale(modDLL, "XML/rooms.xml");
     public static readonly XMLLocale acuLocale = new XMLLocale(modDLL, "XML/acu.xml");
 
@@ -93,13 +95,19 @@ namespace ReikaKalseki.AqueousEngineering
         
         CustomPrefab.addPrefabNamespace("ReikaKalseki.AqueousEngineering");
         
-        locale.load();
+        itemLocale.load();
+        machineLocale.load();
         roomLocale.load();
         acuLocale.load();
         
-        poo = new MiniPoo(locale.getEntry("MiniPoop"));
+        poo = new MiniPoo(itemLocale.getEntry("MiniPoop"));
 	    poo.Patch();
 		BioReactorHandler.Main.SetBioReactorCharge(poo.TechType, BaseBioReactor.GetCharge(TechType.SeaTreaderPoop)/4);
+		
+        toy = new StalkerToy(itemLocale.getEntry("StalkerToy"));
+        toy.addIngredient(TechType.Hoopfish, 1);
+        toy.addIngredient(TechType.Titanium, 2);
+	    toy.Patch();
 	    
 	    seabaseStasisControl = new HolographicControl("SeabaseStasis", "Fire stasis pulse", fireStasisPulses, btn => machineExists<BaseStasisTurretLogic>(btn));
 	    seabaseStasisControl.setIcons("Textures/HoloButtons/StasisButton", 200).Patch();
@@ -162,7 +170,7 @@ namespace ReikaKalseki.AqueousEngineering
        	int count = 0;
        	foreach (TechnologyFragment f in repairBeaconFragments) {
        		count += worldgen.getCount(f.fragmentPrefab.ClassID);
-	    	f.fragmentPrefab.setDisplayName(locale.getEntry("BaseRepairBeacon").getField<string>("frag"));
+	    	f.fragmentPrefab.setDisplayName(machineLocale.getEntry("BaseRepairBeacon").getField<string>("frag"));
        	}
 		SNUtil.log("Found "+count+" "+repairBlock.ClassID+" fragments to use", modDLL);
        	PDAHandler.EditFragmentsToScan(GenUtil.getFragment(repairBlock.TechType, 0).TechType, count);
@@ -184,10 +192,11 @@ namespace ReikaKalseki.AqueousEngineering
         TechnologyUnlockSystem.instance.addDirectUnlock(TechType.Beacon, beaconBlock.TechType);
         TechnologyUnlockSystem.instance.addDirectUnlock(poo.TechType, acuCleanerBlock.TechType);
         TechnologyUnlockSystem.instance.addDirectUnlock(TechType.BaseWaterPark, acuMonitorBlock.TechType);
+        TechnologyUnlockSystem.instance.addDirectUnlock(TechType.BaseWaterPark, toy.TechType);
         TechnologyUnlockSystem.instance.addDirectUnlock(TechType.BaseMapRoom, cameraAntennaBlock.TechType);
         //TechnologyUnlockSystem.instance.addDirectUnlock(TechType.StasisRifle, stasisBlock.TechType);
         
-        XMLLocale.LocaleEntry e = locale.getEntry("BaseACUMonitor");
+        XMLLocale.LocaleEntry e = machineLocale.getEntry("BaseACUMonitor");
         PDAManager.PDAPage page = PDAManager.createPage(e.key+"PDA", e.getField<string>("pdatitle"), e.pda, e.getField<string>("category"));
         page.register();
         
@@ -251,7 +260,7 @@ namespace ReikaKalseki.AqueousEngineering
     }
     
     private static M createMachine<M, N>(string lck) where N : CustomMachineLogic where M : CustomMachine<N> {
-    	XMLLocale.LocaleEntry e = locale.getEntry(lck);
+    	XMLLocale.LocaleEntry e = machineLocale.getEntry(lck);
     	M m = (M)Activator.CreateInstance(typeof(M), e);
         m.Patch();
         if (!string.IsNullOrEmpty(e.pda))
@@ -270,6 +279,14 @@ namespace ReikaKalseki.AqueousEngineering
 		else {
 			RecipeUtil.addIngredient(repellentBlock.TechType, TechType.SeamothElectricalDefense, 1);
 			RecipeUtil.addIngredient(stasisBlock.TechType, TechType.StasisRifle, 1);
+		}
+		    	
+		Spawnable platinum = ItemRegistry.instance.getItem("PLATINUM");
+		if (platinum != null) {
+			RecipeUtil.addIngredient(toy.TechType, platinum.TechType, 1);
+		}
+		else {
+			RecipeUtil.addIngredient(toy.TechType, TechType.Silver, 1);
 		}
 		
 		Spawnable luminol = ItemRegistry.instance.getItem("Luminol");
