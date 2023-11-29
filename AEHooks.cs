@@ -32,6 +32,7 @@ namespace ReikaKalseki.AqueousEngineering {
 	    	DIHooks.inventoryClosedEvent += onInvClosed;
 	    	DIHooks.onBaseLoadedEvent += onBaseLoaded;
 	    	DIHooks.constructabilityEvent += enforceACUBuildability;
+	    	DIHooks.gravTrapAttemptEvent += gravTryAttract;
 	    	DIHooks.onSkyApplierSpawnEvent += onSkyApplierSpawn;
 	    	DIHooks.onPlayerTickEvent += tickPlayer;
 	    	DIHooks.getFoodRateEvent += affectFoodRate;
@@ -144,6 +145,14 @@ namespace ReikaKalseki.AqueousEngineering {
 	   			check.placeable &= check.placeOn && (ObjectUtil.isRoom(check.placeOn.gameObject, false) || ObjectUtil.isMoonpool(check.placeOn.gameObject, false, false));
 				check.ignoreSpaceRequirements = false;
 		   	}
+	   		else if (Builder.constructableTechType == AqueousEngineeringMod.powerRelayBlock.TechType) {
+	   			check.placeable = !check.placeOn;
+				check.ignoreSpaceRequirements = true;
+		   	}
+	   		else if (Builder.constructableTechType == AqueousEngineeringMod.atpTapBlock.TechType) {
+	   			check.placeable = check.placeOn && ATPTapLogic.isValidSourceObject(check.placeOn.gameObject);
+				check.ignoreSpaceRequirements = true;
+		   	}
 	    }
 	   /*
 	   public static bool onRedundantScan() {
@@ -244,5 +253,19 @@ namespace ReikaKalseki.AqueousEngineering {
 			PDAManager.PDAPage pp = PDAManager.getPage(e.key+"PDA");
 			pp.relock();
 	   }*/
+	    
+	    public static void gravTryAttract(DIHooks.GravTrapGrabAttempt h) {
+		   	if (h.gravtrap.GetComponent<ItemCollector.ItemCollectorLogic>()) {
+	   			h.allowGrab &= ItemCollector.ItemCollectorLogic.canGrab(h.target);
+		   	}
+	    }
+		
+		public static void onTakeDamage(DIHooks.DamageToDeal dmg) {
+		   	if (dmg.type == DamageType.Heat) {
+				PrefabIdentifier pi = dmg.target.GetComponent<PrefabIdentifier>();
+				if (pi && pi.ClassId == AqueousEngineeringMod.collector.ClassID)
+					dmg.setValue(0);
+		   	}
+		}
 	}
 }

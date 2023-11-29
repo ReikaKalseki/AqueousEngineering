@@ -48,6 +48,14 @@ namespace ReikaKalseki.AqueousEngineering {
 			//r.materials[0].SetFloat("_Fresnel", 0.6F);
 			//r.materials[0].SetFloat("_SpecInt", 8F);
 			
+			Constructable c = go.GetComponent<Constructable>();
+			c.allowedOnWall = true;
+			c.allowedOutside = true;
+			c.allowedOnCeiling = true;
+			c.allowedOnGround = true;
+			c.allowedOnConstructables = true;
+			c.forceUpright = false;
+			
 			ObjectUtil.removeChildObject(go, "model/root/head");
 			ObjectUtil.removeChildObject(go, "UI/Canvas/temperatureBar");
 		}
@@ -58,7 +66,7 @@ namespace ReikaKalseki.AqueousEngineering {
 		
 		internal static readonly SoundManager.SoundData workingSound = SoundManager.registerSound(AqueousEngineeringMod.modDLL, "atptap", "Sounds/atptap.ogg", SoundManager.soundMode3D);
 		
-		private bool hasCable;
+		private GameObject powerSource;
 		
 		private ThermalPlant thermalComponent;
 		
@@ -66,13 +74,23 @@ namespace ReikaKalseki.AqueousEngineering {
 		
 		private float lastSound = -1;
 		
-		private static readonly HashSet<string> cableObjects = new HashSet<string>(){
+		private static readonly HashSet<string> validObjects = new HashSet<string>(){
+			//cables
 			"31f84eba-d435-438c-a58e-f3f7bae8bfbd",
 			"69cd7462-7cd2-456c-bfff-50903c391737",
 			"94933bb3-0587-4e8d-a38d-b7ec4c859b1a",
 			"37f07c77-ac44-4246-9f53-1d186fb99921",
 			"2334eec8-0968-4e0f-8441-25e0f76fc6b6",
+			
+			//sanctuaries
+			"640f57a6-6436-4132-a9bb-d914f3e19ef5", //pillars with light column, used as spotlights
+			
 		};
+		
+		public static bool isValidSourceObject(GameObject go) {
+			PrefabIdentifier pi = go.FindAncestor<PrefabIdentifier>();
+			return pi && validObjects.Contains(pi.ClassId);
+		}
 		
 		private static readonly Vector3 drfLocation = new Vector3(-248, -800, 281);
 		
@@ -100,7 +118,7 @@ namespace ReikaKalseki.AqueousEngineering {
 			thermalComponent.enabled = false;
 			thermalComponent.CancelInvoke();
 					
-			if (hasCable && getBuildable().constructed && DayNightCycle.main.timePassedAsFloat-lastSound >= 6.2F) {
+			if (powerSource && getBuildable().constructed && DayNightCycle.main.timePassedAsFloat-lastSound >= 6.2F) {
 				lastSound = DayNightCycle.main.timePassedAsFloat;
 				SoundManager.playSoundAt(workingSound, transform.position);
 			}
@@ -111,21 +129,24 @@ namespace ReikaKalseki.AqueousEngineering {
 		}
 		
 		private void tryFindCable() {
-			hasCable = false;
+			powerSource = null;
 			if (Vector3.Distance(transform.position, drfLocation) <= 200) {
 				return; //those cables are dead
 			}
-			hasCable = WorldUtil.areAnyObjectsNear(transform.position, 4, isValidCable);
-			setEmissiveStates(hasCable);
+			powerSource = WorldUtil.areAnyObjectsNear(transform.position, 4, isValidCable);
+			setEmissiveStates((bool)powerSource);
 		}
 		
 		private bool isValidCable(GameObject go) {
+			PrecursorTeleporter pt = go.GetComponent<PrecursorTeleporter>();
+			if (pt)
+				return pt.isOpen;
 			PrefabIdentifier pi = go.GetComponent<PrefabIdentifier>();
-			return pi && cableObjects.Contains(pi.classId);
+			return pi && validObjects.Contains(pi.classId);
 		}
 		
 		private void AddPower() {
-			if (this.getBuildable().constructed && hasCable) {
+			if (powerSource && this.getBuildable().constructed) {
 				//float trash = 0f;
 				//thermalComponent.powerSource.AddEnergy(25, out trash);
 				SubRoot sub = getSub();

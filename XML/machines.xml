@@ -343,6 +343,28 @@
 			See ACU information
 		</tooltip>
 	</BaseACUMonitor>
+	<BaseFloatingPowerRelay>
+		<name>
+			Floating Power Transmitter
+		</name>
+		<desc>
+			Extends the range of a power source. Does not need to be connected to a wall.
+		</desc>
+		<pda>
+			
+		</pda>
+	</BaseFloatingPowerRelay>
+	<ItemCollector>
+		<name>
+			Item Collector
+		</name>
+		<desc>
+			Expands upon the gravtrap technology to automatically collect the items it catches as well. Is constructed to be highly heat-resistant.
+		</desc>
+		<pda>
+			
+		</pda>
+	</ItemCollector>
 	<Name>
 		<name>
 			

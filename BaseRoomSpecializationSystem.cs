@@ -361,7 +361,7 @@ namespace ReikaKalseki.AqueousEngineering {
 				decoRating += windows*getWindowDecoValue(bb, bc, hasGlassRoof); //windows, rating is base location dependent
 			//SNUtil.writeToChat("Room at "+bc.transform.position+" has options "+options.toDebugString()+" & deco value "+decoRating+" ("+plantPanels+"/"+windows+"*"+getWindowDecoValue(bb, bc, hasGlassRoof)+")");
 			bool large = isLargeRoom(bc);
-			int lockerThresh = large ? 6 : 3;
+			int lockerThresh = large ? 8 : 5;
 			if (lockerCount >= lockerThresh) { //do before leisure/agri are removed
 				options.Add(RoomTypes.STORAGE);
 				if (options.Count == Enum.GetValues(typeof(RoomTypes)).Length) { //if only lockers + other generics, will not have any filtering

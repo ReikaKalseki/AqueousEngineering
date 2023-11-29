@@ -47,6 +47,7 @@ namespace ReikaKalseki.AqueousEngineering
     public static BaseDrillableGrinder grinderBlock;
     public static RepairBeacon repairBlock;
     public static RoomDataDisplay roomDataBlock;
+    public static FloatingPowerRelay powerRelayBlock;
     
     public static OutdoorPot outdoorBasicPot;
     public static OutdoorPot outdoorChicPot;
@@ -54,6 +55,7 @@ namespace ReikaKalseki.AqueousEngineering
     
     public static MiniPoo poo;
     public static StalkerToy toy;
+    public static ItemCollector collector;
     
     public static HolographicControl seabaseStasisControl;
     public static HolographicControl seabaseSonarControl;
@@ -109,6 +111,9 @@ namespace ReikaKalseki.AqueousEngineering
         toy.addIngredient(TechType.Titanium, 2);
 	    toy.Patch();
 	    
+        collector = new ItemCollector(machineLocale.getEntry("ItemCollector")); //deliberately under machine locale for site
+	    collector.Patch();
+	    
 	    seabaseStasisControl = new HolographicControl("SeabaseStasis", "Fire stasis pulse", fireStasisPulses, btn => machineExists<BaseStasisTurretLogic>(btn));
 	    seabaseStasisControl.setIcons("Textures/HoloButtons/StasisButton", 200).Patch();
 	    seabaseSonarControl = new HolographicControl("SeabaseSonar", "Toggle sonar", btn => toggleMachines<BaseSonarPingerLogic>(btn), btn => machineExists<BaseSonarPingerLogic>(btn));
@@ -133,6 +138,7 @@ namespace ReikaKalseki.AqueousEngineering
 	    controlsBlock = createMachine<BaseControlPanel, BaseControlPanelLogic>("BaseControlPanel");
 	    grinderBlock = createMachine<BaseDrillableGrinder, BaseDrillableGrinderLogic>("BaseDrillableGrinder");
 	    roomDataBlock = createMachine<RoomDataDisplay, RoomDataDisplayLogic>("BaseRoomDataDisplay");
+	    powerRelayBlock = createMachine<FloatingPowerRelay, FloatingPowerRelayLogic>("BaseFloatingPowerRelay");
 	    string[] li = VanillaFlora.MUSHROOM_BUMP.getPrefabs(true, true).ToArray();
 	    repairBeaconFragments = new TechnologyFragment[li.Length-2];
 	    for (int i = 1; i < li.Length-1; i++) { //only idx 1,2,3 since 0 is rotated and tall and 4 has a light and is just 3 anyway
@@ -194,7 +200,11 @@ namespace ReikaKalseki.AqueousEngineering
         TechnologyUnlockSystem.instance.addDirectUnlock(TechType.BaseWaterPark, acuMonitorBlock.TechType);
         TechnologyUnlockSystem.instance.addDirectUnlock(TechType.BaseWaterPark, toy.TechType);
         TechnologyUnlockSystem.instance.addDirectUnlock(TechType.BaseMapRoom, cameraAntennaBlock.TechType);
+        TechnologyUnlockSystem.instance.addDirectUnlock(TechType.PowerTransmitter, powerRelayBlock.TechType);
         //TechnologyUnlockSystem.instance.addDirectUnlock(TechType.StasisRifle, stasisBlock.TechType);
+        //TechnologyUnlockSystem.instance.addDirectUnlock(TechType.Gravsphere, collector.TechType);
+        
+        StoryHandler.instance.registerTrigger(new TechTrigger(TechType.Gravsphere), new TechUnlockEffect(collector.TechType, 1, 10));
         
         XMLLocale.LocaleEntry e = machineLocale.getEntry("BaseACUMonitor");
         PDAManager.PDAPage page = PDAManager.createPage(e.key+"PDA", e.getField<string>("pdatitle"), e.pda, e.getField<string>("category"));
@@ -304,10 +314,12 @@ namespace ReikaKalseki.AqueousEngineering
 			RecipeUtil.addIngredient(acuCleanerBlock.TechType, motor.TechType, 1);
 			RecipeUtil.addIngredient(farmerBlock.TechType, motor.TechType, 2);
 			RecipeUtil.addIngredient(grinderBlock.TechType, motor.TechType, 5);
+			RecipeUtil.addIngredient(collector.TechType, motor.TechType, 1);
 		}
 		else {
 			RecipeUtil.addIngredient(acuCleanerBlock.TechType, TechType.Lubricant, 2);
 			RecipeUtil.addIngredient(farmerBlock.TechType, TechType.Lubricant, 5);
+			RecipeUtil.addIngredient(collector.TechType, TechType.AdvancedWiringKit, 1);
 		}
 		
 		Spawnable plating = ItemRegistry.instance.getItem("HullPlating");
