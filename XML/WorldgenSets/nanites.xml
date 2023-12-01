@@ -250,4 +250,56 @@
       <z>1221.85</z>
     </position>
   </generator>
+  <customprefab>
+    <prefab>fragment_11502_0</prefab>
+    <position>
+      <x>-897.728210449219</x>
+      <y>-435.459442138672</y>
+      <z>-1424.32604980469</z>
+    </position>
+    <rotation>
+      <x>19.4275512695313</x>
+      <y>339.602478027344</y>
+      <z>321.887420654297</z>
+      <quaternion>
+        <x>0.213941842317581</x>
+        <y>-0.110742464661598</y>
+        <z>-0.288492977619171</z>
+        <w>0.926680505275726</w>
+      </quaternion>
+    </rotation>
+    <scale>
+      <x>1</x>
+      <y>1</y>
+      <z>1</z>
+    </scale>
+    <xmlID>5e640699-32a6-45c3-a296-7256271857cd</xmlID>
+    <tech>fragment_11502_0</tech>
+  </customprefab>
+  <customprefab>
+    <prefab>fragment_11502_1</prefab>
+    <position>
+      <x>-1224.0302734375</x>
+      <y>-335.122161865234</y>
+      <z>-385.241973876953</z>
+    </position>
+    <rotation>
+      <x>9.00008010864258</x>
+      <y>137.999725341797</y>
+      <z>24.1999473571777</z>
+      <quaternion>
+        <x>0.222584873437881</x>
+        <y>0.904130578041077</y>
+        <z>0.00326818972826004</z>
+        <w>0.364682406187058</w>
+      </quaternion>
+    </rotation>
+    <scale>
+      <x>1</x>
+      <y>1</y>
+      <z>1</z>
+    </scale>
+    <xmlID>15ce07c3-7b40-478f-8698-bef8831012a5</xmlID>
+    <tech>fragment_11502_0</tech>
+  </customprefab>
 </Root>

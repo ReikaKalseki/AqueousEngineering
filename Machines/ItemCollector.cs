@@ -67,9 +67,9 @@ namespace ReikaKalseki.AqueousEngineering
 			
 			private readonly List<StorageContainer> targetInventories = new List<StorageContainer>();
 			
-			internal static bool canGrab(Rigidbody rb) {
-				Pickupable pp = rb.GetComponent<Pickupable>();
-				return (pp && pp.isPickupable && !pp.attached) || rb.GetComponent<BreakableResource>();
+			internal static bool canGrab(GameObject go) {
+				Pickupable pp = go.GetComponent<Pickupable>();
+				return (pp && pp.isPickupable && !pp.attached) || go.GetComponent<BreakableResource>();
 			}
 			
 			void Update() {

@@ -148,6 +148,9 @@ namespace ReikaKalseki.AqueousEngineering {
 			
 			decoRatings["0fbf203a-a940-4b6e-ac63-0fe2737d84c2"] = 0.25F; //chic pot
 			
+			decoRatings["ResourceMonitorBuildableSmall"] = 0.05F;
+			decoRatings["ResourceMonitorBuildableLarge"] = 0.1F;
+			
 			//FCS
 			decoRatings["NeonPlanter"] = 0.5F;
 			decoRatings["FireExtinguisherRefueler"] = -0.25F;

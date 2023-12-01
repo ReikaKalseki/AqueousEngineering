@@ -53,7 +53,7 @@
 			Ampeel Antenna
 		</name>
 		<desc>
-			Draws small amounts of power from passing ampeels to maintain power in a seabase. Most effective at short range. Not capable of sustaining high power loads.
+			Draws small amounts of power from passing ampeels to maintain power in a seabase. Most effective at short range. Not capable of sustaining high power loads. Can also be placed in an ACU containing ampeels, with a significantly reduced effect.
 		</desc>
 		<pda>
 			

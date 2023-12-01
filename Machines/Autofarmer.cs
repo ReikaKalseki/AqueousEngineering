@@ -92,8 +92,7 @@ namespace ReikaKalseki.AqueousEngineering {
 		
 		protected override void updateEntity(float seconds) {
 			if (!effect) {
-				GameObject go = ObjectUtil.createWorldObject("d11dfcc3-bce7-4870-a112-65a5dab5141b", true, false);
-				go.SetActive(false);
+				GameObject go = ObjectUtil.lookupPrefab("d11dfcc3-bce7-4870-a112-65a5dab5141b");
 				go = go.GetComponent<Gravsphere>().vfxPrefab;
 				go = UnityEngine.Object.Instantiate(go);
 				effect = go.GetComponent<VFXElectricLine>();
