@@ -64,7 +64,7 @@ namespace ReikaKalseki.AqueousEngineering {
 			addFood(new PlantFood(VanillaFlora.CREEPVINE, 0.15F, BiomeRegions.Kelp));
 			addFood(new PlantFood(VanillaFlora.CREEPVINE_FERTILE, 0.25F, BiomeRegions.Kelp));
 			addFood(new PlantFood(VanillaFlora.BLOOD_KELP, 0.25F, BiomeRegions.BloodKelp));
-			addFood(new PlantFood(VanillaFlora.JELLYSHROOM, 0.25F, BiomeRegions.Jellyshroom));
+			addFood(new PlantFood(VanillaFlora.JELLYSHROOM_SMALL, 0.25F, BiomeRegions.Jellyshroom));
 			addFood(new PlantFood(VanillaFlora.EYE_STALK, 0.15F, BiomeRegions.Other));
 			addFood(new PlantFood(VanillaFlora.GABE_FEATHER, 0.15F, BiomeRegions.BloodKelp, BiomeRegions.Other));
 			addFood(new PlantFood(VanillaFlora.GHOSTWEED, 0.25F, BiomeRegions.LostRiver));
