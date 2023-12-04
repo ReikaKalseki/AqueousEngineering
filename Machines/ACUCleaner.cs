@@ -129,6 +129,7 @@ namespace ReikaKalseki.AqueousEngineering {
 							InventoryItem ii = getStorage().container.AddItem(pp);
 							if (ii != null) {
 								connectedACU.RemoveItem(pp);
+								pp.PlayPickupSound();
 								pp.gameObject.SetActive(false);
 								break;
 							}

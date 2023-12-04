@@ -127,7 +127,7 @@ namespace ReikaKalseki.AqueousEngineering {
 						foreach (VehicleDockingBay dock in docks) {
 							Vehicle v = dock.dockedVehicle;
 							if (v)
-								docked.Add(v);
+								docked.Add(v);	
 						}
 						vehicleString = docked.Count == 0 ? "No docked vehicles" : "Docked Vehicles: "+string.Join(", ", docked.Select<Vehicle, string>(v => v.GetName()));
 					}
@@ -138,7 +138,7 @@ namespace ReikaKalseki.AqueousEngineering {
 		}
 		
 		private string generateBeaconLabel(SubRoot sub) {
-			string loc = "Location: "+BiomeBase.getBiome(transform.position).displayName+" ("+(int)Ocean.main.GetDepthOf(gameObject)+"m)";
+			string loc = "Location: "+WorldUtil.getRegionalDescription(transform.position);
 			string pw = "Power: "+sub.powerRelay.GetPower().ToString("##.0")+"/"+sub.powerRelay.GetMaxPower()+" ("+sub.powerRelay.powerStatus+")";
 			string ret = loc+"\n"+pw;
 			if (!string.IsNullOrEmpty(vehicleString))
