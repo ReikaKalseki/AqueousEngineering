@@ -210,11 +210,54 @@ namespace ReikaKalseki.AqueousEngineering {
 			MIXEDTHEME,
 		}
 		
+		internal class ACUContentView : StorageContainer {
+			
+			private ACUCallback controller;
+			
+			internal void setController(ACUCallback acu) {
+				controller = acu;
+				container = new ACUContainerRelay(acu);
+			}
+			
+			void Update() {
+				((ACUContainerRelay)container).tick();
+			}
+			
+		}
+		
+		internal class ACUContainerRelay : ItemsContainer {
+			
+			private readonly ACUCallback controller;
+			
+			internal ACUContainerRelay(ACUCallback call) : base(8, 10, call.transform, "ACURelay", null) {
+				controller = call;
+				onRemoveItem += (ii) => {controller.acu.RemoveItem(ii.item.GetComponent<WaterParkItem>());};
+			}
+			
+			internal void tick() {
+				_items.Clear();
+				foreach (WaterParkItem wp in controller.acu.items) {
+					Pickupable pp = wp.GetComponent<Pickupable>();
+					if (pp) {
+						TechType tt = pp.GetTechType();
+						Vector2int sz = CraftData.GetItemSize(tt);
+						ItemGroup grp = _items.ContainsKey(tt) ? _items[tt] : new ItemGroup(_items.Count, sz.x, sz.y);
+						grp.items.Add(new InventoryItem(pp));
+						_items[tt] = grp;
+					}
+				}
+				//SNUtil.writeToChat(_items.toDebugString());
+			}
+			
+		}
+		
 		internal class ACUCallback : MonoBehaviour {
 			
 			internal WaterPark acu;
 			
-			internal StorageContainer sc;
+			internal BaseRoot seabase;
+			internal ACUContentView contentView;
+			internal StorageContainer planter;
 			internal List<WaterParkPiece> column;
 			internal GameObject lowestSegment;
 			internal GameObject floor;
@@ -248,7 +291,11 @@ namespace ReikaKalseki.AqueousEngineering {
 				if (acu != w) {
 					
 					CancelInvoke("tick");
-					sc = null;
+					if (contentView)
+						UnityEngine.Object.Destroy(contentView);
+					contentView = null;
+					planter = null;
+					seabase = null;
 					column = null;
 					decoHolders = null;
 					lowestSegment = null;
@@ -261,13 +308,17 @@ namespace ReikaKalseki.AqueousEngineering {
 						//SNUtil.writeToChat("Setup ACU Hook");
 						SNUtil.log("Switching ACU "+acu+" @ "+acu.transform.position+" to "+this);
 						InvokeRepeating("tick", 0, 1);
-						sc = acu.planter.GetComponentInChildren<StorageContainer>();
+						seabase = acu.GetComponentInParent<BaseRoot>();
+						planter = acu.planter.GetComponentInChildren<StorageContainer>();
 						column = ACUCallbackSystem.instance.getACUComponents(acu);
 						lowestSegment = ACUCallbackSystem.instance.getACUFloor(column);
 						floor = ObjectUtil.getChildObject(lowestSegment, "Large_Aquarium_Room_generic_ground");
 						decoHolders = ObjectUtil.getChildObjects(lowestSegment, ACUTheming.ACU_DECO_SLOT_NAME);
 						bubbleVents = ObjectUtil.getChildObject(lowestSegment, "Bubbles");
 						ventBubbleEmitters = bubbleVents.GetComponentsInChildren<ParticleSystem>();
+						contentView = acu.gameObject.EnsureComponent<ACUContentView>();
+						contentView.enabled = true;
+						contentView.setController(this);
 						load();
 					}
 				}
@@ -396,7 +447,7 @@ namespace ReikaKalseki.AqueousEngineering {
 				potentialBiomes.Clear();
 				potentialBiomes.AddRange(BiomeRegions.getAllBiomes());
 				//SNUtil.writeToChat("SC:"+sc);
-				PrefabIdentifier[] plants = sc.GetComponentsInChildren<PrefabIdentifier>();
+				PrefabIdentifier[] plants = planter.GetComponentsInChildren<PrefabIdentifier>();
 				plantCount = 0;
 				herbivoreCount = 0;
 				carnivoreCount = 0;

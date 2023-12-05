@@ -145,8 +145,22 @@ namespace ReikaKalseki.AqueousEngineering {
 			decoRatings["cb89366d-eac0-4011-8665-fafde75b215c"] = 0.25F; //markiplier
 			decoRatings["f7e26c44-bb28-4979-8f83-76ed529979fc"] = 0.25F; //markiplier
 			decoRatings["c96baff4-0993-4893-8345-adb8709901a7"] = 0.33F; //toy cat
+			decoRatings["7ea4a91e-80fc-43aa-8ce3-5d52bd19e278"] = 0.33F; //"gorge toy"
 			
 			decoRatings["0fbf203a-a940-4b6e-ac63-0fe2737d84c2"] = 0.25F; //chic pot
+			
+			decoRatings["2cee55bc-6136-47c5-a1ed-14c8f3203856"] = 0.5F; //lab parts
+			decoRatings["9c5f22de-5049-48bb-ad1e-0d78c894210e"] = 0.5F; //lab parts
+			decoRatings["3fd9050b-4baf-4a78-a883-e774c648887c"] = 0.75F; //lab parts
+			
+			decoRatings["1faf2b57-ff4f-4ea5-a715-7cc5ff6aae60"] = 0.05F; //lab containers
+			decoRatings["1b0b7f6d-9793-469c-9872-dfe690834fee"] = 0.05F; //lab containers
+			decoRatings["7f601dd4-0645-414d-bb62-5b0b62985836"] = 0.05F; //lab containers
+			decoRatings["a227d6b6-d64c-4bf0-b919-2db02d67d037"] = 0.05F; //lab containers
+			decoRatings["d6389e01-f2cd-4f9d-a495-0867753e44f0"] = 0.05F; //lab containers
+			decoRatings["e7f9c5e7-3906-4efd-b239-28783bce17a5"] = 0.05F; //lab containers
+			
+			decoRatings["a36047b0-1533-4718-8879-d6ba9229c978"] = 1.5F; //large lab glass tube
 			
 			decoRatings["ResourceMonitorBuildableSmall"] = 0.05F;
 			decoRatings["ResourceMonitorBuildableLarge"] = 0.1F;
@@ -496,7 +510,7 @@ namespace ReikaKalseki.AqueousEngineering {
 			return ret;
 		}
 		
-		private float getItemDecoValue(TechType tt) {
+		public float getItemDecoValue(TechType tt) {
 			return itemDecoRatings.ContainsKey(tt) ? itemDecoRatings[tt] : 0;
 		}
 		

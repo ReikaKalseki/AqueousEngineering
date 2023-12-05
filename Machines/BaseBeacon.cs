@@ -37,6 +37,8 @@ namespace ReikaKalseki.AqueousEngineering {
 		public override void initializeMachine(GameObject go) {
 			base.initializeMachine(go);
 			ObjectUtil.removeComponent<PowerRelay>(go);
+			ObjectUtil.removeComponent<PowerFX>(go);
+			ObjectUtil.removeComponent<PowerSystemPreview>(go);
 						
 			BaseBeaconLogic lgc = go.GetComponent<BaseBeaconLogic>();
 			

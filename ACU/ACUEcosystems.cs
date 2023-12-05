@@ -293,7 +293,7 @@ namespace ReikaKalseki.AqueousEngineering {
 				if (acuRoom)
 					f *= 1.5F;
 				//SNUtil.writeToChat(c+" ate > "+f);
-				amt.consume(c, acu, acu.sc, eaten);
+				amt.consume(c, acu, acu.planter, eaten);
 				if (f > 0 && UnityEngine.Random.Range(0F, 1F) < f) {
 					GameObject poo = ObjectUtil.createWorldObject(AqueousEngineeringMod.poo.ClassID);
 					poo.transform.position = c.transform.position+Vector3.down*0.05F;

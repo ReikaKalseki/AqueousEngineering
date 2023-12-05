@@ -88,6 +88,10 @@ namespace ReikaKalseki.AqueousEngineering {
 			AqueousEngineeringMod.powerRelayBlock.initializeMachine(gameObject);
 		}
 		
+		protected override bool needsAttachedBase() {
+			return false;
+		}
+		
 		protected override float getTickRate() {
 			return 0F;
 		}

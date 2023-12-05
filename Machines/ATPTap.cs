@@ -101,6 +101,10 @@ namespace ReikaKalseki.AqueousEngineering {
 			base.InvokeRepeating("AddPower", UnityEngine.Random.value, 1f);
 		}
 		
+		protected override bool needsAttachedBase() {
+			return false;
+		}
+		
 		protected override float getTickRate() {
 			return 0.5F;
 		}
