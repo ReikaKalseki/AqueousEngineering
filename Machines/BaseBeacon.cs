@@ -55,6 +55,7 @@ namespace ReikaKalseki.AqueousEngineering {
 			//go.GetComponent<ConstructableBounds>().bounds.position = new Vector3(1, 1.0F, 0);
 			
 			Beacon b = go.EnsureComponent<Beacon>();
+			b.pickupable = null; //this will cause the beacon to throw an exception, but this is actually good because it skips the rest of the Awake()
 			b.beaconActiveState = true;
 			
 			PingInstance ping = go.EnsureComponent<PingInstance>();

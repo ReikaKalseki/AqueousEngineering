@@ -25,6 +25,7 @@ namespace ReikaKalseki.AqueousEngineering {
 		private static float lastPlayerRoomCheckTime;
 	    
 	    static AEHooks() {
+			SNUtil.log("Initializing AEHooks");
 	    	DIHooks.onWorldLoadedEvent += onWorldLoaded;
 	    	DIHooks.onConstructedEvent += onConstructionComplete;
 	    	DIHooks.onItemPickedUpEvent += onPickup;
@@ -32,7 +33,7 @@ namespace ReikaKalseki.AqueousEngineering {
 	    	DIHooks.knifeHarvestEvent += interceptItemHarvest;
 	    	DIHooks.inventoryClosedEvent += onInvClosed;
 	    	DIHooks.onBaseLoadedEvent += onBaseLoaded;
-	    	DIHooks.constructabilityEvent += enforceACUBuildability;
+	    	DIHooks.constructabilityEvent += enforceBuildability;
 	    	DIHooks.gravTrapAttemptEvent += gravTryAttract;
 	    	DIHooks.onSkyApplierSpawnEvent += onSkyApplierSpawn;
 	    	DIHooks.onPlayerTickEvent += tickPlayer;
@@ -132,7 +133,7 @@ namespace ReikaKalseki.AqueousEngineering {
 			return face && face.gameObject.name.Contains("WaterPark");
 		}
 	    */
-	    public static void enforceACUBuildability(DIHooks.BuildabilityCheck check) {	        
+	    public static void enforceBuildability(DIHooks.BuildabilityCheck check) {	        
 			if (isBuildingACUBuiltBlock()) {
 	   			check.placeable = check.placeOn && check.placeOn.gameObject.FindAncestor<WaterParkPiece>();//isOnACU(check.placeOn && chec);
 				check.ignoreSpaceRequirements = true;
