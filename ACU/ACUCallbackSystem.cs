@@ -214,13 +214,37 @@ namespace ReikaKalseki.AqueousEngineering {
 			
 			private ACUCallback controller;
 			
+			private static readonly Type resourceMonitorLogic = InstructionHandlers.getTypeBySimpleName("ResourceMonitor.Components.ResourceMonitorLogic");
+			
 			internal void setController(ACUCallback acu) {
-				controller = acu;
+				if (controller == acu)
+					return;
+				controller = acu;/*
+				storageRoot = gameObject.EnsureComponent<ChildObjectIdentifier>();
+				storageRoot.ClassId = "ACUFakeInv";
+				storageRoot.id = "";*/
 				container = new ACUContainerRelay(acu);
 			}
 			
 			void Update() {
-				((ACUContainerRelay)container).tick();
+				if (container != null)
+					((ACUContainerRelay)container).tick();
+			}
+			
+			public override void Awake() {
+				creationTime = DayNightCycle.main.timePassedAsFloat; //do not invoke createContainer, which means need to do the below hook manually
+				if (resourceMonitorLogic != null)
+					Invoke("notifyResourceMonitor", 10);
+			}
+			
+			private void notifyResourceMonitor() {
+				//SNUtil.writeToChat("Updating StorageMonitors with ACU "+controller.acu.transform.position);
+				Type t2 = resourceMonitorLogic.Assembly.GetType("ResourceMonitor.Patchers.StorageContainerAwakePatcher");
+				IList li = (IList)t2.GetField("registeredResourceMonitors", BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Static).GetValue(null);
+				MethodInfo call = resourceMonitorLogic.GetMethod("AlertNewStorageContainerPlaced", BindingFlags.Public | BindingFlags.Instance);
+				foreach (var obj in li) {
+					call.Invoke(obj, BindingFlags.Default, null, new object[]{this}, null);
+				}
 			}
 			
 		}

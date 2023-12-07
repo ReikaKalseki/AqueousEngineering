@@ -212,6 +212,8 @@ namespace ReikaKalseki.AqueousEngineering {
 			itemDecoRatings[TechType.PrecursorKey_Purple] = 1.5F;
 			itemDecoRatings[TechType.PrecursorIonPowerCell] = 1.25F;
 			itemDecoRatings[TechType.Kyanite] = 1.5F;
+			itemDecoRatings[TechType.Diamond] = 0.5F;
+			itemDecoRatings[TechType.AluminumOxide] = 0.5F;
 			
 			itemDecoRatings[TechType.Peeper] = 0.05F;
 			itemDecoRatings[TechType.Boomerang] = 0.05F;

@@ -28,6 +28,7 @@ namespace ReikaKalseki.AqueousEngineering {
 	    	DIHooks.onWorldLoadedEvent += onWorldLoaded;
 	    	DIHooks.onConstructedEvent += onConstructionComplete;
 	    	DIHooks.onItemPickedUpEvent += onPickup;
+	    	DIHooks.onDamageEvent += onTakeDamage;
 	    	DIHooks.knifeHarvestEvent += interceptItemHarvest;
 	    	DIHooks.inventoryClosedEvent += onInvClosed;
 	    	DIHooks.onBaseLoadedEvent += onBaseLoaded;
@@ -261,8 +262,8 @@ namespace ReikaKalseki.AqueousEngineering {
 	    }
 		
 		public static void onTakeDamage(DIHooks.DamageToDeal dmg) {
-		   	if (dmg.type == DamageType.Heat) {
-				PrefabIdentifier pi = dmg.target.GetComponent<PrefabIdentifier>();
+		   	if (dmg.type == DamageType.Heat || dmg.type == DamageType.Fire) {
+				PrefabIdentifier pi = dmg.target.FindAncestor<PrefabIdentifier>();
 				if (pi && pi.ClassId == AqueousEngineeringMod.collector.ClassID)
 					dmg.setValue(0);
 		   	}
