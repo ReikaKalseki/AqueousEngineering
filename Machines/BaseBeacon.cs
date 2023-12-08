@@ -18,10 +18,15 @@ namespace ReikaKalseki.AqueousEngineering {
 	
 	public class BaseBeacon : CustomMachine<BaseBeaconLogic> {
 		
+		private readonly SignalManager.ModSignal signal;
+		
 		public BaseBeacon(XMLLocale.LocaleEntry e) : base(e.key, e.name, e.desc, "8949b0da-5173-431f-a989-e621af02f942") {
 			addIngredient(TechType.MapRoomUpgradeScanRange, 1);
 			addIngredient(TechType.Beacon, 1);
 			addIngredient(TechType.LEDLight, 1);
+			
+			signal = SignalManager.createSignal("BaseBeacon", e.name, e.desc, "", "");
+			signal.register(null, TextureManager.getSprite(AqueousEngineeringMod.modDLL, "Textures/base-beacon-marker"), Vector3.zero);
 		}
 
 		public override bool UnlockedAtStart {
@@ -59,7 +64,9 @@ namespace ReikaKalseki.AqueousEngineering {
 			b.beaconActiveState = true;
 			
 			PingInstance ping = go.EnsureComponent<PingInstance>();
-			ping.pingType = PingType.Beacon;
+			ping.pingType = signal.signalType;//PingType.Beacon;
+			PingHandler.RegisterNewPingType("", null);
+			//ping.displayPingInManager = false;
 			ping.colorIndex = 0;
 			ping.origin = go.transform;
 			ping.minDist = 18f;
@@ -142,7 +149,7 @@ namespace ReikaKalseki.AqueousEngineering {
 		
 		private string generateBeaconLabel(SubRoot sub) {
 			string loc = "Location: "+WorldUtil.getRegionalDescription(transform.position);
-			string pw = "Power: "+sub.powerRelay.GetPower().ToString("##.0")+"/"+sub.powerRelay.GetMaxPower()+" ("+sub.powerRelay.powerStatus+")";
+			string pw = "Power: "+sub.powerRelay.GetPower().ToString("0.0")+"/"+sub.powerRelay.GetMaxPower()+" ("+sub.powerRelay.powerStatus+")";
 			string ret = loc+"\n"+pw;
 			if (!string.IsNullOrEmpty(vehicleString))
 				ret = ret+"\n"+vehicleString;
