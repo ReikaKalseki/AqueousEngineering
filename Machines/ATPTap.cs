@@ -151,13 +151,8 @@ namespace ReikaKalseki.AqueousEngineering {
 		
 		private void AddPower() {
 			if (powerSource && this.getBuildable().constructed) {
-				//float trash = 0f;
-				//thermalComponent.powerSource.AddEnergy(25, out trash);
-				SubRoot sub = getSub();
-				if (sub) {
-					float trash = 0f;
-					sub.powerRelay.AddEnergy(AqueousEngineeringMod.config.getInt(AEConfig.ConfigEntries.ATPTAPRATE), out trash);
-				}
+				float trash = 0f;
+				thermalComponent.powerSource.AddEnergy(AqueousEngineeringMod.config.getInt(AEConfig.ConfigEntries.ATPTAPRATE), out trash);
 			}
 		}
 		

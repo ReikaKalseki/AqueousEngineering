@@ -365,6 +365,17 @@
 			
 		</pda>
 	</ItemCollector>
+	<CyclopsCollectorTether>
+		<name>
+			Item Collector Cyclops Tether
+		</name>
+		<desc>
+			Leashes an item collector under the cyclops (when running), allowing for automatic collection as the cyclops moves around.
+		</desc>
+		<pda>
+			
+		</pda>
+	</CyclopsCollectorTether>
 	<Name>
 		<name>
 			

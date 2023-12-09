@@ -92,7 +92,7 @@ namespace ReikaKalseki.AqueousEngineering {
 			objectTypeMappings["PeeperLoungeBar"] = new RoomTypes[]{RoomTypes.LEISURE};	
 			objectTypeMappings["FireExtinguisherRefueler"] = new RoomTypes[]{RoomTypes.MECHANICAL};	
 			objectTypeMappings["DSSFloorServerRack"] = new RoomTypes[]{RoomTypes.MECHANICAL};	
-			objectTypeMappings["QuantumPowerBankCharger"] = new RoomTypes[]{RoomTypes.MECHANICAL};	
+			//objectTypeMappings["QuantumPowerBankCharger"] = new RoomTypes[]{RoomTypes.MECHANICAL};	
 			//objectTypeMappings["QuantumTeleporter"] = new RoomTypes[]{RoomTypes.MECHANICAL};	
 			objectTypeMappings["FCSShower"] = new RoomTypes[]{RoomTypes.LEISURE};	
 			objectTypeMappings["FCSSink"] = new RoomTypes[]{RoomTypes.LEISURE};	

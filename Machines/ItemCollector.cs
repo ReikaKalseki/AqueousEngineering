@@ -73,20 +73,25 @@ namespace ReikaKalseki.AqueousEngineering
 				return (pp && pp.isPickupable && !pp.attached) || go.GetComponent<BreakableResource>();
 			}
 			
-			internal void moveTowards(SubRoot sub) {
-				Vector3 tgt = sub.transform.position+sub.transform.up*-10-sub.transform.forward*18;
-				Vector3 diff = tgt-transform.position;
-				body.velocity = diff.normalized*Mathf.Min(diff.sqrMagnitude*0.02F, 30);
-			}
-			
 			void Update() {
 				if (!gravity)
 					gravity = GetComponent<Gravsphere>();
 				if (!body)
 					body = GetComponent<Rigidbody>();
 				
-				if (Player.main.currentSub && Player.main.currentSub.isCyclops && Vector3.Distance(transform.position, Player.main.currentSub.transform.position) <= 100) {
-					moveTowards(Player.main.currentSub);
+				if (Player.main.currentSub && Player.main.currentSub.isCyclops && Vector3.Distance(transform.position, Player.main.currentSub.transform.position) <= 120) {
+					SubRoot sub = Player.main.currentSub;
+					CyclopsMotorMode mode = sub.GetComponentInChildren<CyclopsMotorMode>();
+					if (mode && mode.engineOn) {
+						ItemCollectorCyclopsTetherLogic lgc = sub.GetComponentInChildren<ItemCollectorCyclopsTetherLogic>();
+						if (lgc) {
+							lgc.itemCollector = gameObject;	
+							Vector3 tgt = sub.transform.position+sub.transform.up*-9-sub.transform.forward*18;
+							Vector3 diff = tgt-transform.position;
+							body.velocity = diff.normalized*Mathf.Min(diff.sqrMagnitude*0.04F, 30);
+							lgc.lineRenderer.attachPoint.position = tgt+Vector3.up*2;
+						}
+					}
 				}
 				
 				float time = DayNightCycle.main.timePassedAsFloat;
