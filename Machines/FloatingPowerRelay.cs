@@ -70,7 +70,8 @@ namespace ReikaKalseki.AqueousEngineering {
 			c.allowedOnConstructables = false;
 			c.allowedOnGround = false;
 			c.allowedOnWall = false;
-			c.model = go;//mdl;
+			c.model = UnityEngine.Object.Instantiate(go.GetComponentInChildren<Renderer>().gameObject);//mdl;
+			ObjectUtil.removeComponent<Collider>(c.model);
 		}
 		
 	}

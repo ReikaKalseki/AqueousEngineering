@@ -192,7 +192,7 @@ namespace ReikaKalseki.AqueousEngineering
        	
        	ACUCallbackSystem.instance.register();
        	
-       	StoryHandler.instance.registerTrigger(new StoryTrigger("Precursor_LavaCastleBase_ThermalPlant2"), new TechUnlockEffect(atpTapBlock.TechType, 0.05F));
+       	StoryHandler.instance.registerTrigger(new ScanTrigger(TechType.PrecursorThermalPlant), new TechUnlockEffect(atpTapBlock.TechType, 1F, 5));
 			
         System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(typeof(AEHooks).TypeHandle);
         

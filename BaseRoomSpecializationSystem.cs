@@ -344,7 +344,14 @@ namespace ReikaKalseki.AqueousEngineering {
 				decoRatings[pfb] = deco;
 		}
 		
-		internal RoomTypes getType(BaseRoot bb, BaseCell bc, List<PrefabIdentifier> li, out float decoRating) {
+		public void debugRoomValues() {
+			BaseCell bc = AEHooks.getCurrentPlayerRoom();
+			BaseRoot bb = bc.gameObject.FindAncestor<BaseRoot>();
+			float trash;
+			getType(bb, bc, ObjectUtil.getBaseObjectsInRoom(bb, bc), out trash, true);
+		}
+		
+		internal RoomTypes getType(BaseRoot bb, BaseCell bc, List<PrefabIdentifier> li, out float decoRating, bool debug = false) {
 			HashSet<RoomTypes> options = new HashSet<RoomTypes>((IEnumerable<RoomTypes>)Enum.GetValues(typeof(RoomTypes)));
 			//if (bc.GetComponentInChildren<BaseNuclearReactor>() || bc.GetComponentInChildren<BaseBioReactor>())
 			//	options.Add(RoomTypes.POWER);
@@ -368,6 +375,8 @@ namespace ReikaKalseki.AqueousEngineering {
 				if (Array.IndexOf(obj, RoomTypes.AGRICULTURAL) >= 0)
 				    agriCount++;
 				decoRating += getDecoRating(pi);
+				if (debug)
+					SNUtil.log(pi.name+": "+getObjectType(pi).toDebugString()+", deco value = "+getDecoRating(pi));
 				//SNUtil.writeToChat("Cell "+bc.transform.position+": Object "+pi.name+" > "+getObjectType(pi).toDebugString()+" #"+getDecoRating(pi));
 			}
 			bool hasGlassRoof = ObjectUtil.getChildObject(bc.gameObject, "BaseRoomInteriorTopGlass") != null;
@@ -377,8 +386,9 @@ namespace ReikaKalseki.AqueousEngineering {
 				windows += 3; //counts as 3 windows
 			decoRating += plantPanels*1.5F; //plant panels, 1.5 each
 			if (windows > 0)
-				decoRating += windows*getWindowDecoValue(bb, bc, hasGlassRoof); //windows, rating is base location dependent
-			//SNUtil.writeToChat("Room at "+bc.transform.position+" has options "+options.toDebugString()+" & deco value "+decoRating+" ("+plantPanels+"/"+windows+"*"+getWindowDecoValue(bb, bc, hasGlassRoof)+")");
+				decoRating += windows*getWindowDecoValue(bb, bc, hasGlassRoof, debug); //windows, rating is base location dependent
+			if (debug)
+				SNUtil.writeToChat("Room at "+bc.transform.position+" has options "+options.toDebugString()+" & deco value "+decoRating+" ("+plantPanels+"/"+windows+"*"+getWindowDecoValue(bb, bc, hasGlassRoof, debug)+")");
 			bool large = isLargeRoom(bc);
 			int lockerThresh = large ? 8 : 5;
 			if (lockerCount >= lockerThresh) { //do before leisure/agri are removed
@@ -394,11 +404,15 @@ namespace ReikaKalseki.AqueousEngineering {
 				options.Remove(RoomTypes.AGRICULTURAL);
 			if (options.Count == 2 && options.Contains(RoomTypes.UNSPECIALIZED)) //if unspecialized + one thing, choose that one thing
 				options.Remove(RoomTypes.UNSPECIALIZED);
-			//SNUtil.writeToChat("Net options "+options.toDebugString()+" from "+lockerCount+"/"+agriCount);
+			if (debug) {
+				string msg = "Net options "+options.toDebugString()+" from "+lockerCount+"/"+agriCount;
+				SNUtil.writeToChat(msg);
+				SNUtil.log(msg);
+			}
 			return options.Count == 1 ? options.First() : RoomTypes.UNSPECIALIZED;
 		}
 		
-		private float getWindowDecoValue(BaseRoot bb, BaseCell bc, bool hasGlassRoof) {
+		private float getWindowDecoValue(BaseRoot bb, BaseCell bc, bool hasGlassRoof, bool debug) {
 			Vector3 pos = bc.transform.position;
 			if (pos.y >= -1)
 				return 0.1F;
@@ -429,12 +443,14 @@ namespace ReikaKalseki.AqueousEngineering {
 				else if (biome.Contains("ghosttree") || biome.Contains("junction"))
 					scenery = 1.0F;
 			}
+			if (debug)
+				SNUtil.log("Biome "+b.displayName+" scenery value is "+scenery);
 			if (scenery > 0) {
 				int objectsFound = 0;
 				int totalFound = 0;
 				
 				WorldUtil.getObjectsNear<GameObject>(pos, 100, go => {
-				if (go.activeInHierarchy && go.transform.position.y >= pos.y-50 && (hasGlassRoof || go.transform.position.y <= pos.y+50) && !ObjectUtil.isOnBase(bb, go.transform) && !go.FindAncestor<Player>()) {
+				if (go.activeSelf && go.transform.position.y >= pos.y-50 && (hasGlassRoof || go.transform.position.y <= pos.y+50) && isExternalPropObject(bb, go.transform)) {
 					totalFound++;
 					if (go.FindAncestor<PrefabIdentifier>())
 						objectsFound++;
@@ -444,11 +460,13 @@ namespace ReikaKalseki.AqueousEngineering {
 					scenery = 0;
 				else if (objectsFound <= 200) //terrain only, or terrain plus only a handful of things, still many because of things like grass
 					scenery *= 0.33F;
-				//SNUtil.writeToChat("Found near-room outdoor objects: "+objectsFound+"/"+totalFound);
+				if (debug)
+					SNUtil.log("Found near-room outdoor objects: "+objectsFound+"/"+totalFound);
 			}
-			float ret = 0.5F*scenery;
+			float ret = 0.75F*scenery;
 			IEcoTarget tgt = EcoRegionManager.main.FindNearestTarget(EcoTargetType.Leviathan, pos, null, 8);
-			//SNUtil.writeToChat("Nearby leviathan: "+(tgt != null ? tgt.GetGameObject().name : "None"));
+			if (debug)
+				SNUtil.log("Nearby leviathan: "+(tgt != null ? tgt.GetGameObject().name : "None"));
 			if (tgt != null) {
 				float dist = Vector3.Distance(tgt.GetPosition(), pos);
 				if (dist <= 250) {
@@ -458,7 +476,8 @@ namespace ReikaKalseki.AqueousEngineering {
 				}
 			}
 			tgt = EcoRegionManager.main.FindNearestTarget(EcoTargetType.HeatArea, pos, null, 4);
-			//SNUtil.writeToChat("Nearby heat area: "+(tgt != null ? tgt.GetGameObject().name : "None"));
+			if (debug)
+				SNUtil.log("Nearby heat area: "+(tgt != null ? tgt.GetGameObject().name : "None"));
 			if (tgt != null) {
 				float dist = Vector3.Distance(tgt.GetPosition(), pos);
 				if (dist <= 80) {
@@ -466,6 +485,19 @@ namespace ReikaKalseki.AqueousEngineering {
 				}
 			}
 			return ret;
+		}
+		
+		private bool isExternalPropObject(BaseRoot bb, Component c) {
+			Transform t = c.transform;
+			while (t != null) {
+				if (t == bb.transform || t == Player.main.transform)
+					return false;
+				Planter p = t.GetComponent<Planter>();
+				if (p)
+					return !p.isIndoor;
+				t = t.parent;
+			}
+			return true;
 		}
 		
 		private float getDecoRating(PrefabIdentifier pi) {
@@ -507,7 +539,7 @@ namespace ReikaKalseki.AqueousEngineering {
 			TechType tt = pp.GetTechType();
 			float ret = getItemDecoValue(tt);
 			if (tt == TechType.Peeper && pp.GetComponent<Peeper>().isHero)
-				ret = 1.5F;
+				ret = 1.0F;
 			//SNUtil.writeToChat("Deco value of inv item "+pp+" ("+tt+"): "+ret);
 			return ret;
 		}

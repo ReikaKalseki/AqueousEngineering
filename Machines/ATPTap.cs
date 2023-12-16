@@ -40,6 +40,9 @@ namespace ReikaKalseki.AqueousEngineering {
 						
 			ATPTapLogic lgc = go.GetComponent<ATPTapLogic>();
 			
+			go.GetComponent<PowerRelay>().maxOutboundDistance = 20;
+			go.GetComponent<LargeWorldEntity>().cellLevel = LargeWorldEntity.CellLevel.Global;
+			
 			Renderer r = go.GetComponentInChildren<Renderer>();
 			//SNUtil.dumpTextures(r);
 			RenderUtil.swapToModdedTextures(r, this);

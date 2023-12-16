@@ -152,7 +152,7 @@ namespace ReikaKalseki.AqueousEngineering {
 				check.ignoreSpaceRequirements = true;
 		   	}
 	   		else if (Builder.constructableTechType == AqueousEngineeringMod.atpTapBlock.TechType) {
-	   			check.placeable = check.placeOn && ATPTapLogic.isValidSourceObject(check.placeOn.gameObject);
+	   			check.placeable = check.placeOn && ATPTapLogic.isValidSourceObject(check.placeOn.gameObject) && WorldUtil.getObjectsNearMatching(check.placeOn.transform.position, 100, go => go.GetComponent<ATPTapLogic>() && go.GetComponent<Constructable>().constructed).Count == 0;
 				check.ignoreSpaceRequirements = true;
 		   	}
 	    }
@@ -269,5 +269,10 @@ namespace ReikaKalseki.AqueousEngineering {
 					dmg.setValue(0);
 		   	}
 		}
+	   
+	   public static void onPlacedItem(PlaceTool pt) {
+	   		if (Player.main.currentSub && Player.main.currentSub.isBase)
+	   			BaseRoomSpecializationSystem.instance.updateRoom(pt.gameObject);
+	   }
 	}
 }

@@ -565,9 +565,19 @@ namespace ReikaKalseki.AqueousEngineering {
 				}
 				currentBonus += 5F*f0;
 				if (infectedTotal > 0) {
-					currentBonus -= infectedTotal;
-					if (UnityEngine.Random.Range(0F, 1F) <= infectedTotal*0.005F*dT) {
-						infectedFish.GetRandom().GetComponent<LiveMixin>().Kill(DamageType.Starve);
+					currentBonus -= infectedTotal*2;
+					if (UnityEngine.Random.Range(0F, 1F) <= infectedTotal*0.015F*dT) {
+						GameObject go = ObjectUtil.createWorldObject(VanillaCreatures.WARPER.prefab);
+						bool inACU = UnityEngine.Random.Range(0F, 1F) < 0.2F;
+						go.transform.position = inACU ? acu.transform.position : MathUtil.getRandomVectorAround(acu.transform.position, new Vector3(10, 0, 10));
+						Warper wp = go.GetComponent<Warper>();
+						wp.WarpIn(null);
+						if (inACU) {
+							go.EnsureComponent<ACUWarper>();
+						}
+						else {
+							AttractToTarget.attractCreatureToTarget(wp, acu.gameObject.FindAncestor<BaseCell>().GetComponent<LiveMixin>(), false);
+						}
 					}
 				}
 				if (currentBonus > 0) {
@@ -625,6 +635,14 @@ namespace ReikaKalseki.AqueousEngineering {
 				}
 				nextIsDebug = false;
 			}
+		}
+		
+		class ACUWarper : MonoBehaviour {
+			
+			void Update() {
+				transform.localScale = Vector3.one*0.4F;
+			}
+			
 		}
 		
 		internal List<WaterParkPiece> getACUComponents(WaterPark acu) {
