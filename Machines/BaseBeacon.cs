@@ -148,7 +148,7 @@ namespace ReikaKalseki.AqueousEngineering {
 		}
 		
 		private string generateBeaconLabel(SubRoot sub) {
-			string loc = "Location: "+WorldUtil.getRegionalDescription(transform.position);
+			string loc = "Location: "+WorldUtil.getRegionalDescription(transform.position, true);
 			string pw = "Power: "+sub.powerRelay.GetPower().ToString("0.0")+"/"+sub.powerRelay.GetMaxPower()+" ("+sub.powerRelay.powerStatus+")";
 			string ret = loc+"\n"+pw;
 			if (!string.IsNullOrEmpty(vehicleString))

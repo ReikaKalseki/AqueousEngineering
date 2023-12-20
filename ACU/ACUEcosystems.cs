@@ -149,6 +149,8 @@ namespace ReikaKalseki.AqueousEngineering {
 					acu.sparkleCount++;
 				else if (tt == TechType.Cutefish)
 					acu.cuddleCount++;
+				else if (tt == TechType.Gasopod)
+					acu.gasopodCount++;
 				else //sparkle peepers and cuddlefish are always valid
 					possibleBiomes.IntersectWith(edibleFish[tt].regionType);
 				//if (possibleBiomes.Count <= 0)

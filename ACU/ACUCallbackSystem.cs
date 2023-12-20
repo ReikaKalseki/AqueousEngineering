@@ -294,6 +294,8 @@ namespace ReikaKalseki.AqueousEngineering {
 			internal float carnivoreCount;
 			internal int sparkleCount;
 			internal int cuddleCount;
+			internal int gasopodCount;
+			internal bool consistentBiome;
 			
 			internal float infectedTotal;			
 			internal float currentBonus;	
@@ -477,6 +479,7 @@ namespace ReikaKalseki.AqueousEngineering {
 				carnivoreCount = 0;
 				int teeth = 0;
 				cuddleCount = 0;
+				gasopodCount = 0;
 				infectedTotal = 0;
 				sparkleCount = 0;
 				//SNUtil.writeToChat("@@"+string.Join(",", possibleBiomes));
@@ -628,12 +631,21 @@ namespace ReikaKalseki.AqueousEngineering {
 						theme = BiomeRegions.Shallows;
 					bool changed = theme != currentTheme;
 					currentTheme = theme;
+					consistentBiome = true;
 					ACUTheming.updateACUTheming(this, theme, time, changed || time-lastThemeUpdate > 5 || !appliedTheme);
 				}
 				else if (potentialBiomes.Count > 1) {
 					currentWarnings.Add(ACUWarnings.MIXEDTHEME);
+					consistentBiome = false;
+				}
+				else {
+					consistentBiome = false;
 				}
 				nextIsDebug = false;
+			}
+			
+			public bool isHealthy() {
+				return currentWarnings.Count == 0;
 			}
 		}
 		

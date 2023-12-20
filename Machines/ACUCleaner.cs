@@ -75,7 +75,7 @@ namespace ReikaKalseki.AqueousEngineering {
 		
 	public class ACUCleanerLogic : CustomMachineLogic {
 		
-		private WaterPark connectedACU;
+		private ACUCallbackSystem.ACUCallback connectedACU;
 		
 		//internal GameObject rotator;
 				
@@ -88,14 +88,14 @@ namespace ReikaKalseki.AqueousEngineering {
 			return 2;
 		}
 		
-		private WaterPark tryFindACU() {
+		private ACUCallbackSystem.ACUCallback tryFindACU() {
 			SubRoot sub = getSub();
 			if (!sub) {
 				return null;
 			}
 			foreach (WaterPark wp in sub.GetComponentsInChildren<WaterPark>()) {
 				if (Vector3.Distance(wp.transform.position, transform.position) <= 6) {
-					return wp;
+					return wp.GetComponent<ACUCallbackSystem.ACUCallback>();
 				}
 			}
 			return null;
@@ -121,19 +121,27 @@ namespace ReikaKalseki.AqueousEngineering {
 			if (connectedACU && consumePower(ACUCleaner.POWER_COST*seconds)) {
 				//rotator.transform.position = connectedACU.transform.position+Vector3.down*1.45F;
 				//rotator.transform.localScale = new Vector3(13.8F, 1, 13.8F);
-				foreach (WaterParkItem wp in connectedACU.items) {
+				foreach (WaterParkItem wp in connectedACU.acu.items) {
 					if (wp) {
 						Pickupable pp = wp.GetComponent<Pickupable>();
 						TechType tt = pp.GetTechType();
 						if (tt == TechType.SeaTreaderPoop || tt == AqueousEngineeringMod.poo.TechType || tt == TechType.StalkerTooth) {
 							InventoryItem ii = getStorage().container.AddItem(pp);
 							if (ii != null) {
-								connectedACU.RemoveItem(pp);
+								connectedACU.acu.RemoveItem(pp);
 								pp.PlayPickupSound();
 								pp.gameObject.SetActive(false);
 								break;
 							}
 						}
+					}
+				}
+				if (connectedACU.gasopodCount > 0 && connectedACU.consistentBiome && connectedACU.isHealthy() && connectedACU.currentTheme == BiomeRegions.Shallows) {
+					float ch = connectedACU.gasopodCount*seconds*0.0008F; //0.08%/s per gasopod
+					if (UnityEngine.Random.Range(0F, 1F) <= ch) {
+						GameObject go = ObjectUtil.createWorldObject(TechType.GasPod);
+						getStorage().container.AddItem(go.GetComponent<Pickupable>());
+						go.SetActive(false);
 					}
 				}
 			}

@@ -358,6 +358,7 @@ namespace ReikaKalseki.AqueousEngineering {
 			int lockerCount = 0;
 			int agriCount = 0;
 			decoRating = 0;
+			bool large = isLargeRoom(bc);			
 			foreach (PrefabIdentifier pi in li) {
 				Constructable cc = pi.GetComponent<Constructable>();
 				if (cc && !cc.constructed) {
@@ -374,9 +375,9 @@ namespace ReikaKalseki.AqueousEngineering {
 				    lockerCount++;
 				if (Array.IndexOf(obj, RoomTypes.AGRICULTURAL) >= 0)
 				    agriCount++;
-				decoRating += getDecoRating(pi);
+				decoRating += getDecoRating(pi, large);
 				if (debug)
-					SNUtil.log(pi.name+": "+getObjectType(pi).toDebugString()+", deco value = "+getDecoRating(pi));
+					SNUtil.log(pi.name+": "+getObjectType(pi).toDebugString()+", deco value = "+getDecoRating(pi, large));
 				//SNUtil.writeToChat("Cell "+bc.transform.position+": Object "+pi.name+" > "+getObjectType(pi).toDebugString()+" #"+getDecoRating(pi));
 			}
 			bool hasGlassRoof = ObjectUtil.getChildObject(bc.gameObject, "BaseRoomInteriorTopGlass") != null;
@@ -389,7 +390,6 @@ namespace ReikaKalseki.AqueousEngineering {
 				decoRating += windows*getWindowDecoValue(bb, bc, hasGlassRoof, debug); //windows, rating is base location dependent
 			if (debug)
 				SNUtil.writeToChat("Room at "+bc.transform.position+" has options "+options.toDebugString()+" & deco value "+decoRating+" ("+plantPanels+"/"+windows+"*"+getWindowDecoValue(bb, bc, hasGlassRoof, debug)+")");
-			bool large = isLargeRoom(bc);
 			int lockerThresh = large ? 8 : 5;
 			if (lockerCount >= lockerThresh) { //do before leisure/agri are removed
 				options.Add(RoomTypes.STORAGE);
@@ -500,7 +500,7 @@ namespace ReikaKalseki.AqueousEngineering {
 			return true;
 		}
 		
-		private float getDecoRating(PrefabIdentifier pi) {
+		private float getDecoRating(PrefabIdentifier pi, bool largeRoom) {
 			PictureFrame pf = pi.GetComponent<PictureFrame>();
 			if (pf)
 				return pf.current == PictureFrame.State.None ? -1 : 3;
@@ -521,6 +521,9 @@ namespace ReikaKalseki.AqueousEngineering {
 			Aquarium a = pi.GetComponent<Aquarium>();
 			if (a)
 				return 1+getInventoryDecoValue(a.GetComponent<StorageContainer>()); //even empty has some value
+			ACUCallbackSystem.ACUCallback wp = pi.GetComponent<ACUCallbackSystem.ACUCallback>();
+			if (wp)
+				return getACUDecoValue(wp, largeRoom);
 			return getDecoRating(pi.ClassId);
 		}
 		
@@ -533,6 +536,14 @@ namespace ReikaKalseki.AqueousEngineering {
 			foreach (Pickupable pp in sc.storageRoot.GetComponentsInChildren<Pickupable>(true))
 				ret += getItemDecoValue(pp);
 			return ret;
+		}
+		
+		private float getACUDecoValue(ACUCallbackSystem.ACUCallback wp, bool largeRoom) {
+			float val = wp.consistentBiome ? BiomeBase.getBiome(wp.currentTheme.baseBiome).sceneryValue*(largeRoom ? 3 : 2) : 0;
+			foreach (WaterParkItem wpi in wp.acu.items)
+				val += getItemDecoValue(wpi.GetComponent<Pickupable>());
+			val += getInventoryDecoValue(wp.acu.planter.GetComponent<StorageContainer>());
+			return val;
 		}
 		
 		private float getItemDecoValue(Pickupable pp) {

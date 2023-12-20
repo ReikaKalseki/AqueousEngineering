@@ -77,6 +77,8 @@ namespace ReikaKalseki.AqueousEngineering {
 		
 		private float lastSound = -1;
 		
+		private float shutdownCooldown = -1;
+		
 		private readonly List<GameObject> drills = new List<GameObject>();
 		
 		internal static readonly SoundManager.SoundData workingSound = SoundManager.registerSound(AqueousEngineeringMod.modDLL, "crusher", "Sounds/crusher.ogg", SoundManager.soundMode3D);
@@ -93,6 +95,12 @@ namespace ReikaKalseki.AqueousEngineering {
 		
 		protected override void updateEntity(float seconds) {
 			isReady = !GameModeUtils.RequiresPower() || consumePower((isGrinding ? BaseDrillableGrinder.POWER_COST_ACTIVE : BaseDrillableGrinder.POWER_COST)*seconds);
+			if (!isReady) {
+				float time = DayNightCycle.main.timePassedAsFloat;
+				if (time >= shutdownCooldown) {
+					shutdownCooldown = time+2;
+				}
+			}
 			isGrinding = false;
 			
 			if (!aoe) {
@@ -122,7 +130,7 @@ namespace ReikaKalseki.AqueousEngineering {
 		}
 		
 	    internal void OnTriggerStay(Collider other) {
-			if (!other.isTrigger && isReady) {
+			if (!other.isTrigger && isReady && shutdownCooldown < DayNightCycle.main.timePassedAsFloat) {
 				SoundManager.SoundData sound = workingSound;
 				float loopTime = 3.25F;
 				Drillable d = other.gameObject.FindAncestor<Drillable>();
@@ -133,23 +141,12 @@ namespace ReikaKalseki.AqueousEngineering {
 						return;
 					isGrinding = true;
 					TechType tt = d.resources[0].techType;
-					if (tt == TechType.Kyanite) {
+					if (tt == TechType.Kyanite || aoe.center.y+transform.position.y >= 0.1F) {
 						//too hard : make grinding noises and sparks and such
 						sound = jammedSound;
 						loopTime = 1.6805F;
 					}
-					else {/*
-						GameObject hit;
-						d.OnDrill(d.transform.position, null, out hit);
-						foreach (GameObject drop in d.lootPinataObjects) {
-							SNUtil.writeToChat("Drop: "+drop);
-							if (drop) {
-								drop.transform.position = Vector3.Lerp(d.transform.position, transform.position+aoe.center, 0.5F);
-								DrillableGrindingResult res = new DrillableGrindingResult(this, tt, d, drop);
-								BaseDrillableGrinder.pingEvent(res);
-							}
-						}
-						d.lootPinataObjects.Clear();*/
+					else {
 						drill(d, tt);
 					}
 					if (d.GetComponent<ReactsOnDrilled>())

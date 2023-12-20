@@ -213,6 +213,9 @@ namespace ReikaKalseki.AqueousEngineering
         PDAManager.PDAPage page = PDAManager.createPage(e.key+"PDA", e.getField<string>("pdatitle"), e.pda, e.getField<string>("category"));
         page.register();
         
+        BaseRoomSpecializationSystem.instance.registerModdedObject(toy, 0.25F, BaseRoomSpecializationSystem.RoomTypes.ACU);
+        BaseRoomSpecializationSystem.instance.registerModdedObject(poo, -0.25F, BaseRoomSpecializationSystem.RoomTypes.ACU);
+        
         ConsoleCommandsHandler.Main.RegisterConsoleCommand<Action>("debugACU", ACUCallbackSystem.instance.debugACU);
         ConsoleCommandsHandler.Main.RegisterConsoleCommand<Action>("sunbeamModel", createSunbeamModel);
     }
