@@ -57,6 +57,9 @@ namespace ReikaKalseki.AqueousEngineering
     public static MiniPoo poo;
     public static StalkerToy toy;
     public static ItemCollector collector;
+    public static NuclearFuelItem fulguriteRod;
+    public static NuclearFuelItem cooledRod;
+    //public static NuclearFuelItem reprocessedRod;
     
     public static HolographicControl seabaseStasisControl;
     public static HolographicControl seabaseSonarControl;
@@ -111,6 +114,24 @@ namespace ReikaKalseki.AqueousEngineering
         toy.addIngredient(TechType.Hoopfish, 1);
         toy.addIngredient(TechType.Titanium, 2);
 	    toy.Patch();
+	    
+	    fulguriteRod = new NuclearFuelItem("FulguriteRod");
+	    fulguriteRod.addIngredient(TechType.ReactorRod, 1);
+	    fulguriteRod.addIngredient(TechType.Sulphur, 3);
+	    fulguriteRod.addIngredient(TechType.Benzene, 1);
+	    fulguriteRod.addIngredient(TechType.Lithium, 1);
+	    fulguriteRod.Patch();/*
+	    reprocessedRod = new NuclearFuelItem("ReprocessedRod");
+	    reprocessedRod.addIngredient(TechType.DepletedReactorRod, 1);
+	    reprocessedRod.addIngredient(TechType.Sulphur, 3);
+	    reprocessedRod.addIngredient(TechType.Benzene, 1);
+	    reprocessedRod.addIngredient(TechType.Lithium, 1);
+	    reprocessedRod.Patch();*/
+	    cooledRod = new NuclearFuelItem("WaterCooledRod");
+	    cooledRod.addIngredient(TechType.ReactorRod, 1);
+	    cooledRod.addIngredient(TechType.FilteredWater, 2);
+	    cooledRod.addIngredient(TechType.Aerogel, 1);
+	    cooledRod.Patch();
 	    
         collector = new ItemCollector(machineLocale.getEntry("ItemCollector")); //deliberately under machine locale for site
 	    collector.Patch();
@@ -191,6 +212,11 @@ namespace ReikaKalseki.AqueousEngineering
         outdoorChicPot.register();
        	
        	ACUCallbackSystem.instance.register();
+       	NuclearReactorFuelSystem.instance.register();
+       	
+       	NuclearReactorFuelSystem.instance.registerReactorFuelRelative(cooledRod.TechType, 2F, 0.8F, TechType.DepletedReactorRod);
+       	NuclearReactorFuelSystem.instance.registerReactorFuelRelative(fulguriteRod.TechType, 0.25F, 2.5F, TechType.DepletedReactorRod);
+       	//NuclearReactorFuelSystem.instance.registerReactorFuelRelative(reprocessedRod.TechType, 0.4F, 0.8F, TechType.None);
        	
        	StoryHandler.instance.registerTrigger(new ScanTrigger(TechType.PrecursorThermalPlant), new TechUnlockEffect(atpTapBlock.TechType, 1F, 5));
 			

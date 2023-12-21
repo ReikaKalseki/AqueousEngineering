@@ -429,7 +429,7 @@ namespace ReikaKalseki.AqueousEngineering {
 			}
 			
 			private string generateContentList() {
-				Dictionary<TechType, int> counts = new Dictionary<TechType, int>();
+				CountMap<TechType> counts = new CountMap<TechType>();
 				Dictionary<TechType, int> sizes = new Dictionary<TechType, int>();
 				foreach (WaterParkItem wp in new List<WaterParkItem>(acu.items)) {
 					if (!wp)
@@ -438,19 +438,16 @@ namespace ReikaKalseki.AqueousEngineering {
 					TechType tt = pp ? pp.GetTechType() : TechType.None;
 					if (tt != TechType.None) {
 						sizes[tt] = wp.GetSize();
-						if (counts.ContainsKey(tt))
-							counts[tt] = counts[tt]+1;
-						else
-							counts[tt] = 1;
+						counts.add(tt);
 					}
 				}
 				StringBuilder sb = new StringBuilder();
-				foreach (KeyValuePair<TechType, int> kvp in counts) {
-					sb.Append(Language.main.Get(kvp.Key));
+				foreach (TechType tt in counts.getItems()) {
+					sb.Append(Language.main.Get(tt));
 					sb.Append(": ");
-					sb.Append(kvp.Value);
+					sb.Append(counts.getCount(tt));
 					sb.Append(" (");
-					sb.Append(sizes[kvp.Key]);
+					sb.Append(sizes[tt]);
 					sb.Append(" occupancy slots each)\n");
 				}
 				return sb.ToString();

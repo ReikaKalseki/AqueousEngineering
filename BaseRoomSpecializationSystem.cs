@@ -358,7 +358,8 @@ namespace ReikaKalseki.AqueousEngineering {
 			int lockerCount = 0;
 			int agriCount = 0;
 			decoRating = 0;
-			bool large = isLargeRoom(bc);			
+			bool large = isLargeRoom(bc);		
+			CountMap<TechType> itemDisplays = new CountMap<TechType>();
 			foreach (PrefabIdentifier pi in li) {
 				Constructable cc = pi.GetComponent<Constructable>();
 				if (cc && !cc.constructed) {
@@ -375,19 +376,32 @@ namespace ReikaKalseki.AqueousEngineering {
 				    lockerCount++;
 				if (Array.IndexOf(obj, RoomTypes.AGRICULTURAL) >= 0)
 				    agriCount++;
-				decoRating += getDecoRating(pi, large);
+				decoRating += getDecoRating(pi, itemDisplays, large);
 				if (debug)
-					SNUtil.log(pi.name+": "+getObjectType(pi).toDebugString()+", deco value = "+getDecoRating(pi, large));
+					SNUtil.log(pi.name+": "+getObjectType(pi).toDebugString()+", deco value = "+getDecoRating(pi, null, large));
 				//SNUtil.writeToChat("Cell "+bc.transform.position+": Object "+pi.name+" > "+getObjectType(pi).toDebugString()+" #"+getDecoRating(pi));
 			}
 			bool hasGlassRoof = ObjectUtil.getChildObject(bc.gameObject, "BaseRoomInteriorTopGlass") != null;
 			int plantPanels = ObjectUtil.getChildObjects(bc.gameObject, "BaseRoomPlanterSide(Clone)").Count;
 			int windows = ObjectUtil.getChildObjects(bc.gameObject, "BaseRoomWindowSide(Clone)").Count;
+			bool sideWindows = windows > 0;
 			if (hasGlassRoof)
 				windows += 3; //counts as 3 windows
 			decoRating += plantPanels*1.5F; //plant panels, 1.5 each
-			if (windows > 0)
+			if (windows > 0) {
 				decoRating += windows*getWindowDecoValue(bb, bc, hasGlassRoof, debug); //windows, rating is base location dependent
+				if (sideWindows) {
+					float decoAdd = 0;
+					WorldUtil.getObjectsNear<GameObject>(bc.transform.position, 25, go => {
+						if (go.activeSelf && Mathf.Abs(go.transform.position.y-bc.transform.position.y) <= 10) {
+							Planter p = go.GetComponent<Planter>();
+							if (p)
+								decoAdd += getInventoryDecoValue(p.GetComponent<StorageContainer>())*0.8F;
+						}
+					});
+					decoRating += decoAdd;
+				}
+			}
 			if (debug)
 				SNUtil.writeToChat("Room at "+bc.transform.position+" has options "+options.toDebugString()+" & deco value "+decoRating+" ("+plantPanels+"/"+windows+"*"+getWindowDecoValue(bb, bc, hasGlassRoof, debug)+")");
 			int lockerThresh = large ? 8 : 5;
@@ -500,7 +514,7 @@ namespace ReikaKalseki.AqueousEngineering {
 			return true;
 		}
 		
-		private float getDecoRating(PrefabIdentifier pi, bool largeRoom) {
+		private float getDecoRating(PrefabIdentifier pi, CountMap<TechType> itemDisplays, bool largeRoom) {
 			PictureFrame pf = pi.GetComponent<PictureFrame>();
 			if (pf)
 				return pf.current == PictureFrame.State.None ? -1 : 3;
@@ -512,8 +526,14 @@ namespace ReikaKalseki.AqueousEngineering {
 			if (pi.ClassId == STANDING_LOCKER_PREFAB && QModManager.API.QModServices.Main.ModPresent("lockerMod")) //locker content display
 				return getInventoryDecoValue(pi.GetComponent<StorageContainer>())*0.2F; //20% value since it contains many many items, and they are small
 			ItemDisplayLogic disp = pi.GetComponent<ItemDisplayLogic>();
-			if (disp)
-				return disp.getCurrentItem() == TechType.None ? -0.5F : getItemDecoValue(disp.getCurrentItem());
+			if (disp) {
+				TechType tt = disp.getCurrentItem();
+				if (tt == TechType.None)
+					return -0.25F;
+				if (itemDisplays != null)
+					itemDisplays.add(tt);
+				return getItemDecoValue(disp.getCurrentItem())*getRepeatedDecoPenaltyFactor(itemDisplays == null ? 0 : itemDisplays.getCount(tt), 1);
+			}
 			Planter p = pi.GetComponent<Planter>();
 			if (p) {
 				return getDecoRating(pi.ClassId)+getInventoryDecoValue(p.GetComponent<StorageContainer>());
@@ -531,17 +551,30 @@ namespace ReikaKalseki.AqueousEngineering {
 			return decoRatings.ContainsKey(classID) ? decoRatings[classID] : 0;
 		}
 		
+		private float getRepeatedDecoPenaltyFactor(int idx, int safe = 2) { //idx being "this is the Nth", start penalizing on the third by default (up to 'safe' is unpenalized)
+			return idx <= safe ? 1 : 1F/(1F+0.5F*(idx-safe)); //67% for 3rd, 50% for 4th, 40% for 5th, 33% for 6th, etc
+		}
+		
 		private float getInventoryDecoValue(StorageContainer sc) {
 			float ret = 0;
-			foreach (Pickupable pp in sc.storageRoot.GetComponentsInChildren<Pickupable>(true))
-				ret += getItemDecoValue(pp);
+			CountMap<TechType> counts = new CountMap<TechType>();
+			foreach (Pickupable pp in sc.storageRoot.GetComponentsInChildren<Pickupable>(true)) {
+				TechType tt = pp.GetTechType();
+				counts.add(tt);
+				ret += getItemDecoValue(pp)*getRepeatedDecoPenaltyFactor(counts.getCount(tt));
+			}
 			return ret;
 		}
 		
 		private float getACUDecoValue(ACUCallbackSystem.ACUCallback wp, bool largeRoom) {
 			float val = wp.consistentBiome ? BiomeBase.getBiome(wp.currentTheme.baseBiome).sceneryValue*(largeRoom ? 3 : 2) : 0;
-			foreach (WaterParkItem wpi in wp.acu.items)
-				val += getItemDecoValue(wpi.GetComponent<Pickupable>());
+			CountMap<TechType> counts = new CountMap<TechType>();
+			foreach (WaterParkItem wpi in wp.acu.items) {
+				Pickupable pp = wpi.GetComponent<Pickupable>();
+				TechType tt = pp.GetTechType();
+				counts.add(tt);
+				val += getItemDecoValue(pp)*getRepeatedDecoPenaltyFactor(counts.getCount(tt), 5);
+			}
 			val += getInventoryDecoValue(wp.acu.planter.GetComponent<StorageContainer>());
 			return val;
 		}

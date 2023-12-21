@@ -72,6 +72,10 @@ namespace ReikaKalseki.AqueousEngineering {
 			else if (pi && pi.ClassId == "055b3160-f57b-46ba-80f5-b708d0c8180e" && Vector3.Distance(mountainWreckBlock, sk.transform.position) <= 0.5)
 				new WreckDoorSwaps.DoorSwap(sk.transform.position, "Blocked").applyTo(sk.gameObject);
 		}
+		
+		public static void onNuclearReactorSpawn(BaseNuclearReactor reactor) {
+			reactor.gameObject.EnsureComponent<NuclearReactorFuelSystem.ReactorManager>();
+		}
 	   
 	   	public static void tickACU(WaterPark acu) {
 	   		ACUCallbackSystem.instance.tick(acu);
@@ -269,6 +273,12 @@ namespace ReikaKalseki.AqueousEngineering {
 					dmg.setValue(0);
 		   	}
 		}
+	   
+	   public static void onEquipmentSlotActivated(uGUI_EquipmentSlot slot, bool active) {
+	   	if (active && !slot.active && slot.slot.StartsWith("NuclearReactor", StringComparison.InvariantCultureIgnoreCase)) {
+	   		slot.gameObject.EnsureComponent<NuclearReactorFuelSystem.ReactorFuelDisplay>();
+	   	}
+	   }
 	   
 	   public static void onPlacedItem(PlaceTool pt) {
 	   		if (Player.main.currentSub && Player.main.currentSub.isBase)

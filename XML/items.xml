@@ -21,6 +21,39 @@
 			
 		</pda>
 	</StalkerToy>
+	<FulguriteRod>
+		<name>
+			Fulgurite Fuel Rod
+		</name>
+		<desc>
+			A special nuclear fuel blend that burns extremely quickly, releasing large amounts of energy for a short time.
+		</desc>
+		<pda>
+			
+		</pda>
+	</FulguriteRod>
+	<WaterCooledRod>
+		<name>
+			Water-Cooled Fuel Rod
+		</name>
+		<desc>
+			A refined nuclear fuel item that produces slightly less power per time but lasts much longer.
+		</desc>
+		<pda>
+			
+		</pda>
+	</WaterCooledRod>
+	<ReprocessedRod>
+		<name>
+			Reprocessed Fuel Rod
+		</name>
+		<desc>
+			Waste nuclear istopes, reprocessed to eke out the last bit of available energy.
+		</desc>
+		<pda>
+			
+		</pda>
+	</ReprocessedRod>
 	<Name>
 		<name>
 			
