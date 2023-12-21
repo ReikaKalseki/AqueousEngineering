@@ -176,11 +176,13 @@ namespace ReikaKalseki.AqueousEngineering {
 								Pickupable item = itemInSlot.item;
 								if (item != null) {
 									TechType techType = item.GetTechType();
-									float added;
-									NuclearFuel fuel = NuclearReactorFuelSystem.instance.fuels[techType];
-									DIHooks.addPowerToSeabaseDelegate(reactor._powerSource, fuel.maxPPS*dT, out added, reactor);
-									//SNUtil.writeToChat("Reactor @ "+reactor.transform.position+" generated "+added+" from "+fuel+" in slot "+slot);
-									use(slot, added, fuel);
+									if (techType != TechType.None && techType != TechType.DepletedReactorRod) {
+										float added;
+										NuclearFuel fuel = NuclearReactorFuelSystem.instance.fuels[techType];
+										DIHooks.addPowerToSeabaseDelegate(reactor._powerSource, fuel.maxPPS*dT, out added, reactor);
+										//SNUtil.writeToChat("Reactor @ "+reactor.transform.position+" generated "+added+" from "+fuel+" in slot "+slot);
+										use(slot, added, fuel);
+									}
 								}
 							}
 						}

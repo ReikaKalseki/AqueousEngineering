@@ -344,11 +344,11 @@ namespace ReikaKalseki.AqueousEngineering {
 				decoRatings[pfb] = deco;
 		}
 		
-		public void debugRoomValues() {
+		public static void debugRoomValues() {
 			BaseCell bc = AEHooks.getCurrentPlayerRoom();
 			BaseRoot bb = bc.gameObject.FindAncestor<BaseRoot>();
 			float trash;
-			getType(bb, bc, ObjectUtil.getBaseObjectsInRoom(bb, bc), out trash, true);
+			instance.getType(bb, bc, ObjectUtil.getBaseObjectsInRoom(bb, bc), out trash, true);
 		}
 		
 		internal RoomTypes getType(BaseRoot bb, BaseCell bc, List<PrefabIdentifier> li, out float decoRating, bool debug = false) {
@@ -392,11 +392,18 @@ namespace ReikaKalseki.AqueousEngineering {
 				decoRating += windows*getWindowDecoValue(bb, bc, hasGlassRoof, debug); //windows, rating is base location dependent
 				if (sideWindows) {
 					float decoAdd = 0;
+					HashSet<int> seen = new HashSet<int>();
 					WorldUtil.getObjectsNear<GameObject>(bc.transform.position, 25, go => {
-						if (go.activeSelf && Mathf.Abs(go.transform.position.y-bc.transform.position.y) <= 10) {
+						if (go.activeSelf && !seen.Contains(go.GetInstanceID()) && Mathf.Abs(go.transform.position.y-bc.transform.position.y) <= 10) {
+							seen.Add(go.GetInstanceID());
 							Planter p = go.GetComponent<Planter>();
-							if (p)
-								decoAdd += getInventoryDecoValue(p.GetComponent<StorageContainer>())*0.8F;
+							if (p && !p.isIndoor) {
+								float add = getInventoryDecoValue(p.GetComponent<StorageContainer>())*0.8F;
+								decoAdd += add;
+								if (debug)
+									SNUtil.log("Found nearby exterior planter "+p.name+": +"+add+" ("+p.GetComponent<StorageContainer>().container.GetItemTypes().Select<TechType, string>(tt => Language.main.Get(tt.AsString())).toDebugString());
+			
+							}
 						}
 					});
 					decoRating += decoAdd;
