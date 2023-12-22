@@ -103,7 +103,7 @@ namespace ReikaKalseki.AqueousEngineering {
 				if (!fillBar) {
 					fillBar = new GameObject("FuelLifeIndicator");
 					fillBar.transform.SetParent(transform, false);
-					fillBar.transform.localRotation = Quaternion.identity;
+					fillBar.transform.localRotation = Quaternion.Euler(0, 0, 202.5F);
 					fillBar.layer = gameObject.layer;
 					fillBar.transform.localPosition = Vector3.zero;//new Vector3(0.55F, -0.55F, 0);
 					fillBar.transform.localScale = Vector3.one*2.5F;
