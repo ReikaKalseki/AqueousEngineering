@@ -67,6 +67,8 @@ namespace ReikaKalseki.AqueousEngineering {
 		
 		public static void onSkyApplierSpawn(SkyApplier sk) {
 			PrefabIdentifier pi = sk.GetComponent<PrefabIdentifier>();
+	    	if (pi && pi.name.StartsWith("Seamoth", StringComparison.InvariantCultureIgnoreCase) && pi.name.EndsWith("Arm(Clone)", StringComparison.InvariantCultureIgnoreCase))
+	    		return;
 			if (sk.GetComponent<StarshipDoor>() && Vector3.Distance(mountainWreckLaserable, sk.transform.position) <= 0.5)
 				new WreckDoorSwaps.DoorSwap(sk.transform.position, "Laser").applyTo(sk.gameObject);
 			else if (pi && pi.ClassId == "055b3160-f57b-46ba-80f5-b708d0c8180e" && Vector3.Distance(mountainWreckBlock, sk.transform.position) <= 0.5)
