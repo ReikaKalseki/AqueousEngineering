@@ -179,7 +179,10 @@ namespace ReikaKalseki.AqueousEngineering {
 									if (techType != TechType.None && techType != TechType.DepletedReactorRod) {
 										float added;
 										NuclearFuel fuel = NuclearReactorFuelSystem.instance.fuels[techType];
-										DIHooks.addPowerToSeabaseDelegate(reactor._powerSource, fuel.maxPPS*dT, out added, reactor);
+										float dP = fuel.maxPPS*dT;
+										if (BaseRoomSpecializationSystem.instance.getSavedType(reactor) == BaseRoomSpecializationSystem.RoomTypes.POWER)
+											dP *= 1.25F;
+										DIHooks.addPowerToSeabaseDelegate(reactor._powerSource, dP, out added, reactor);
 										//SNUtil.writeToChat("Reactor @ "+reactor.transform.position+" generated "+added+" from "+fuel+" in slot "+slot);
 										use(slot, added, fuel);
 									}

@@ -100,7 +100,7 @@ namespace ReikaKalseki.AqueousEngineering {
 			return codes.AsEnumerable();
 		}
 	}
-	
+	/* handled in NuclearReactorFuelSystem
 	[HarmonyPatch(typeof(BaseNuclearReactor))]
 	[HarmonyPatch("Update")]
 	public static class NuclearReactorPowerHook {
@@ -119,7 +119,7 @@ namespace ReikaKalseki.AqueousEngineering {
 			}
 			return codes.AsEnumerable();
 		}
-	}
+	}*/
 	
 	[HarmonyPatch(typeof(BaseBioReactor))]
 	[HarmonyPatch("Update")]

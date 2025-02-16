@@ -50,18 +50,18 @@ namespace ReikaKalseki.AqueousEngineering {
 		}
 			
 	    public override void generate(List<GameObject> li) {	
-			for (int i = 0; i < 20; i++) {
+			for (int i = 0; i < 40; i++) {
 				GameObject go = ObjectUtil.createWorldObject(itemList.getRandomEntry());
 				if (!go)
 					continue;
-				go.transform.position = MathUtil.getRandomVectorAround(position, 3F);
+				go.transform.position = MathUtil.getRandomVectorAround(position, 8F);
 				Rigidbody rb = go.EnsureComponent<Rigidbody>();
 				rb.isKinematic = false;
 				rb.velocity = MathUtil.getRandomVectorAround(Vector3.zero, 15);
 				go.EnsureComponent<WorldForces>().underwaterGravity = 3;
 				go.transform.localRotation = UnityEngine.Random.rotationUniform;					
-				MountainWreckRoomDebrisItem prop = go.EnsureComponent<MountainWreckRoomDebrisItem>();
-				prop.Invoke("fixInPlace", 30);
+				PhysicsSettlingProp prop = go.EnsureComponent<PhysicsSettlingProp>();
+				prop.init("mountaincrates", 30);
 				li.Add(go);
 			}
 	    }
@@ -70,31 +70,5 @@ namespace ReikaKalseki.AqueousEngineering {
 			itemList.addEntry(item, amt);
 		}
 			
-	}
-	
-	class MountainWreckRoomDebrisItem : MonoBehaviour {
-		
-		private static readonly Vector3 vent1 = new Vector3(-134.15F, -501, 940.29F);
-		private static readonly Vector3 vent2 = new Vector3(-125.20F, -503, 936.16F);
-		
-		private Rigidbody body;
-		
-		private float time;
-		
-		void Update() {
-			if (!body)
-				body = GetComponentInChildren<Rigidbody>();
-			time += Time.deltaTime;
-			Vector3 pos = transform.position;
-				
-			if (time > 15F && body.velocity.magnitude < 0.03)
-				fixInPlace();
-		}
-		
-		void fixInPlace() {
-			body.isKinematic = true;
-			UnityEngine.Object.Destroy(this);
-		}
-		
 	}
 }
