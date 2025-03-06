@@ -19,7 +19,7 @@ namespace ReikaKalseki.AqueousEngineering {
 		internal static readonly float POWER_COST = 0.0625F;
 		internal static readonly float CONSUMPTION_RATE = 15*60; //s
 		
-		internal static BasicCraftingItem fuel;
+		internal static WorldCollectedItem fuel;
 		
 		public ACUBooster(XMLLocale.LocaleEntry e) : base(e.key, e.name, e.desc, "5fc7744b-5a2c-4572-8e53-eebf990de434") {
 			addIngredient(TechType.Titanium, 1);

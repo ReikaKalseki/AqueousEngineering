@@ -116,19 +116,13 @@ namespace ReikaKalseki.AqueousEngineering {
 			}
 			box.transform.localPosition = Vector3.zero;
 			box.transform.localRotation = Quaternion.identity;
-			foreach (PrefabIdentifier pi in box.transform.GetComponentsInChildren<PrefabIdentifier>()) {
-				if (pi && pi.classId == control.ClassID)
-					return;
-			}
-			GameObject btn = ObjectUtil.createWorldObject(control.ClassID);
-			HolographicControl.HolographicControlTag com = btn.GetComponentInChildren<HolographicControl.HolographicControlTag>();
-			btn.transform.SetParent(box.transform);
+			HolographicControl.HolographicControlTag com = HolographicControl.addButton(box, control);
 			updateButtons();
 			if (activeButtons.Contains(control.ClassID)) {
 				com.setState(true);
 				//activeButtons.Remove(control.ClassID);
 			}
-			SNUtil.log("Added button "+btn+" to control panel; active: "+com.getState(), AqueousEngineeringMod.modDLL);
+			SNUtil.log("Added button "+control.ClassID+" to control panel; active: "+com.getState(), AqueousEngineeringMod.modDLL);
 		}
 		
 		void updateButtons() {

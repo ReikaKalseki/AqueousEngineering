@@ -24,29 +24,31 @@ namespace ReikaKalseki.AqueousEngineering {
 		private static BaseCell currentPlayerRoom;
 		private static float lastPlayerRoomCheckTime;
 	    
-	    static AEHooks() {
+		static AEHooks() {
 			SNUtil.log("Initializing AEHooks");
-	    	DIHooks.onWorldLoadedEvent += onWorldLoaded;
-	    	DIHooks.onConstructedEvent += onConstructionComplete;
-	    	DIHooks.onItemPickedUpEvent += onPickup;
-	    	DIHooks.onDamageEvent += onTakeDamage;
-	    	DIHooks.knifeHarvestEvent += interceptItemHarvest;
-	    	DIHooks.inventoryClosedEvent += onInvClosed;
-	    	DIHooks.onBaseLoadedEvent += onBaseLoaded;
-	    	DIHooks.constructabilityEvent += enforceBuildability;
-	    	DIHooks.gravTrapAttemptEvent += gravTryAttract;
-	    	DIHooks.onSkyApplierSpawnEvent += onSkyApplierSpawn;
-	    	DIHooks.onPlayerTickEvent += tickPlayer;
-	    	DIHooks.getFoodRateEvent += affectFoodRate;
-	    	DIHooks.onSleepEvent += onSleep;
-	    	//DIHooks.onRedundantScanEvent += ch => ch.preventNormalDrop = onRedundantScan();
-	    	CustomMachineLogic.getMachinePowerCostFactorEvent += getCustomMachinePowerCostMultiplier;
-	    }
+			DIHooks.onWorldLoadedEvent += onWorldLoaded;
+			DIHooks.onConstructedEvent += onConstructionComplete;
+			DIHooks.onItemPickedUpEvent += onPickup;
+			DIHooks.onDamageEvent += onTakeDamage;
+			DIHooks.knifeHarvestEvent += interceptItemHarvest;
+			DIHooks.inventoryClosedEvent += onInvClosed;
+			DIHooks.onBaseLoadedEvent += onBaseLoaded;
+			DIHooks.constructabilityEvent += enforceBuildability;
+			DIHooks.gravTrapAttemptEvent += gravTryAttract;
+			DIHooks.onSkyApplierSpawnEvent += onSkyApplierSpawn;
+			DIHooks.onPlayerTickEvent += tickPlayer;
+			DIHooks.getFoodRateEvent += affectFoodRate;
+			DIHooks.onSleepEvent += onSleep;	    	
+			DIHooks.baseRebuildEvent += onBaseRebuild;
+	    	
+			//DIHooks.onRedundantScanEvent += ch => ch.preventNormalDrop = onRedundantScan();
+			CustomMachineLogic.getMachinePowerCostFactorEvent += getCustomMachinePowerCostMultiplier;
+		}
 		
 		public static void tickPlayer(Player ep) {
 			if (ep.currentSub && ep.currentSub.isBase) {
 				float time = DayNightCycle.main.timePassedAsFloat;
-				if (time-lastPlayerRoomCheckTime >= 0.5F) {
+				if (time - lastPlayerRoomCheckTime >= 0.5F) {
 					currentPlayerRoom = ObjectUtil.getBaseRoom((BaseRoot)ep.currentSub, ep.transform.position);
 					lastPlayerRoomCheckTime = time;
 				}
@@ -57,18 +59,19 @@ namespace ReikaKalseki.AqueousEngineering {
 			return currentPlayerRoom;
 		}
 	    
-	    public static void onWorldLoaded() {	        
-	    	OutdoorPot.updateLocale();
+		public static void onWorldLoaded() {	        
+			OutdoorPot.updateLocale();
 	    	
-	    	string s = AqueousEngineeringMod.machineLocale.getEntry("BaseRepairBeacon").getField<string>("frag");
-		    foreach (TechnologyFragment f in AqueousEngineeringMod.repairBeaconFragments)
-		    	LanguageHandler.Main.SetLanguageLine(f.fragmentPrefab.TechType.AsString(), s);
-	    }
+			string s = AqueousEngineeringMod.machineLocale.getEntry("BaseRepairBeacon").getField<string>("frag");
+			foreach (TechnologyFragment f in AqueousEngineeringMod.repairBeaconFragments)
+				LanguageHandler.Main.SetLanguageLine(f.fragmentPrefab.TechType.AsString(), s);
+		}
 		
 		public static void onSkyApplierSpawn(SkyApplier sk) {
 			PrefabIdentifier pi = sk.GetComponent<PrefabIdentifier>();
-	    	if (pi && pi.name.StartsWith("Seamoth", StringComparison.InvariantCultureIgnoreCase) && pi.name.EndsWith("Arm(Clone)", StringComparison.InvariantCultureIgnoreCase))
-	    		return;
+			MoonpoolRotationSystem.instance.processObject(sk.gameObject);
+			if (pi && pi.name.StartsWith("Seamoth", StringComparison.InvariantCultureIgnoreCase) && pi.name.EndsWith("Arm(Clone)", StringComparison.InvariantCultureIgnoreCase))
+				return;
 			if (sk.GetComponent<StarshipDoor>() && Vector3.Distance(mountainWreckLaserable, sk.transform.position) <= 0.5)
 				new WreckDoorSwaps.DoorSwap(sk.transform.position, "Laser").applyTo(sk.gameObject);
 			else if (pi && pi.ClassId == "055b3160-f57b-46ba-80f5-b708d0c8180e" && Vector3.Distance(mountainWreckBlock, sk.transform.position) <= 0.5)
@@ -79,13 +82,38 @@ namespace ReikaKalseki.AqueousEngineering {
 			reactor.gameObject.EnsureComponent<NuclearReactorFuelSystem.ReactorManager>();
 		}
 	   
-	   	public static void tickACU(WaterPark acu) {
-	   		ACUCallbackSystem.instance.tick(acu);
-	   	}
+		public static void tickACU(WaterPark acu) {
+			ACUCallbackSystem.instance.tick(acu);
+		}
+		
+		public static void tryBreedACU(WaterPark acu, WaterParkCreature creature) {
+			if (!acu.items.Contains(creature))
+				return;
+			TechType tt = creature.pickupable.GetTechType();
+			ACUCallbackSystem.ACUCallback call = acu.gameObject.GetComponent<ACUCallbackSystem.ACUCallback>();
+			BaseBioReactor bio = call ? call.isAboveBioreactor : null;
+			bool full = !acu.HasFreeSpace();
+			if (full && !(bio && bio.IsAllowedToAdd(creature.pickupable, false) && bio.container.HasRoomCached(CraftData.GetItemSize(tt))))
+				return;
+			WaterParkCreature mate = acu.items.Find(item => item && item != creature && item is WaterParkCreature && item.pickupable && ((WaterParkCreature)item).GetCanBreed() && item.pickupable.GetTechType() == tt) as WaterParkCreature;
+			if (!mate)
+				return;
+			bool flag = true;
+			if (full) {
+				GameObject go = ObjectUtil.createWorldObject(tt);
+				go.SetActive(false);
+				flag = bio.container.AddItem(go.GetComponent<Pickupable>()) != null;
+			}
+			else {
+				WaterParkCreature.Born(WaterParkCreature.creatureEggs.GetOrDefault(tt, tt), acu, creature.transform.position + Vector3.down);
+			}
+			if (flag)
+				mate.ResetBreedTime();
+		}
 	   
-	   	public static bool canAddItemToACU(Pickupable item) {
+		public static bool canAddItemToACU(Pickupable item) {
 			if (!item)
-		   		return false;
+				return false;
 			TechType tt = item.GetTechType();
 			if (ACUCallbackSystem.isStalkerToy(tt))
 				return true;
@@ -94,13 +122,13 @@ namespace ReikaKalseki.AqueousEngineering {
 				return false;
 			LiveMixin lv = go.GetComponent<LiveMixin>();
 			return !lv || lv.IsAlive();
-	   	}
+		}
 	   
 		public static void onChunkGenGrass(IVoxelandChunk2 chunk) {
-		 	foreach (Renderer r in chunk.grassRenders) {
-		   		ACUTheming.cacheGrassMaterial(r.materials[0]);
+			foreach (Renderer r in chunk.grassRenders) {
+				ACUTheming.cacheGrassMaterial(r.materials[0]);
 			}
-	   	}
+		}
 		
 		public static float getCameraDistanceForRenderFX(MapRoomCamera cam, MapRoomScreen scr) {
 			SubRoot sub = cam.dockingPoint ? cam.dockingPoint.gameObject.GetComponentInParent<SubRoot>() : null;
@@ -139,30 +167,30 @@ namespace ReikaKalseki.AqueousEngineering {
 			return face && face.gameObject.name.Contains("WaterPark");
 		}
 	    */
-	    public static void enforceBuildability(DIHooks.BuildabilityCheck check) {	        
+		public static void enforceBuildability(DIHooks.BuildabilityCheck check) {	        
 			if (isBuildingACUBuiltBlock()) {
-	   			check.placeable = check.placeOn && check.placeOn.gameObject.FindAncestor<WaterParkPiece>();//isOnACU(check.placeOn && chec);
+				check.placeable = check.placeOn && check.placeOn.gameObject.FindAncestor<WaterParkPiece>();//isOnACU(check.placeOn && chec);
 				check.ignoreSpaceRequirements = true;
 			}
-	   		else if (Builder.constructableTechType == AqueousEngineeringMod.ampeelAntennaBlock.TechType && check.placeOn && Player.main.currentWaterPark && check.placeOn.gameObject.FindAncestor<WaterParkPiece>().GetWaterParkModule() == Player.main.currentWaterPark) {
-	   			check.placeable = true;
+			else if (Builder.constructableTechType == AqueousEngineeringMod.ampeelAntennaBlock.TechType && check.placeOn && Player.main.currentWaterPark && check.placeOn.gameObject.FindAncestor<WaterParkPiece>().GetWaterParkModule() == Player.main.currentWaterPark) {
+				check.placeable = true;
 				check.ignoreSpaceRequirements = true;
-		   	}
-	   		else if (Builder.constructableTechType == AqueousEngineeringMod.batteryBlock.TechType) {
-	   			//SNUtil.writeToChat(check.placeOn ? check.placeOn.gameObject.GetFullHierarchyPath() : "null");
-	   			check.placeable &= check.placeOn && (ObjectUtil.isRoom(check.placeOn.gameObject, false) || ObjectUtil.isMoonpool(check.placeOn.gameObject, false, false));
+			}
+			else if (Builder.constructableTechType == AqueousEngineeringMod.batteryBlock.TechType) {
+				//SNUtil.writeToChat(check.placeOn ? check.placeOn.gameObject.GetFullHierarchyPath() : "null");
+				check.placeable &= check.placeOn && (ObjectUtil.isRoom(check.placeOn.gameObject, false) || ObjectUtil.isMoonpool(check.placeOn.gameObject, false, false));
 				check.ignoreSpaceRequirements = false;
-		   	}
-	   		else if (Builder.constructableTechType == AqueousEngineeringMod.powerRelayBlock.TechType) {
-	   			check.placeable = !check.placeOn;
+			}
+			else if (Builder.constructableTechType == AqueousEngineeringMod.powerRelayBlock.TechType) {
+				check.placeable = !check.placeOn;
 				check.ignoreSpaceRequirements = true;
-		   	}
-	   		else if (Builder.constructableTechType == AqueousEngineeringMod.atpTapBlock.TechType) {
-	   			check.placeable = check.placeOn && ATPTapLogic.isValidSourceObject(check.placeOn.gameObject) && WorldUtil.getObjectsNearMatching(check.placeOn.transform.position, 100, go => go.GetComponent<ATPTapLogic>() && go.GetComponent<Constructable>().constructed).Count == 0;
+			}
+			else if (Builder.constructableTechType == AqueousEngineeringMod.atpTapBlock.TechType) {
+				check.placeable = check.placeOn && ATPTapLogic.isValidSourceObject(check.placeOn.gameObject) && WorldUtil.getObjectsNearMatching(check.placeOn.transform.position, 100, go => go.GetComponent<ATPTapLogic>() && go.GetComponent<Constructable>().constructed).Count == 0;
 				check.ignoreSpaceRequirements = true;
-		   	}
-	    }
-	   /*
+			}
+		}
+		/*
 	   public static bool onRedundantScan() {
 	   	PDAScanner.ScanTarget tgt = PDAScanner.scanTarget;
 	   	if (tgt.gameObject) {
@@ -171,120 +199,124 @@ namespace ReikaKalseki.AqueousEngineering {
 	   	}
 	   }*/
 	    
-	    public static void interceptItemHarvest(DIHooks.KnifeHarvest h) {
-	    	if (h.hit && h.drops.Count > 0) {
-	   			Planter p = h.hit.FindAncestor<Planter>();
-		    	if (p && BaseRoomSpecializationSystem.instance.getSavedType(p) == BaseRoomSpecializationSystem.RoomTypes.AGRICULTURAL) {
-	   				if (UnityEngine.Random.Range(0F, 1F) < 0.33F)
-	    				h.drops[h.defaultDrop] = h.drops[h.defaultDrop]+1;
-		        }
-	    	}
-	    }
+		public static void interceptItemHarvest(DIHooks.KnifeHarvest h) {
+			if (h.hit && h.drops.Count > 0) {
+				Planter p = h.hit.FindAncestor<Planter>();
+				if (p && BaseRoomSpecializationSystem.instance.getSavedType(p) == BaseRoomSpecializationSystem.RoomTypes.AGRICULTURAL) {
+					if (UnityEngine.Random.Range(0F, 1F) < 0.33F)
+						h.drops[h.defaultDrop] = h.drops[h.defaultDrop] + 1;
+				}
+			}
+		}
 	    
-	    public static void onPickup(Pickupable pp, Exosuit prawn, bool isKnife) {
-	   		if (BaseRoomSpecializationSystem.instance.getPlayerRoomType(Player.main) == BaseRoomSpecializationSystem.RoomTypes.AGRICULTURAL) {
-	   			Eatable ea = pp.GetComponent<Eatable>();
-		    	if (ea) {
-	   				//SNUtil.writeToChat(pp+" is edible, +25% to values since agri room");
-	   				ea.waterValue *= 1.25F;
-	   				ea.foodValue *= 1.25F;
-		        }
-	    	}
-	    }
+		public static void onPickup(Pickupable pp, Exosuit prawn, bool isKnife) {
+			if (BaseRoomSpecializationSystem.instance.getPlayerRoomType(Player.main) == BaseRoomSpecializationSystem.RoomTypes.AGRICULTURAL) {
+				Eatable ea = pp.GetComponent<Eatable>();
+				if (ea) {
+					//SNUtil.writeToChat(pp+" is edible, +25% to values since agri room");
+					ea.waterValue *= 1.25F;
+					ea.foodValue *= 1.25F;
+				}
+			}
+		}
 	   
-	   public static float getReactorGeneration(float orig, MonoBehaviour reactor) { //either bio or nuclear
-	   	//SNUtil.writeToChat("Reactor gen "+orig+" in "+BaseRoomSpecializationSystem.instance.getSavedType(reactor));
-	   	return BaseRoomSpecializationSystem.instance.getSavedType(reactor) == BaseRoomSpecializationSystem.RoomTypes.POWER ? orig*1.25F : orig;
-	   }
+		public static float getReactorGeneration(float orig, MonoBehaviour reactor) { //either bio or nuclear
+			//SNUtil.writeToChat("Reactor gen "+orig+" in "+BaseRoomSpecializationSystem.instance.getSavedType(reactor));
+			return BaseRoomSpecializationSystem.instance.getSavedType(reactor) == BaseRoomSpecializationSystem.RoomTypes.POWER ? orig * 1.25F : orig;
+		}
 	   
-	   public static void onSleep(Bed bed) {
-	   	//SNUtil.writeToChat("Slept in "+BaseRoomSpecializationSystem.instance.getSavedType(bed));
-	   	float deco;
-	   	float thresh;
-	   	if (BaseRoomSpecializationSystem.instance.getSavedType(bed, out deco, out thresh) == BaseRoomSpecializationSystem.RoomTypes.LEISURE)
-	   		Player.main.gameObject.AddComponent<HealingOverTime>().setValues(Mathf.Min(20, 15+deco-thresh), bed.kSleepRealTimeDuration).activate();
-	   }
+		public static void onSleep(Bed bed) {
+			//SNUtil.writeToChat("Slept in "+BaseRoomSpecializationSystem.instance.getSavedType(bed));
+			float deco;
+			float thresh;
+			if (BaseRoomSpecializationSystem.instance.getSavedType(bed, out deco, out thresh) == BaseRoomSpecializationSystem.RoomTypes.LEISURE)
+				Player.main.gameObject.AddComponent<HealingOverTime>().setValues(Mathf.Min(20, 15 + deco - thresh), bed.kSleepRealTimeDuration).activate();
+		}
 	   
-	   public static void affectFoodRate(DIHooks.FoodRateCalculation calc) {
-	   	float deco;
-	   	float thresh;
-	   	BaseRoomSpecializationSystem.RoomTypes type = BaseRoomSpecializationSystem.instance.getPlayerRoomType(Player.main, out deco, out thresh);
-	   	//SNUtil.writeToChat("Current player room type: "+type);
-	   	if (type == BaseRoomSpecializationSystem.RoomTypes.LEISURE)
-	   		calc.rate *= Mathf.Max(0.2F, 0.33F-0.02F*(deco-thresh));
-	   	else if (type == BaseRoomSpecializationSystem.RoomTypes.WORK)
-	   		calc.rate *= 0.8F-0.01F*Mathf.Min(5, deco);
-	   }
+		public static void affectFoodRate(DIHooks.FoodRateCalculation calc) {
+			float deco;
+			float thresh;
+			BaseRoomSpecializationSystem.RoomTypes type = BaseRoomSpecializationSystem.instance.getPlayerRoomType(Player.main, out deco, out thresh);
+			//SNUtil.writeToChat("Current player room type: "+type);
+			if (type == BaseRoomSpecializationSystem.RoomTypes.LEISURE)
+				calc.rate *= Mathf.Max(0.2F, 0.33F - 0.02F * (deco - thresh));
+			else if (type == BaseRoomSpecializationSystem.RoomTypes.WORK)
+				calc.rate *= 0.8F - 0.01F * Mathf.Min(5, deco);
+		}
 	   
-	   public static float getCrafterTime(float time, Crafter c) {
-	   	//SNUtil.writeToChat("Crafter time "+time+" in "+BaseRoomSpecializationSystem.instance.getSavedType(c));
-	   	if (BaseRoomSpecializationSystem.instance.getSavedType(c) == BaseRoomSpecializationSystem.RoomTypes.WORK)
-	   		time /= 1.5F;
-	   	return time;
-	   }
+		public static float getCrafterTime(float time, Crafter c) {
+			//SNUtil.writeToChat("Crafter time "+time+" in "+BaseRoomSpecializationSystem.instance.getSavedType(c));
+			if (BaseRoomSpecializationSystem.instance.getSavedType(c) == BaseRoomSpecializationSystem.RoomTypes.WORK)
+				time /= 1.5F;
+			return time;
+		}
 	   
-	   public static void onConstructionComplete(Constructable c, bool complete) {
-	   	if (Player.main.currentSub && Player.main.currentSub.isBase)
-	   		BaseRoomSpecializationSystem.instance.updateRoom(c.gameObject);
-	   }
+		public static void onConstructionComplete(Constructable c, bool complete) {
+			if (Player.main.currentSub && Player.main.currentSub.isBase)
+				BaseRoomSpecializationSystem.instance.updateRoom(c.gameObject);
+		}
 	   
-	   public static void onInvClosed(StorageContainer sc) {
-	   	if (Player.main.currentSub && Player.main.currentSub.isBase && BaseRoomSpecializationSystem.instance.storageHasDecoValue(sc))
-	   		BaseRoomSpecializationSystem.instance.updateRoom(sc.gameObject);
-	   }
+		public static void onInvClosed(StorageContainer sc) {
+			if (Player.main.currentSub && Player.main.currentSub.isBase && BaseRoomSpecializationSystem.instance.storageHasDecoValue(sc))
+				BaseRoomSpecializationSystem.instance.updateRoom(sc.gameObject);
+		}
 	   
-	   public static float getWaterFilterPowerCost(float cost, FiltrationMachine c) {
-	   	//SNUtil.writeToChat("Waterfilter power cost "+cost+" in "+BaseRoomSpecializationSystem.instance.getSavedType(c));
-	   	if (BaseRoomSpecializationSystem.instance.getSavedType(c) == BaseRoomSpecializationSystem.RoomTypes.MECHANICAL)
-	   		cost *= 0.8F;
-	   	return cost;
-	   }
+		public static float getWaterFilterPowerCost(float cost, FiltrationMachine c) {
+			//SNUtil.writeToChat("Waterfilter power cost "+cost+" in "+BaseRoomSpecializationSystem.instance.getSavedType(c));
+			if (BaseRoomSpecializationSystem.instance.getSavedType(c) == BaseRoomSpecializationSystem.RoomTypes.MECHANICAL)
+				cost *= 0.8F;
+			return cost;
+		}
 	   
-	   public static float getChargerSpeed(float speed, Charger c) {
-	   	//SNUtil.writeToChat("Charger speed "+speed+" in "+BaseRoomSpecializationSystem.instance.getSavedType(c));
-	   	if (BaseRoomSpecializationSystem.instance.getSavedType(c) == BaseRoomSpecializationSystem.RoomTypes.MECHANICAL)
-	   		speed *= 1.5F;
-	   	return speed;
-	   }
+		public static float getChargerSpeed(float speed, Charger c) {
+			//SNUtil.writeToChat("Charger speed "+speed+" in "+BaseRoomSpecializationSystem.instance.getSavedType(c));
+			if (BaseRoomSpecializationSystem.instance.getSavedType(c) == BaseRoomSpecializationSystem.RoomTypes.MECHANICAL)
+				speed *= 1.5F;
+			return speed;
+		}
 	   
-	   public static void getCustomMachinePowerCostMultiplier(CustomMachinePowerCostFactorCheck ch) {
-	   	if (BaseRoomSpecializationSystem.instance.getSavedType(ch.machine) == BaseRoomSpecializationSystem.RoomTypes.MECHANICAL)
-	   		ch.value *= 0.8F;
-	   }
+		public static void getCustomMachinePowerCostMultiplier(CustomMachinePowerCostFactorCheck ch) {
+			if (BaseRoomSpecializationSystem.instance.getSavedType(ch.machine) == BaseRoomSpecializationSystem.RoomTypes.MECHANICAL)
+				ch.value *= 0.8F;
+		}
 	   
-	   public static void onBaseLoaded(BaseRoot root) {
-	   	BaseRoomSpecializationSystem.instance.recomputeBaseRooms(root);
-	   }
-	   /*
+		public static void onBaseLoaded(BaseRoot root) {
+			BaseRoomSpecializationSystem.instance.recomputeBaseRooms(root);
+		}
+		/*
 	   public static void onPDAClosed() {
 			XMLLocale.LocaleEntry e = AqueousEngineeringMod.acuMonitorBlock.locale;
 			PDAManager.PDAPage pp = PDAManager.getPage(e.key+"PDA");
 			pp.relock();
 	   }*/
 	    
-	    public static void gravTryAttract(DIHooks.GravTrapGrabAttempt h) {
-		   	if (h.gravtrap.GetComponent<ItemCollector.ItemCollectorLogic>()) {
-	   			h.allowGrab &= ItemCollector.ItemCollectorLogic.canGrab(h.target);
-		   	}
-	    }
+		public static void gravTryAttract(DIHooks.GravTrapGrabAttempt h) {
+			if (h.gravtrap.GetComponent<ItemCollector.ItemCollectorLogic>()) {
+				h.allowGrab &= ItemCollector.ItemCollectorLogic.canGrab(h.target);
+			}
+		}
 		
 		public static void onTakeDamage(DIHooks.DamageToDeal dmg) {
-		   	if (dmg.type == DamageType.Heat || dmg.type == DamageType.Fire) {
+			if (dmg.type == DamageType.Heat || dmg.type == DamageType.Fire) {
 				PrefabIdentifier pi = dmg.target.FindAncestor<PrefabIdentifier>();
 				if (pi && pi.ClassId == AqueousEngineeringMod.collector.ClassID)
 					dmg.setValue(0);
-		   	}
+			}
 		}
 	   
-	   public static void onEquipmentSlotActivated(uGUI_EquipmentSlot slot, bool active) {
-	   	if (active && !slot.active && slot.slot.StartsWith("NuclearReactor", StringComparison.InvariantCultureIgnoreCase)) {
-	   		slot.gameObject.EnsureComponent<NuclearReactorFuelSystem.ReactorFuelDisplay>();
-	   	}
-	   }
+		public static void onEquipmentSlotActivated(uGUI_EquipmentSlot slot, bool active) {
+			if (active && !slot.active && slot.slot.StartsWith("NuclearReactor", StringComparison.InvariantCultureIgnoreCase)) {
+				slot.gameObject.EnsureComponent<NuclearReactorFuelSystem.ReactorFuelDisplay>();
+			}
+		}
 	   
-	   public static void onPlacedItem(PlaceTool pt) {
-	   		if (Player.main.currentSub && Player.main.currentSub.isBase)
-	   			BaseRoomSpecializationSystem.instance.updateRoom(pt.gameObject);
-	   }
+		public static void onPlacedItem(PlaceTool pt) {
+			if (Player.main.currentSub && Player.main.currentSub.isBase)
+				BaseRoomSpecializationSystem.instance.updateRoom(pt.gameObject);
+		}
+		
+		public static void onBaseRebuild(Base b) {
+			MoonpoolRotationSystem.instance.rebuildBase(b);
+		}
 	}
 }

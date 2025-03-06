@@ -87,6 +87,67 @@ namespace ReikaKalseki.AqueousEngineering {
 			addFood(new PlantFood(VanillaFlora.DEEP_MUSHROOM, 0.1F, BiomeRegions.LostRiver, BiomeRegions.LavaZone));
 		}
 		
+		public static void addPost() {
+			TechType tt = SNUtil.getTechType("StellarThalassacean");
+			if (tt != TechType.None)
+				addPredatorType(tt, 6F, 1.5F, 0.3F, false, BiomeRegions.GrandReef, BiomeRegions.Koosh, BiomeRegions.Other);
+			
+			tt = SNUtil.getTechType("JasperThalassacean");
+			if (tt != TechType.None)
+				addPredatorType(tt, 6F, 1.5F, 0.3F, false, BiomeRegions.LostRiver);
+			
+			tt = SNUtil.getTechType("Twisteel");
+			if (tt != TechType.None)
+				addPredatorType(tt, 2F, 0.5F, 0.8F, true, BiomeRegions.BloodKelp, BiomeRegions.Koosh);
+			
+			tt = SNUtil.getTechType("JellySpinner");
+			if (tt != TechType.None)
+				addFood(new AnimalFood(tt, BiomeRegions.BloodKelp, BiomeRegions.LostRiver));
+			
+			tt = SNUtil.getTechType("TriangleFish");
+			if (tt != TechType.None)
+				addFood(new AnimalFood(tt, BiomeRegions.Shallows));
+			
+			tt = SNUtil.getTechType("Axetail");
+			if (tt != TechType.None)
+				addFood(new AnimalFood(tt, BiomeRegions.RedGrass));
+			
+			tt = SNUtil.getTechType("RibbonRay");
+			if (tt != TechType.None)
+				addFood(new AnimalFood(tt, BiomeRegions.Shallows, BiomeRegions.Mushroom));
+			
+			tt = SNUtil.getTechType("GrandGlider");
+			if (tt != TechType.None) {
+				addFood(new AnimalFood(tt, 2, BiomeRegions.GrandReef, BiomeRegions.Koosh, BiomeRegions.Other));
+				addPredatorType(tt, 3.0F, 0.8F, 0.75F, false, BiomeRegions.GrandReef, BiomeRegions.Koosh, BiomeRegions.Other);
+			}
+			
+			tt = SNUtil.getTechType("Filtorb");
+			if (tt != TechType.None)
+				addFood(new AnimalFood(tt, 0.1F, BiomeRegions.Shallows, BiomeRegions.RedGrass, BiomeRegions.GrandReef, BiomeRegions.Other));
+			
+			addClownPincher("EmeraldClownPincher", BiomeRegions.Kelp);
+			addClownPincher("SapphireClownPincher", BiomeRegions.GrandReef);
+			addClownPincher("RubyClownPincher", BiomeRegions.LavaZone);
+			addClownPincher("AmberClownPincher", BiomeRegions.Other);
+			addClownPincher("CitrineClownPincher", BiomeRegions.Other);
+			
+			tt = SNUtil.getTechType("GulperLeviathanBaby");
+			if (tt != TechType.None)
+				addPredatorType(tt, 5F, 4F, 0.2F, true, BiomeRegions.GrandReef);
+			tt = SNUtil.getTechType("GulperLeviathan");
+			if (tt != TechType.None)
+				addPredatorType(tt, 8F, 8F, 0.2F, true, BiomeRegions.BloodKelp, BiomeRegions.Other);
+		}
+		
+		private static void addClownPincher(string id, BiomeRegions.RegionType br) {
+			TechType tt = SNUtil.getTechType(id);
+			if (tt != TechType.None) {
+				addFood(new AnimalFood(tt, br));
+				addPredatorType(tt, 1.5F, 2F, 1.6F, false, br);
+			}
+		}
+		
 		public static void addPredatorType(TechType tt, float relativeValue, float metaRate, float pooChance, bool carn, params BiomeRegions.RegionType[] rr) {
 			List<BiomeRegions.RegionType> li = rr.ToList();
 			li.RemoveAt(0);
@@ -143,7 +204,7 @@ namespace ReikaKalseki.AqueousEngineering {
 			return li;
 		}
 		
-		internal static Creature handleCreature(ACUCallbackSystem.ACUCallback acu, float dT, WaterParkItem wp, TechType tt, List<WaterParkCreature> foodFish, PrefabIdentifier[] plants, bool acuRoom, HashSet<BiomeRegions.RegionType> possibleBiomes) {
+		internal static Creature handleCreature(ACUCallbackSystem.ACUCallback acu, float dT, WaterParkCreature wp, TechType tt, List<WaterParkCreature> foodFish, PrefabIdentifier[] plants, bool acuRoom, HashSet<BiomeRegions.RegionType> possibleBiomes) {
 			if (edibleFish.ContainsKey(tt)) {
 				if (tt == TechType.Peeper && wp.gameObject.GetComponent<Peeper>().isHero)
 					acu.sparkleCount++;
@@ -157,7 +218,7 @@ namespace ReikaKalseki.AqueousEngineering {
 				//	SNUtil.writeToChat("Biome list empty after "+tt+" > "+edibleFish[tt]);
 				if (acu.nextIsDebug)
 					SNUtil.writeToChat(tt+" > "+edibleFish[tt]+" > "+string.Join(",", possibleBiomes));
-				foodFish.Add((WaterParkCreature)wp);
+				foodFish.Add(wp);
 				acu.herbivoreCount++;
 			}
 			else if (metabolisms.ContainsKey(tt)) {
@@ -174,7 +235,7 @@ namespace ReikaKalseki.AqueousEngineering {
 				//if (possibleBiomes.Count <= 0)
 				//	SNUtil.writeToChat("Biome list empty after "+tt+" > "+am);
 				Creature c = wp.gameObject.GetComponentInChildren<Creature>();
-				if (((WaterParkCreature)wp).isMature) {
+				if (wp.isMature) {
 					c.Hunger.Add(dT*am.metabolismPerSecond*FOOD_SCALAR);
 					c.Hunger.Falloff = 0;
 					if (c.Hunger.Value >= 0.5F) {
@@ -218,7 +279,7 @@ namespace ReikaKalseki.AqueousEngineering {
 			return 1;
 		}
 		
-		private static void eat(ACUCallbackSystem.ACUCallback acu, WaterParkItem wp, Creature c, ACUMetabolism am, PrefabIdentifier[] plants, bool acuRoom) {
+		private static void eat(ACUCallbackSystem.ACUCallback acu, WaterParkCreature wp, Creature c, ACUMetabolism am, PrefabIdentifier[] plants, bool acuRoom) {
 			Food amt;
 			GameObject eaten;
 			if (tryEat(acu, c, am, plants, out amt, out eaten)) {
@@ -267,7 +328,7 @@ namespace ReikaKalseki.AqueousEngineering {
 			return false;
 		}
 		
-		private static void onEaten(ACUCallbackSystem.ACUCallback acu, WaterParkItem wp, Creature c, ACUMetabolism am, Food amt, GameObject eaten, bool acuRoom) {
+		private static void onEaten(ACUCallbackSystem.ACUCallback acu, WaterParkCreature wp, Creature c, ACUMetabolism am, Food amt, GameObject eaten, bool acuRoom) {
 			float food = amt.foodValue*FOOD_SCALAR*2.5F;
 			if (acuRoom)
 				food *= 1.2F;
@@ -290,7 +351,7 @@ namespace ReikaKalseki.AqueousEngineering {
 			if (c.Hunger.Value >= food) {
 				c.Happy.Add(1F);
 				c.Hunger.Add(-food);
-				float f = am.normalizedPoopChance*amt.foodValue*Mathf.Pow(((WaterParkCreature)wp).age, 2F);
+				float f = am.normalizedPoopChance*amt.foodValue*Mathf.Pow(wp.age, 2F);
 				f *= AqueousEngineeringMod.config.getFloat(AEConfig.ConfigEntries.POO_RATE);
 				if (acuRoom)
 					f *= 1.5F;
@@ -349,13 +410,19 @@ namespace ReikaKalseki.AqueousEngineering {
 				item = tt;
 			}
 			
+			internal AnimalFood(TechType tt, float f, params BiomeRegions.RegionType[] r) : base(f, r) {
+				item = tt;
+			}
+			
 			public AnimalFood(Spawnable s, float f, params BiomeRegions.RegionType[] r) : base(f, r) {
 				item = s.TechType;
 			}
 			
 			public static float calculateFoodValue(TechType tt) {
 				GameObject go = ObjectUtil.lookupPrefab(SNUtil.getTechType("Cooked"+tt));
-				Eatable ea = go.GetComponent<Eatable>();
+				if (!go)
+					go = ObjectUtil.lookupPrefab(SNUtil.getTechType(tt+"Cooked"));
+				Eatable ea = go ? go.GetComponent<Eatable>() : null;
 				return ea ? ea.foodValue*0.01F : 0.2F; //so a reginald is ~40%
 			}
 			

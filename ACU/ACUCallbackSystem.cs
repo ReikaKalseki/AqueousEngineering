@@ -96,6 +96,7 @@ namespace ReikaKalseki.AqueousEngineering {
 			
 			internal float lastPlanktonBoost;
 			internal float lastTick;
+			internal float nextSoundTime;
 			
 			internal Dictionary<string, CreatureCache> creatureData = new Dictionary<string, CreatureCache>();
 			
@@ -280,6 +281,7 @@ namespace ReikaKalseki.AqueousEngineering {
 			internal WaterPark acu;
 			
 			internal BaseRoot seabase;
+			internal BaseCell baseCell;
 			internal ACUContentView contentView;
 			internal StorageContainer planter;
 			internal List<WaterParkPiece> column;
@@ -296,6 +298,8 @@ namespace ReikaKalseki.AqueousEngineering {
 			internal int cuddleCount;
 			internal int gasopodCount;
 			internal bool consistentBiome;
+			
+			internal BaseBioReactor isAboveBioreactor;
 			
 			internal float infectedTotal;			
 			internal float currentBonus;	
@@ -325,6 +329,7 @@ namespace ReikaKalseki.AqueousEngineering {
 					column = null;
 					decoHolders = null;
 					lowestSegment = null;
+					isAboveBioreactor = null;
 					floor = null;
 					cache = null;
 					
@@ -338,13 +343,19 @@ namespace ReikaKalseki.AqueousEngineering {
 						planter = acu.planter.GetComponentInChildren<StorageContainer>();
 						column = ACUCallbackSystem.instance.getACUComponents(acu);
 						lowestSegment = ACUCallbackSystem.instance.getACUFloor(column);
-						floor = ObjectUtil.getChildObject(lowestSegment, "Large_Aquarium_Room_generic_ground");
-						decoHolders = ObjectUtil.getChildObjects(lowestSegment, ACUTheming.ACU_DECO_SLOT_NAME);
-						bubbleVents = ObjectUtil.getChildObject(lowestSegment, "Bubbles");
+						if (lowestSegment) {
+							floor = ObjectUtil.getChildObject(lowestSegment, "Large_Aquarium_Room_generic_ground");
+							decoHolders = ObjectUtil.getChildObjects(lowestSegment, ACUTheming.ACU_DECO_SLOT_NAME);
+							bubbleVents = ObjectUtil.getChildObject(lowestSegment, "Bubbles");
+						}
+						else {
+							SNUtil.log("ACU "+acu.transform.position+" had no lowest segment??? C="+column.Select<WaterParkPiece, string>(wpp => wpp.transform.position.ToString()).toDebugString());
+						}
 						ventBubbleEmitters = bubbleVents.GetComponentsInChildren<ParticleSystem>();
 						contentView = acu.gameObject.EnsureComponent<ACUContentView>();
 						contentView.enabled = true;
 						contentView.setController(this);
+						isAboveBioreactor = ACUCallbackSystem.instance.checkAboveBioreactor(acu, this);
 						load();
 					}
 				}
@@ -486,7 +497,7 @@ namespace ReikaKalseki.AqueousEngineering {
 				stalkerToyValue = 0;
 				bool hasStalkerToy = false;
 				bool acuRoom = BaseRoomSpecializationSystem.instance.getSavedType(acu) == BaseRoomSpecializationSystem.RoomTypes.ACU;
-				foreach (WaterParkItem wp in new List<WaterParkItem>(acu.items)) {
+				foreach (WaterParkItem wp in new List<WaterParkItem>(acu.items)) { //clone because might change in ACUEcosystems.handleCreature
 					if (!wp)
 						continue;
 					Pickupable pp = wp.gameObject.GetComponentInChildren<Pickupable>();
@@ -501,6 +512,16 @@ namespace ReikaKalseki.AqueousEngineering {
 						teeth++;
 					}
 					else if (wp is WaterParkCreature) {
+						WaterParkCreature wpc = (WaterParkCreature)wp;
+						if (wpc.parameters == null) {
+							SNUtil.log("WaterParkCreature had null params: "+wpc.name+" / "+wp.GetComponent<Creature>());
+							ObjectUtil.dumpObjectData(wpc.gameObject);
+							wpc.parameters = WaterParkCreature.GetParameters(wpc.GetComponent<Pickupable>().GetTechType());
+							if (wpc.parameters == null) {
+								SNUtil.log("Fetches null params!");
+								wpc.parameters = WaterParkCreatureParameters.GetDefaultValue();
+							}
+						}
 						InfectedMixin mix = wp.GetComponent<InfectedMixin>();
 						if (mix) {
 							float amt = mix.GetInfectedAmount();
@@ -509,12 +530,39 @@ namespace ReikaKalseki.AqueousEngineering {
 								infectedFish.Add(mix);
 							}
 						}
-						Creature c = ACUEcosystems.handleCreature(this, dT, wp, tt, foodFish, plants, acuRoom, potentialBiomes);
+						Creature c = ACUEcosystems.handleCreature(this, dT, wpc, tt, foodFish, plants, acuRoom, potentialBiomes);
 						if (tt == TechType.Stalker) {
 							stalkers.Add((Stalker)c);
 						}
 					}
 		   	 	}
+				
+				if (time >= cache.nextSoundTime && acu.items.Count > 0) {
+					WaterParkCreature wpc = acu.items.GetRandom() as WaterParkCreature;
+					if (wpc) {
+						bool flag = false;
+						FMOD_CustomLoopingEmitter[] ca = wpc.GetComponentsInChildren<FMOD_CustomLoopingEmitter>();
+						if (ca != null && ca.Length > 0) {
+							ca.GetRandom().Play();
+							flag = true;
+						}
+						else {
+							AttackLastTarget[] a = wpc.GetComponentsInChildren<AttackLastTarget>();
+							if (a != null && a.Length > 0) {
+								FMOD_CustomEmitter emit = a.GetRandom().attackStartSound;
+								if (emit) {
+									emit.Play();
+									flag = true;
+								}
+							}
+						}
+						if (flag)
+							cache.nextSoundTime = time+UnityEngine.Random.Range(1F, 5F);
+						else
+							cache.nextSoundTime = time+UnityEngine.Random.Range(1F, 2F);
+					}
+				}
+						
 				HashSet<ACUEcosystems.PlantFood> plantTypes = ACUEcosystems.collectPlants(this, plants, potentialBiomes);
 				consistent = potentialBiomes.Count > 0 && plantCount > 0;
 				int max = potentialBiomes.Count == 1 ? ACUEcosystems.getPlantsForBiome(potentialBiomes.First<BiomeRegions.RegionType>()).Count : 99;
@@ -675,6 +723,29 @@ namespace ReikaKalseki.AqueousEngineering {
 			foreach (WaterParkPiece wp in li) {
 				if (wp.ceilingTop && wp.ceilingTop.activeSelf)
 					return wp.ceilingTop;
+			}
+			return null;
+		}
+			
+		internal BaseBioReactor checkAboveBioreactor(WaterPark acu, ACUCallback call) {
+			//BaseCell cell = call.lowestSegment.FindAncestor<BaseCell>();
+			Vector3 at = acu.transform.position;//cell.transform.position; //acu pos is lowest one
+			Vector3 seek = at+Vector3.down*3.5F;
+			/*
+			BaseCell below = null;
+			foreach (BaseCell bc in cell.transform.parent.GetComponentsInChildren<BaseCell>()) {
+				if ((bc.transform.position-seek).sqrMagnitude < 0.01) {
+					below = bc;
+					break;
+				}
+			}
+			if (below) {
+				
+			}*/
+			foreach (BaseBioReactor bio in acu.transform.parent.GetComponentsInChildren<BaseBioReactor>()) { //acu is parented directly to base, as is bioreactor
+				if ((bio.transform.position-seek).sqrMagnitude < 0.01) {
+					return bio;
+				}
 			}
 			return null;
 		}

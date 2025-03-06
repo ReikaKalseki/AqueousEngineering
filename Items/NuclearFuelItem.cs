@@ -53,13 +53,13 @@ namespace ReikaKalseki.AqueousEngineering
 
 		public override TechCategory CategoryForPDA {
 			get {
-				return TechCategory.Electronics;
+				return AqueousEngineeringMod.nuclearCategory;
 			}
 		}
 
 		public override string[] StepsToFabricatorTab {
 			get {
-				return new string[]{"Resources", "Electronics"};
+				return new string[]{"Resources", "Nuclear"};
 			}
 		}
 	}

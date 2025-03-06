@@ -22,6 +22,7 @@ namespace ReikaKalseki.AqueousEngineering {
 		
 		private static readonly string ACU_PREFAB = "31662630-7cba-4583-8456-2fa1c4cc31aa";
 		private static readonly string STANDING_LOCKER_PREFAB = "775feb4c-dab9-4322-b4a5-a4289ca1cf6a";
+		private static readonly string BASIC_LOCKER_PREFAB = "5fc7744b-5a2c-4572-8e53-eebf990de434";
 		
 		private static readonly HashSet<string> lockers = new HashSet<string>();
 		private static readonly Dictionary<string, float> decoRatings = new Dictionary<string, float>();
@@ -34,8 +35,8 @@ namespace ReikaKalseki.AqueousEngineering {
 		
 		private BaseRoomSpecializationSystem() {
 			lockers.Add("367656d6-87d9-42a1-926c-3cf959ea1c85");
-			lockers.Add("5fc7744b-5a2c-4572-8e53-eebf990de434");
-			lockers.Add("775feb4c-dab9-4322-b4a5-a4289ca1cf6a");			
+			lockers.Add(BASIC_LOCKER_PREFAB);
+			lockers.Add(STANDING_LOCKER_PREFAB);			
 			lockers.Add("cd34fecd-794c-4a0c-8012-dd81b77f2840");		
 			lockers.Add("CabinetWide");	
 			lockers.Add("CabinetMediumTall");	
@@ -67,7 +68,8 @@ namespace ReikaKalseki.AqueousEngineering {
 			objectTypeMappings["bef7bc0b-149d-4342-bbb4-329047685578"] = new RoomTypes[]{RoomTypes.WORK}; //fragment analyzer
 			objectTypeMappings["c0175cf7-0b6a-4a1d-938f-dad0dbb6fa06"] = new RoomTypes[]{RoomTypes.WORK, RoomTypes.MECHANICAL, RoomTypes.LEISURE}; //medical cabinet
 			objectTypeMappings["c9bdcc4d-a8c6-43c0-8f7a-f86841cd4493"] = new RoomTypes[]{RoomTypes.WORK}; //specimen analyzer
-			objectTypeMappings["5c06baec-0539-4f26-817d-78443548cc52"] = new RoomTypes[]{RoomTypes.LEISURE, RoomTypes.WORK, RoomTypes.MECHANICAL}; //radio		
+			objectTypeMappings["5c06baec-0539-4f26-817d-78443548cc52"] = new RoomTypes[]{RoomTypes.LEISURE, RoomTypes.WORK, RoomTypes.MECHANICAL}; //radio	
+			//no need to map chargers; that is handled directly via instanceof Charger in the computation code
 
 			//FCS
 			objectTypeMappings["CabinetTVStand"] = new RoomTypes[]{RoomTypes.LEISURE};	
@@ -197,7 +199,11 @@ namespace ReikaKalseki.AqueousEngineering {
 			decoRatings["ahsRightCornerwGlassRailing"] = 0.1F;
 			decoRatings["ahsrailingglass"] = 0.05F;
 			decoRatings["LedLightStickShort"] = 0.125F;
-			decoRatings["LedLightStickLong"] = 0.25F;			
+			decoRatings["LedLightStickLong"] = 0.25F;
+			
+			//misc other mods
+			decoRatings["ActualTimeAnalogueClock"] = 0.25F;
+			decoRatings["ActualTimeDigitalClock"] = 0.25F;
 			//
 			
 			//decoRatings["****"] = 1.5F; //plant panel
@@ -369,8 +375,7 @@ namespace ReikaKalseki.AqueousEngineering {
 				RoomTypes[] obj = getObjectType(pi);
 				//if (obj.Length == 1)
 				//	options.AddRange(obj);
-				//else
-				if (obj.Length > 1 || obj[0] != RoomTypes.UNSPECIALIZED) //do not rule out all other room types just because of an unspecialized item
+				//else if (obj.Length > 1 || obj[0] != RoomTypes.UNSPECIALIZED) //do not rule out all other room types just because of an unspecialized item
 					options.IntersectWith(obj);
 				if (lockers.Contains(pi.ClassId))
 				    lockerCount++;
@@ -763,7 +768,7 @@ namespace ReikaKalseki.AqueousEngineering {
 						if (lockers.Contains(prefab.ClassId)) {
 							StorageContainer sc = prefab.GetComponent<StorageContainer>();
 							StorageContainer refSc = ObjectUtil.lookupPrefab(prefab.ClassId).GetComponent<StorageContainer>();
-							sc.Resize(refSc.width+1, refSc.height+1);
+							sc.Resize(refSc.width+1, refSc.height+(prefab.ClassId == BASIC_LOCKER_PREFAB ? 2 : 1));
 						}
 						break;
 					case RoomTypes.ACU:

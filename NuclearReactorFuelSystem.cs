@@ -30,23 +30,23 @@ namespace ReikaKalseki.AqueousEngineering {
 		}
 		
 		public void register() {
-			registerReactorFuel(TechType.ReactorRod, BaseNuclearReactor.charge[TechType.ReactorRod], 4.166666F); //default PPS for reactor was 4.1666665f
+			registerReactorFuel(TechType.ReactorRod, BaseNuclearReactor.charge[TechType.ReactorRod], 4.166666F, 1); //default PPS for reactor was 4.1666665f
 			
 			SaveSystem.addSaveHandler(REACTOR_CLASSID, this);
 		}
 		
-		public void registerReactorFuel(TechType tt, float capacity, float pps) {
-			registerReactorFuel(tt, capacity, pps, TechType.DepletedReactorRod);
+		public void registerReactorFuel(TechType tt, float capacity, float pps, float rad) {
+			registerReactorFuel(tt, capacity, pps, rad, TechType.DepletedReactorRod);
 		}
 		
-		public void registerReactorFuelRelative(TechType tt, float capacity, float pps, TechType depleted) {
+		public void registerReactorFuelRelative(TechType tt, float capacity, float pps, float rad, TechType depleted) {
 			NuclearFuel baseline = fuels[TechType.ReactorRod];
-			registerReactorFuel(tt, capacity*baseline.energyPerItem, pps*baseline.maxPPS, depleted);
+			registerReactorFuel(tt, capacity*baseline.energyPerItem, pps*baseline.maxPPS, rad, depleted);
 		}
 		
-		public void registerReactorFuel(TechType tt, float capacity, float pps, TechType depleted) {
+		public void registerReactorFuel(TechType tt, float capacity, float pps, float rad, TechType depleted) {
 			BaseNuclearReactor.charge[tt] = capacity;
-			fuels[tt] = new NuclearFuel(tt, capacity, pps, depleted);
+			fuels[tt] = new NuclearFuel(tt, capacity, pps, rad, depleted);
 		}
 		
 		public override void save(PrefabIdentifier pi) {
@@ -66,27 +66,61 @@ namespace ReikaKalseki.AqueousEngineering {
 			public readonly TechType itemType;
 			public readonly float energyPerItem;
 			public readonly float maxPPS;
+			public readonly float radiationIntensityFactor;
 			public readonly TechType depletedFuel;
 			
-			internal NuclearFuel(TechType tt, float e, float p) : this(tt, e, p, TechType.DepletedReactorRod) {
+			internal NuclearFuel(TechType tt, float e, float p, float r) : this(tt, e, p, r, TechType.DepletedReactorRod) {
 				
 			}
 			
-			internal NuclearFuel(TechType tt, float e, float p, TechType dep) {
+			internal NuclearFuel(TechType tt, float e, float p, float r, TechType dep) {
 				itemType = tt;
 				energyPerItem = e;
 				maxPPS = p;
+				radiationIntensityFactor = r;
 				depletedFuel = dep;
 			}
 			
-			public override string ToString()
-			{
-				return string.Format("[NuclearFuel ItemType={0}, EnergyPerItem={1}, MaxPPS={2}, DepletedFuel={3}]", itemType.AsString(), energyPerItem, maxPPS, depletedFuel.AsString());
+			public override string ToString() {
+				return string.Format("[NuclearFuel ItemType={0}, EnergyPerItem={1}, MaxPPS={2}, Radiation={3}, DepletedFuel={4}]", itemType.AsString(), energyPerItem, maxPPS, radiationIntensityFactor, depletedFuel.AsString());
 			}
 
 			
 		}
-		
+		/*
+		internal class NuclearReactorRadiationManager : MonoBehaviour {
+			
+			private RadiatePlayerInRange radiation;
+			private BaseNuclearReactor reactor;
+			
+			private float radiationIntensity;
+				
+			void Start() {
+				reactor = gameObject.GetComponent<BaseNuclearReactor>();
+				radiation = gameObject.EnsureComponent<RadiatePlayerInRange>();
+				radiation.tracker = gameObject.EnsureComponent<PlayerDistanceTracker>();
+			}
+			
+			void Update() {
+				radiationIntensity = 0;
+				if (reactor) {
+					List<string> slots = new List<string>();
+					reactor.equipment.GetSlots(EquipmentType.NuclearReactor, slots);
+					foreach (string slot in slots) {
+						InventoryItem ii = reactor.equipment.GetItemInSlot(slot);
+						if (ii != null) {
+							float f = 1;
+							radiationIntensity += 1F/slots.Count*f;
+						}
+					}
+				}
+				radiationIntensity = Mathf.Clamp01(radiationIntensity);
+				radiation.enabled = radiationIntensity > 0;
+				radiation.radiateRadius = 6*radiationIntensity;
+			}
+			
+		}
+		*/
 		internal class ReactorFuelDisplay : MonoBehaviour {
 			
 			private uGUI_EquipmentSlot slot;
@@ -152,6 +186,16 @@ namespace ReikaKalseki.AqueousEngineering {
 			
 			private BaseNuclearReactor reactor;
 			
+			private RadiatePlayerInRange radiation;
+			
+			private float radiationIntensity;
+				
+			void Start() {
+				reactor = gameObject.GetComponent<BaseNuclearReactor>();
+				radiation = gameObject.EnsureComponent<RadiatePlayerInRange>();
+				radiation.tracker = gameObject.EnsureComponent<PlayerDistanceTracker>();
+			}
+			
 			internal float getReactorRodLife(string slot) {
 				if (!usedEnergy.ContainsKey(slot))
 					return 0;
@@ -165,6 +209,7 @@ namespace ReikaKalseki.AqueousEngineering {
 			void Update() {
 				if (!reactor)
 					reactor = GetComponent<BaseNuclearReactor>();
+				radiationIntensity = 0;
 				if (reactor && reactor.constructed >= 1f) {
 					float space = reactor._powerSource.maxPower-reactor._powerSource.power;
 					if (space > 0.1F) {
@@ -183,6 +228,7 @@ namespace ReikaKalseki.AqueousEngineering {
 										if (BaseRoomSpecializationSystem.instance.getSavedType(reactor) == BaseRoomSpecializationSystem.RoomTypes.POWER)
 											dP *= 1.25F;
 										DIHooks.addPowerToSeabaseDelegate(reactor._powerSource, dP, out added, reactor);
+										radiationIntensity += 1F/BaseNuclearReactor.slotIDs.Length*fuel.radiationIntensityFactor;
 										//SNUtil.writeToChat("Reactor @ "+reactor.transform.position+" generated "+added+" from "+fuel+" in slot "+slot);
 										use(slot, added, fuel);
 									}
@@ -191,6 +237,9 @@ namespace ReikaKalseki.AqueousEngineering {
 						}
 					}
 				}
+				radiationIntensity = Mathf.Clamp(radiationIntensity, 0, 2);
+				radiation.enabled = radiationIntensity > 0; //will not do damage unless add a DamagePlayerInRadius
+				radiation.radiateRadius = 4.5F*radiationIntensity; //about the inner radius of a room at 100%
 			}
 			
 			private void use(string slot, float amt, NuclearFuel fuel) {

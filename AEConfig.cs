@@ -16,6 +16,7 @@ namespace ReikaKalseki.AqueousEngineering
 			[ConfigEntry("ATP Tap Generation Rate", typeof(int), 12, 5, 40, 0)]ATPTAPRATE, //How many power cells worth of storage a SB battery can store. Also sets its craft cost.
 			[ConfigEntry("Show room status messages in HUD", true)]ROOMCHAT, //Whether to print text to the upper-left every time a room changes type or decoration rating.
 			[ConfigEntry("Leisure Room Deco Rating Requirement", typeof(float), 15, 8, 30, 0)]LEISUREDECO, //What decoration rating must be achieved for a room to count as a leisure room.
+			[ConfigEntry("ACU Creatures Make Sound", true)]ACUSOUND, //Whether to enable ambient creature noises for creatures in ACUs
 		}
 	}
 }

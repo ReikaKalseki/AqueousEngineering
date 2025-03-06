@@ -22,7 +22,7 @@ namespace ReikaKalseki.AqueousEngineering {
 		
 		internal static readonly Dictionary<TechType, WildFeedingBehavior> behaviors = new Dictionary<TechType, WildFeedingBehavior>();
 		
-		internal static BasicCraftingItem fuel;
+		internal static WorldCollectedItem fuel;
 		
 		static PlanktonFeeder() {			
 			behaviors[TechType.Peeper] = new WildFeedingBehavior(150, 60, 6, 0.15F, 10);

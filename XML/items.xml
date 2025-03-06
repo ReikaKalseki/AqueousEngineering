@@ -1,4 +1,18 @@
 <Root>
+  <CraftingNodes>
+	<name>
+		
+	</name>
+	<desc>
+		
+	</desc>
+	<pda>
+		
+	</pda>
+	<nuclear>
+		Nuclear Products
+	</nuclear>
+  </CraftingNodes>
 	<MiniPoop>
 		<name>
 			Alien Feces (Small)
@@ -43,6 +57,17 @@
 			
 		</pda>
 	</WaterCooledRod>
+	<ShieldedRod>
+		<name>
+			Shielded Fuel Rod
+		</name>
+		<desc>
+			A nuclear fuel rod clad in thick leaded glass. No effect on power production but almost entirely eliminates ambient radiation.
+		</desc>
+		<pda>
+			
+		</pda>
+	</ShieldedRod>
 	<ReprocessedRod>
 		<name>
 			Reprocessed Fuel Rod

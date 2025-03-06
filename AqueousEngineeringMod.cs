@@ -59,12 +59,23 @@ namespace ReikaKalseki.AqueousEngineering
     public static ItemCollector collector;
     public static NuclearFuelItem fulguriteRod;
     public static NuclearFuelItem cooledRod;
+    public static NuclearFuelItem shieldedRod;
     //public static NuclearFuelItem reprocessedRod;
+    
+    public static TechCategory nuclearCategory;
     
     public static HolographicControl seabaseStasisControl;
     public static HolographicControl seabaseSonarControl;
     public static HolographicControl seabaseRepellentControl;
     
+    public static HolographicControl rotateMoonpool;
+    /*
+    public static HolographicControl moonPoolRotateP90;
+    public static HolographicControl moonPoolRotateM90;
+    public static HolographicControl moonPoolRotateP15;
+    public static HolographicControl moonPoolRotateM15;
+    */
+   
     public static TechnologyFragment[] repairBeaconFragments;
     
     public static readonly WorldgenDatabase worldgen = new WorldgenDatabase();
@@ -106,6 +117,11 @@ namespace ReikaKalseki.AqueousEngineering
         roomLocale.load();
         acuLocale.load();
         
+        XMLLocale.LocaleEntry e = itemLocale.getEntry("CraftingNodes");
+   		nuclearCategory = TechCategoryHandler.Main.AddTechCategory("Nuclear", e.getField<string>("nuclear"));
+        TechCategoryHandler.Main.TryRegisterTechCategoryToTechGroup(TechGroup.Resources, nuclearCategory);
+        CraftTreeHandler.Main.AddTabNode(CraftTree.Type.Fabricator, "Nuclear", e.getField<string>("nuclear"), TextureManager.getSprite(modDLL, "Textures/NuclearTab"), "Resources");
+        
         poo = new MiniPoo(itemLocale.getEntry("MiniPoop"));
 	    poo.Patch();
 		BioReactorHandler.Main.SetBioReactorCharge(poo.TechType, BaseBioReactor.GetCharge(TechType.SeaTreaderPoop)/4);
@@ -114,6 +130,9 @@ namespace ReikaKalseki.AqueousEngineering
         toy.addIngredient(TechType.Hoopfish, 1);
         toy.addIngredient(TechType.Titanium, 2);
 	    toy.Patch();
+	    
+	    setNuclear(TechType.ReactorRod);
+	    //setNuclear(TechType.DepletedReactorRod);
 	    
 	    fulguriteRod = new NuclearFuelItem("FulguriteRod");
 	    fulguriteRod.addIngredient(TechType.ReactorRod, 1);
@@ -133,16 +152,33 @@ namespace ReikaKalseki.AqueousEngineering
 	    cooledRod.addIngredient(TechType.Aerogel, 1);
 	    cooledRod.Patch();
 	    
+	    shieldedRod = new NuclearFuelItem("ShieldedRod");
+	    shieldedRod.addIngredient(TechType.ReactorRod, 1);
+	    shieldedRod.addIngredient(TechType.Lead, 4);
+	    shieldedRod.Patch();
+	    
         collector = new ItemCollector(machineLocale.getEntry("ItemCollector")); //deliberately under machine locale for site
 	    collector.Patch();
 	    
-	    seabaseStasisControl = new HolographicControl("SeabaseStasis", "Fire stasis pulse", fireStasisPulses, btn => machineExists<BaseStasisTurretLogic>(btn));
+	    seabaseStasisControl = new HolographicControl("SeabaseStasis", "Fire stasis pulse", true, fireStasisPulses, btn => machineExists<BaseStasisTurretLogic>(btn));
 	    seabaseStasisControl.setIcons("Textures/HoloButtons/StasisButton", 200).Patch();
-	    seabaseSonarControl = new HolographicControl("SeabaseSonar", "Toggle sonar", btn => toggleMachines<BaseSonarPingerLogic>(btn), btn => machineExists<BaseSonarPingerLogic>(btn));
+	    seabaseSonarControl = new HolographicControl("SeabaseSonar", "Toggle sonar", true, btn => toggleMachines<BaseSonarPingerLogic>(btn), btn => machineExists<BaseSonarPingerLogic>(btn));
 	    seabaseSonarControl.setIcons("Textures/HoloButtons/SonarButton", 200).Patch();
-	    seabaseRepellentControl = new HolographicControl("SeabaseRepellent", "Toggle repellant pylon", btn => toggleMachines<BaseCreatureRepellentLogic>(btn), btn => machineExists<BaseCreatureRepellentLogic>(btn));
+	    seabaseRepellentControl = new HolographicControl("SeabaseRepellent", "Toggle repellant pylon", true, btn => toggleMachines<BaseCreatureRepellentLogic>(btn), btn => machineExists<BaseCreatureRepellentLogic>(btn));
 	    seabaseRepellentControl.setIcons("Textures/HoloButtons/RepellentButton", 200).Patch();
-	    
+	    /*
+	    moonPoolRotateP90 = new HolographicControl("MoonPoolP90", "Rotate 90 Degrees Clockwise", false, MoonpoolRotationSystem.instance.rotateMoonpool, btn => true);
+	    moonPoolRotateP90.setIcons("Textures/HoloButtons/MoonPoolP90", 200).Patch();
+	    moonPoolRotateM90 = new HolographicControl("MoonPoolM90", "Rotate 90 Degrees AntiClockwise", false, MoonpoolRotationSystem.instance.rotateMoonpool, btn => true);
+	    moonPoolRotateM90.setIcons("Textures/HoloButtons/MoonPoolM90", 200).Patch();
+	    moonPoolRotateP15 = new HolographicControl("MoonPoolP15", "Rotate 15 Degrees Clockwise", false, MoonpoolRotationSystem.instance.rotateMoonpool, btn => true);
+	    moonPoolRotateP15.setIcons("Textures/HoloButtons/MoonPoolP15", 200).Patch();
+	    moonPoolRotateM15 = new HolographicControl("MoonPoolM15", "Rotate 15 Degrees AntiClockwise", false, MoonpoolRotationSystem.instance.rotateMoonpool, btn => true);
+	    moonPoolRotateM15.setIcons("Textures/HoloButtons/MoonPoolM15", 200).Patch();
+	    */
+	    rotateMoonpool = new HolographicControl("MoonPoolRotate", "Rotate Docking Bay", false, MoonpoolRotationSystem.instance.rotateMoonpool, btn => true);
+	    rotateMoonpool.setIcons("Textures/HoloButtons/MoonPoolRotate", 200).Patch();
+	   
 	    sonarBlock = createMachine<BaseSonarPinger, BaseSonarPingerLogic>("BaseSonar");
 	    repellentBlock = createMachine<BaseCreatureRepellent, BaseCreatureRepellentLogic>("BaseRepellent");
 	    beaconBlock = createMachine<BaseBeacon, BaseBeaconLogic>("BaseBeacon");
@@ -214,8 +250,9 @@ namespace ReikaKalseki.AqueousEngineering
        	ACUCallbackSystem.instance.register();
        	NuclearReactorFuelSystem.instance.register();
        	
-       	NuclearReactorFuelSystem.instance.registerReactorFuelRelative(cooledRod.TechType, 2F, 0.8F, TechType.DepletedReactorRod);
-       	NuclearReactorFuelSystem.instance.registerReactorFuelRelative(fulguriteRod.TechType, 0.25F, 2.5F, TechType.DepletedReactorRod);
+       	NuclearReactorFuelSystem.instance.registerReactorFuelRelative(cooledRod.TechType, 2F, 0.8F, 0.75F, TechType.DepletedReactorRod);
+       	NuclearReactorFuelSystem.instance.registerReactorFuelRelative(fulguriteRod.TechType, 0.25F, 2.5F, 1.5F, TechType.DepletedReactorRod);
+       	NuclearReactorFuelSystem.instance.registerReactorFuelRelative(shieldedRod.TechType, 1F, 1F, 0.1F, TechType.DepletedReactorRod);
        	//NuclearReactorFuelSystem.instance.registerReactorFuelRelative(reprocessedRod.TechType, 0.4F, 0.8F, TechType.None);
        	
        	StoryHandler.instance.registerTrigger(new ScanTrigger(TechType.PrecursorThermalPlant), new TechUnlockEffect(atpTapBlock.TechType, 1F, 5));
@@ -232,18 +269,35 @@ namespace ReikaKalseki.AqueousEngineering
         //TechnologyUnlockSystem.instance.addDirectUnlock(TechType.StasisRifle, stasisBlock.TechType);
         //TechnologyUnlockSystem.instance.addDirectUnlock(TechType.Gravsphere, collector.TechType);
         
+        TechnologyUnlockSystem.instance.addDirectUnlock(TechType.ReactorRod, cooledRod.TechType);
+        TechnologyUnlockSystem.instance.addDirectUnlock(TechType.ReactorRod, fulguriteRod.TechType);
+        TechnologyUnlockSystem.instance.addDirectUnlock(TechType.ReactorRod, shieldedRod.TechType);
+        
         StoryHandler.instance.registerTrigger(new TechTrigger(TechType.Gravsphere), new TechUnlockEffect(collector.TechType, 1, 10));
         StoryHandler.instance.registerTrigger(new MultiTechTrigger(collector.TechType, TechType.Cyclops), new TechUnlockEffect(collectorTetherBlock.TechType, 1, 10));
         
-        XMLLocale.LocaleEntry e = machineLocale.getEntry("BaseACUMonitor");
+        e = machineLocale.getEntry("BaseACUMonitor");
         PDAManager.PDAPage page = PDAManager.createPage(e.key+"PDA", e.getField<string>("pdatitle"), e.pda, e.getField<string>("category"));
         page.register();
         
         BaseRoomSpecializationSystem.instance.registerModdedObject(toy, 0.25F, BaseRoomSpecializationSystem.RoomTypes.ACU);
         BaseRoomSpecializationSystem.instance.registerModdedObject(poo, -0.25F, BaseRoomSpecializationSystem.RoomTypes.ACU);
         
+        BaseRoomSpecializationSystem.instance.registerModdedObject(acuBoosterBlock, 0, BaseRoomSpecializationSystem.RoomTypes.ACU);
+        BaseRoomSpecializationSystem.instance.registerModdedObject(acuCleanerBlock, 0, BaseRoomSpecializationSystem.RoomTypes.ACU);
+        BaseRoomSpecializationSystem.instance.registerModdedObject(acuMonitorBlock, 0, BaseRoomSpecializationSystem.RoomTypes.ACU);
+        BaseRoomSpecializationSystem.instance.registerModdedObject(batteryBlock, 0, BaseRoomSpecializationSystem.RoomTypes.POWER);
+        
         ConsoleCommandsHandler.Main.RegisterConsoleCommand<Action>("debugACU", ACUCallbackSystem.instance.debugACU);
         ConsoleCommandsHandler.Main.RegisterConsoleCommand<Action>("sunbeamModel", createSunbeamModel);
+        
+        if (config.getBoolean(AEConfig.ConfigEntries.ACUSOUND))
+        	WaterParkCreature.behavioursToDisableInside[0] = typeof(AqueousEngineeringMod); //replace with a non-MB class that will never be present
+    }
+    
+    internal static void setNuclear(TechType item) {
+		RecipeUtil.changeRecipePath(item, "Resources", "Nuclear");
+		RecipeUtil.setItemCategory(item, TechGroup.Resources, nuclearCategory);
     }
     
     private static void createSunbeamModel() {
@@ -396,7 +450,7 @@ namespace ReikaKalseki.AqueousEngineering
 		Spawnable plankton = ItemRegistry.instance.getItem("planktonItem");
 		if (plankton != null) {
 			SNUtil.log("Found plankton item. Adding compat machinery.");
-		    PlanktonFeeder.fuel = (BasicCraftingItem)plankton;
+		    PlanktonFeeder.fuel = (WorldCollectedItem)plankton;
 		    ACUBooster.fuel = PlanktonFeeder.fuel;
 	    	acuBoosterBlock = createMachine<ACUBooster, ACUBoosterLogic>("BaseACUBooster");
 		    planktonFeederBlock = createMachine<PlanktonFeeder, PlanktonFeederLogic>("BasePlanktonFeeder");
@@ -412,12 +466,25 @@ namespace ReikaKalseki.AqueousEngineering
 			SNUtil.log("Plankton item not found.");
 		}
 		
+		ACUEcosystems.addPost();
+		
     	BaseRoomSpecializationSystem.instance.registerModdedObject(acuBoosterBlock, 0, BaseRoomSpecializationSystem.RoomTypes.ACU);
     	BaseRoomSpecializationSystem.instance.registerModdedObject(acuCleanerBlock, 0, BaseRoomSpecializationSystem.RoomTypes.ACU);
     	BaseRoomSpecializationSystem.instance.registerModdedObject(acuMonitorBlock, 0, BaseRoomSpecializationSystem.RoomTypes.ACU);
     	BaseRoomSpecializationSystem.instance.registerModdedObject(ampeelAntennaBlock, 0, BaseRoomSpecializationSystem.RoomTypes.ACU);
     	BaseRoomSpecializationSystem.instance.registerModdedObject(repairBlock, -0.1F, BaseRoomSpecializationSystem.RoomTypes.MECHANICAL);
     	BaseRoomSpecializationSystem.instance.registerModdedObject(batteryBlock, 0, BaseRoomSpecializationSystem.RoomTypes.POWER);
+    	
+    	TechType refuel = SNUtil.getTechType("ReplenishReactorRod");
+    	if (refuel != TechType.None) {
+    		CraftTreeHandler.RemoveNode(CraftTree.Type.Fabricator, "Resources", "Electronics", "ReplenishReactorRod");
+			CraftTreeHandler.AddCraftingNode(CraftTree.Type.Fabricator, refuel, "Resources", "Nuclear");
+    	}
+    	
+    	TechType baseglass = SNUtil.getTechType("BaseGlass");
+    	if (baseglass != TechType.None) {
+    		RecipeUtil.addIngredient(shieldedRod.TechType, baseglass, 1);
+    	}
     }
 
   }
