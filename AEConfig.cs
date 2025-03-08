@@ -17,6 +17,8 @@ namespace ReikaKalseki.AqueousEngineering
 			[ConfigEntry("Show room status messages in HUD", true)]ROOMCHAT, //Whether to print text to the upper-left every time a room changes type or decoration rating.
 			[ConfigEntry("Leisure Room Deco Rating Requirement", typeof(float), 15, 8, 30, 0)]LEISUREDECO, //What decoration rating must be achieved for a room to count as a leisure room.
 			[ConfigEntry("ACU Creatures Make Sound", true)]ACUSOUND, //Whether to enable ambient creature noises for creatures in ACUs
+			[ConfigEntry("BioReactor Power Threshold", typeof(float), 90F, 5F, 100, 100)]BIOTHRESH, //What the base power percentage must fall below for bioreactors to activate.
+			[ConfigEntry("Nuclear Reactor Power Threshold", typeof(float), 75F, 5F, 100, 100)]NUCTHRESH, //What the base power percentage must fall below for nuclear reactors to activate.
 		}
 	}
 }

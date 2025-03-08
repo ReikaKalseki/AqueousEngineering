@@ -137,7 +137,7 @@ namespace ReikaKalseki.AqueousEngineering {
 				addPredatorType(tt, 5F, 4F, 0.2F, true, BiomeRegions.GrandReef);
 			tt = SNUtil.getTechType("GulperLeviathan");
 			if (tt != TechType.None)
-				addPredatorType(tt, 8F, 8F, 0.2F, true, BiomeRegions.BloodKelp, BiomeRegions.Other);
+				addPredatorType(tt, 8F, 8F, 0.2F, true, BiomeRegions.BloodKelp, BiomeRegions.GrandReef, BiomeRegions.Other);
 		}
 		
 		private static void addClownPincher(string id, BiomeRegions.RegionType br) {

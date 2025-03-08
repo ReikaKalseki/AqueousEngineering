@@ -209,37 +209,43 @@ namespace ReikaKalseki.AqueousEngineering {
 			void Update() {
 				if (!reactor)
 					reactor = GetComponent<BaseNuclearReactor>();
-				radiationIntensity = 0;
-				if (reactor && reactor.constructed >= 1f) {
-					float space = reactor._powerSource.maxPower-reactor._powerSource.power;
-					if (space > 0.1F) {
-						float dT = DayNightCycle.main.deltaTime;
-						for (int i = 0; i < BaseNuclearReactor.slotIDs.Length; i++) {
-							string slot = BaseNuclearReactor.slotIDs[i];
-							InventoryItem itemInSlot = reactor.equipment.GetItemInSlot(slot);
-							if (itemInSlot != null) {
-								Pickupable item = itemInSlot.item;
-								if (item != null) {
-									TechType techType = item.GetTechType();
-									if (techType != TechType.None && techType != TechType.DepletedReactorRod) {
-										float added;
-										NuclearFuel fuel = NuclearReactorFuelSystem.instance.fuels[techType];
-										float dP = fuel.maxPPS*dT;
-										if (BaseRoomSpecializationSystem.instance.getSavedType(reactor) == BaseRoomSpecializationSystem.RoomTypes.POWER)
-											dP *= 1.25F;
-										DIHooks.addPowerToSeabaseDelegate(reactor._powerSource, dP, out added, reactor);
-										radiationIntensity += 1F/BaseNuclearReactor.slotIDs.Length*fuel.radiationIntensityFactor;
-										//SNUtil.writeToChat("Reactor @ "+reactor.transform.position+" generated "+added+" from "+fuel+" in slot "+slot);
-										use(slot, added, fuel);
+				float dT = DayNightCycle.main.deltaTime;
+				if (dT > 0) {
+					radiationIntensity = 0;
+					if (reactor && reactor.constructed >= 1f) {
+						float space = reactor._powerSource.maxPower-reactor._powerSource.power;
+						if (space > 0.1F) {
+							SubRoot sub = gameObject.FindAncestor<SubRoot>();
+							bool on = sub && sub.powerRelay && sub.powerRelay.GetPower()*100F/sub.powerRelay.GetMaxPower() < AqueousEngineeringMod.config.getFloat(AEConfig.ConfigEntries.NUCTHRESH);
+							if (on) {
+								for (int i = 0; i < BaseNuclearReactor.slotIDs.Length; i++) {
+									string slot = BaseNuclearReactor.slotIDs[i];
+									InventoryItem itemInSlot = reactor.equipment.GetItemInSlot(slot);
+									if (itemInSlot != null) {
+										Pickupable item = itemInSlot.item;
+										if (item) {
+											TechType techType = item.GetTechType();
+											if (techType != TechType.None && techType != TechType.DepletedReactorRod) {
+												float added;
+												NuclearFuel fuel = NuclearReactorFuelSystem.instance.fuels[techType];
+												float dP = fuel.maxPPS*dT;
+												if (BaseRoomSpecializationSystem.instance.getSavedType(reactor) == BaseRoomSpecializationSystem.RoomTypes.POWER)
+													dP *= 1.25F;
+												DIHooks.addPowerToSeabaseDelegate(reactor._powerSource, dP, out added, reactor);
+												radiationIntensity += 1F/BaseNuclearReactor.slotIDs.Length*fuel.radiationIntensityFactor;
+												//SNUtil.writeToChat("Reactor @ "+reactor.transform.position+" generated "+added+" from "+fuel+" in slot "+slot);
+												use(slot, added, fuel);
+											}
+										}
 									}
 								}
 							}
 						}
 					}
+					radiationIntensity = Mathf.Clamp(radiationIntensity, 0, 2);
+					radiation.enabled = radiationIntensity > 0; //will not do damage unless add a DamagePlayerInRadius
+					radiation.radiateRadius = 4.5F*radiationIntensity; //about the inner radius of a room at 100%
 				}
-				radiationIntensity = Mathf.Clamp(radiationIntensity, 0, 2);
-				radiation.enabled = radiationIntensity > 0; //will not do damage unless add a DamagePlayerInRadius
-				radiation.radiateRadius = 4.5F*radiationIntensity; //about the inner radius of a room at 100%
 			}
 			
 			private void use(string slot, float amt, NuclearFuel fuel) {
