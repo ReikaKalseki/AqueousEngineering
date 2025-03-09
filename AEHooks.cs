@@ -209,7 +209,8 @@ namespace ReikaKalseki.AqueousEngineering {
 			}
 		}
 	    
-		public static void onPickup(Pickupable pp, Exosuit prawn, bool isKnife) {
+		public static void onPickup(DIHooks.ItemPickup ip) {
+			Pickupable pp = ip.item;
 			if (BaseRoomSpecializationSystem.instance.getPlayerRoomType(Player.main) == BaseRoomSpecializationSystem.RoomTypes.AGRICULTURAL) {
 				Eatable ea = pp.GetComponent<Eatable>();
 				if (ea) {
