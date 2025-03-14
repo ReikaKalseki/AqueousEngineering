@@ -186,14 +186,13 @@ namespace ReikaKalseki.AqueousEngineering {
 			
 			private BaseNuclearReactor reactor;
 			
-			private RadiatePlayerInRange radiation;
+			private AoERadiationZone radiation;
 			
 			private float radiationIntensity;
 				
 			void Start() {
 				reactor = gameObject.GetComponent<BaseNuclearReactor>();
-				radiation = gameObject.EnsureComponent<RadiatePlayerInRange>();
-				radiation.tracker = gameObject.EnsureComponent<PlayerDistanceTracker>();
+				radiation = gameObject.EnsureComponent<AoERadiationZone>();
 			}
 			
 			internal float getReactorRodLife(string slot) {
@@ -244,7 +243,8 @@ namespace ReikaKalseki.AqueousEngineering {
 					}
 					radiationIntensity = Mathf.Clamp(radiationIntensity, 0, 2);
 					radiation.enabled = radiationIntensity > 0; //will not do damage unless add a DamagePlayerInRadius
-					radiation.radiateRadius = 4.5F*radiationIntensity; //about the inner radius of a room at 100%
+					radiation.setRadii(4.5F, 2F); //about the radius of its room
+					radiation.maxIntensity = radiationIntensity*0.25F;
 				}
 			}
 			

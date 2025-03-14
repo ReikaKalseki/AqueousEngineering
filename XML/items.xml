@@ -68,6 +68,17 @@
 			
 		</pda>
 	</ShieldedRod>
+	<IonRod>
+		<name>
+			Nuclear Ion Fuel Rod
+		</name>
+		<desc>
+			The ultimate in nuclear fuel technology, harnessing ion crystals to massively improve both the total energy output and power production rate of the nuclear reactor.
+		</desc>
+		<pda>
+			
+		</pda>
+	</IonRod>
 	<ReprocessedRod>
 		<name>
 			Reprocessed Fuel Rod

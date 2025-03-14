@@ -60,6 +60,7 @@ namespace ReikaKalseki.AqueousEngineering
     public static NuclearFuelItem fulguriteRod;
     public static NuclearFuelItem cooledRod;
     public static NuclearFuelItem shieldedRod;
+    public static NuclearFuelItem ionRod;
     //public static NuclearFuelItem reprocessedRod;
     
     public static TechCategory nuclearCategory;
@@ -157,6 +158,12 @@ namespace ReikaKalseki.AqueousEngineering
 	    shieldedRod.addIngredient(TechType.Lead, 4);
 	    shieldedRod.Patch();
 	    
+	    ionRod = new NuclearFuelItem("IonRod");
+	    ionRod.addIngredient(fulguriteRod.TechType, 1);
+	    ionRod.addIngredient(TechType.UraniniteCrystal, 10);
+	    ionRod.addIngredient(TechType.PrecursorIonCrystal, 3);
+	    ionRod.Patch();
+	    
         collector = new ItemCollector(machineLocale.getEntry("ItemCollector")); //deliberately under machine locale for site
 	    collector.Patch();
 	    
@@ -253,9 +260,11 @@ namespace ReikaKalseki.AqueousEngineering
        	NuclearReactorFuelSystem.instance.registerReactorFuelRelative(cooledRod.TechType, 2F, 0.8F, 0.75F, TechType.DepletedReactorRod);
        	NuclearReactorFuelSystem.instance.registerReactorFuelRelative(fulguriteRod.TechType, 0.25F, 2.5F, 1.5F, TechType.DepletedReactorRod);
        	NuclearReactorFuelSystem.instance.registerReactorFuelRelative(shieldedRod.TechType, 1F, 1F, 0.1F, TechType.DepletedReactorRod);
+       	NuclearReactorFuelSystem.instance.registerReactorFuelRelative(ionRod.TechType, 5F, 2F, 1.0F, TechType.DepletedReactorRod);
        	//NuclearReactorFuelSystem.instance.registerReactorFuelRelative(reprocessedRod.TechType, 0.4F, 0.8F, TechType.None);
        	
        	StoryHandler.instance.registerTrigger(new ScanTrigger(TechType.PrecursorThermalPlant), new TechUnlockEffect(atpTapBlock.TechType, 1F, 5));
+       	StoryHandler.instance.registerTrigger(new ScanTrigger(TechType.PrecursorPrisonIonGenerator), new TechUnlockEffect(ionRod.TechType, 1F, 1));
 			
         System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(typeof(AEHooks).TypeHandle);
         

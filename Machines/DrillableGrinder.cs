@@ -153,17 +153,40 @@ namespace ReikaKalseki.AqueousEngineering {
 						d.gameObject.SendMessage("onDrilled");
 				}
 				else {
-					Player p = other.gameObject.FindAncestor<Player>();
-					if (p && p.IsSwimming()) {
+					CustomGrindable cg = other.gameObject.FindAncestor<CustomGrindable>();
+					if (cg) {
 						isGrinding = true;
-						p.liveMixin.TakeDamage(20*Time.deltaTime, p.transform.position, DamageType.Drill, gameObject);
+						int n = UnityEngine.Random.Range(cg.numberToYieldMin, cg.numberToYieldMax + 1);
+						for (int i = 0; i < n; i++) {
+							//CustomGrindableResult cres = new CustomGrindableResult(cg);
+							//cg.resourceChoice.Invoke(cres);
+							//GameObject drop = cres.drop;
+							GameObject drop = cg.chooseRandomResource();//.Invoke(cg);
+							if (drop) {
+								DrillableGrindingResult res = new DrillableGrindingResult(this, cg.techType, cg, drop);
+								doDrop(res);
+							}
+							else {
+								//SNUtil.writeToChat("Custom Grindable resulted in null drop");
+							}
+						}
+						if (cg.GetComponent<ReactsOnDrilled>())
+							cg.gameObject.SendMessage("onDrilled");
+						UnityEngine.Object.Destroy(cg.gameObject);
 					}
-					SeaMoth v = other.gameObject.FindAncestor<SeaMoth>();
-					if (v) {
-						isGrinding = true;
-						v.liveMixin.TakeDamage(10*Time.deltaTime, v.transform.position, DamageType.Drill, gameObject);
-						sound = jammedSound;
-						loopTime = 1.6805F;
+					else {
+						Player p = other.gameObject.FindAncestor<Player>();
+						if (p && p.IsSwimming()) {
+							isGrinding = true;
+							p.liveMixin.TakeDamage(20*Time.deltaTime, p.transform.position, DamageType.Drill, gameObject);
+						}
+						SeaMoth v = other.gameObject.FindAncestor<SeaMoth>();
+						if (v) {
+							isGrinding = true;
+							v.liveMixin.TakeDamage(10*Time.deltaTime, v.transform.position, DamageType.Drill, gameObject);
+							sound = jammedSound;
+							loopTime = 1.6805F;
+						}
 					}
 				}
 				
@@ -201,17 +224,7 @@ namespace ReikaKalseki.AqueousEngineering {
 							GameObject drop = d.ChooseRandomResource();
 							if (drop) {
 								DrillableGrindingResult res = new DrillableGrindingResult(this, tt, d, drop);
-								BaseDrillableGrinder.pingEvent(res);
-								if (res.drop) {
-									for (int a = 0; a < res.dropCount; a++) {
-										GameObject use = UnityEngine.Object.Instantiate(res.drop);
-										use.SetActive(true);
-										use.transform.position = aoe.transform.position+Vector3.down*0.7F+transform.forward*0.25F;
-										use.transform.rotation = UnityEngine.Random.rotationUniform;
-										use.GetComponent<Rigidbody>().isKinematic = false;
-										use.GetComponent<Rigidbody>().AddForce(transform.forward.normalized*15);
-									}
-								}
+								doDrop(res);
 							}
 						}
 					}
@@ -223,6 +236,26 @@ namespace ReikaKalseki.AqueousEngineering {
 						d.Invoke("DestroySelf", time);
 					}
 				}
+			}
+		}
+		
+		private void doDrop(DrillableGrindingResult res) {
+			//SNUtil.writeToChat("Rock Crusher dropping "+res);
+			BaseDrillableGrinder.pingEvent(res);
+			//SNUtil.writeToChat("Post-Event Drop: "+res.drop+" x"+res.dropCount);
+			if (res.drop) {
+				for (int a = 0; a < res.dropCount; a++) {
+					GameObject use = UnityEngine.Object.Instantiate(res.drop);
+					use.SetActive(true);
+					use.transform.position = aoe.transform.position + Vector3.down * 0.7F + transform.forward * 0.25F;
+					use.transform.rotation = UnityEngine.Random.rotationUniform;
+					Rigidbody rb = use.GetComponent<Rigidbody>();
+					rb.isKinematic = false;
+					rb.AddForce(transform.forward.normalized * 12);
+				}
+			}
+			else {
+				//SNUtil.writeToChat("Rock Crusher received null drop after event");
 			}
 		}
 	}
@@ -241,13 +274,13 @@ namespace ReikaKalseki.AqueousEngineering {
 		
 		public readonly BaseDrillableGrinderLogic grinder;	
 		public readonly TechType materialTech;			
-		public readonly Drillable drillable;
+		public readonly MonoBehaviour drillable;
 		public readonly GameObject originalDrop;
 		
 		public GameObject drop;
 		public int dropCount = 1;
 		
-		internal DrillableGrindingResult(BaseDrillableGrinderLogic lgc, TechType tt, Drillable d, GameObject go) {
+		internal DrillableGrindingResult(BaseDrillableGrinderLogic lgc, TechType tt, MonoBehaviour d, GameObject go) {
 			grinder = lgc;
 			materialTech = tt;
 			drillable = d;
@@ -255,5 +288,53 @@ namespace ReikaKalseki.AqueousEngineering {
 			drop = originalDrop;
 		}
 		
+		public override string ToString() {
+			return string.Format("[DrillableGrindingResult Grinder={0}, MaterialTech={1}, Drillable={2}, OriginalDrop={3}, Drop={4}, DropCount={5}]", grinder.transform.position, materialTech.AsString(), drillable, originalDrop, drop, dropCount);
+		}
+
+		
 	}
+	/*
+	public sealed class CustomTypesGrindable : CustomGrindable {
+		
+		public WeightedRandom<TechType> dropTable;
+		
+		public override GameObject chooseRandomResource() {
+			return ObjectUtil.lookupPrefab(dropTable.getRandomEntry());
+		}
+		
+	}
+	
+	public sealed class CustomTypeGrindable : CustomGrindable {
+		
+		public TechType dropType;
+		
+		public override GameObject chooseRandomResource() {
+			return ObjectUtil.lookupPrefab(dropType);
+		}
+		
+	}
+	*/
+	public abstract class CustomGrindable : MonoBehaviour {
+		
+		public TechType techType;
+		public int numberToYieldMin = 1;
+		public int numberToYieldMax = 1;
+		//public Func<CustomGrindable, GameObject> chooseRandomResource = (cg) => {SNUtil.writeToChat("Unset drops for CustomGrindable "+cg.gameObject.name)+"!"; return null;};
+		//public readonly UnityEngine.Events.UnityEvent<CustomGrindableResult> resourceChoice = new GrindableResultEvent(); //does not copy with listeners
+		
+		public abstract GameObject chooseRandomResource();
+		
+	}
+	/*
+	public class CustomGrindableResult {
+		
+		public readonly CustomGrindable grindable;
+		public GameObject drop;
+		
+		internal CustomGrindableResult(CustomGrindable g) {
+			grindable = g;
+		}
+		
+	}*/
 }

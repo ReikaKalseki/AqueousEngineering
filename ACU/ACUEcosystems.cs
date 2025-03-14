@@ -60,6 +60,7 @@ namespace ReikaKalseki.AqueousEngineering {
 			addFood(new AnimalFood(TechType.Hoopfish, BiomeRegions.Kelp, BiomeRegions.Koosh, BiomeRegions.GrandReef, BiomeRegions.Other));
 			addFood(new AnimalFood(TechType.Spinefish, BiomeRegions.BloodKelp, BiomeRegions.LostRiver));
 			addFood(new AnimalFood(TechType.Hoverfish, BiomeRegions.Kelp));
+			addFood(new AnimalFood(TechType.Jumper, BiomeRegions.Shallows, BiomeRegions.Kelp, BiomeRegions.Other));
 			
 			addFood(new PlantFood(VanillaFlora.CREEPVINE, 0.15F, BiomeRegions.Kelp));
 			addFood(new PlantFood(VanillaFlora.CREEPVINE_FERTILE, 0.25F, BiomeRegions.Kelp));

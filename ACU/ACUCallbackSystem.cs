@@ -537,7 +537,7 @@ namespace ReikaKalseki.AqueousEngineering {
 					}
 		   	 	}
 				
-				if (time >= cache.nextSoundTime && acu.items.Count > 0) {
+				if (AqueousEngineeringMod.config.getBoolean(AEConfig.ConfigEntries.ACUSOUND) && time >= cache.nextSoundTime && acu.items.Count > 0) {
 					WaterParkCreature wpc = acu.items.GetRandom() as WaterParkCreature;
 					if (wpc) {
 						bool flag = false;
