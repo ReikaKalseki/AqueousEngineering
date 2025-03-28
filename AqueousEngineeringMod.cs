@@ -49,6 +49,7 @@ namespace ReikaKalseki.AqueousEngineering
     public static RoomDataDisplay roomDataBlock;
     public static FloatingPowerRelay powerRelayBlock;
     public static ItemCollectorCyclopsTether collectorTetherBlock;
+    public static ItemDistributor distributorBlock;
     
     public static OutdoorPot outdoorBasicPot;
     public static OutdoorPot outdoorChicPot;
@@ -205,6 +206,7 @@ namespace ReikaKalseki.AqueousEngineering
 	    roomDataBlock = createMachine<RoomDataDisplay, RoomDataDisplayLogic>("BaseRoomDataDisplay");
 	    powerRelayBlock = createMachine<FloatingPowerRelay, FloatingPowerRelayLogic>("BaseFloatingPowerRelay");
 	    collectorTetherBlock = createMachine<ItemCollectorCyclopsTether, ItemCollectorCyclopsTetherLogic>("CyclopsCollectorTether");
+	    distributorBlock = createMachine<ItemDistributor, ItemDistributorLogic>("ItemDistributor");
 	    string[] li = VanillaFlora.MUSHROOM_BUMP.getPrefabs(true, true).ToArray();
 	    repairBeaconFragments = new TechnologyFragment[li.Length-2];
 	    for (int i = 1; i < li.Length-1; i++) { //only idx 1,2,3 since 0 is rotated and tall and 4 has a light and is just 3 anyway
@@ -410,11 +412,13 @@ namespace ReikaKalseki.AqueousEngineering
 			RecipeUtil.addIngredient(farmerBlock.TechType, motor.TechType, 2);
 			RecipeUtil.addIngredient(grinderBlock.TechType, motor.TechType, 5);
 			RecipeUtil.addIngredient(collector.TechType, motor.TechType, 1);
+			RecipeUtil.addIngredient(distributorBlock.TechType, motor.TechType, 2);
 		}
 		else {
 			RecipeUtil.addIngredient(acuCleanerBlock.TechType, TechType.Lubricant, 2);
 			RecipeUtil.addIngredient(farmerBlock.TechType, TechType.Lubricant, 5);
 			RecipeUtil.addIngredient(collector.TechType, TechType.AdvancedWiringKit, 1);
+			RecipeUtil.addIngredient(distributorBlock.TechType, TechType.Lubricant, 3);
 		}
 		
 		Spawnable plating = ItemRegistry.instance.getItem("HullPlating");

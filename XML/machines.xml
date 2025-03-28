@@ -376,17 +376,17 @@
 			
 		</pda>
 	</CyclopsCollectorTether>
-	<Name>
+	<ItemDistributor>
 		<name>
-			
+			Item Routing Assistant
 		</name>
 		<desc>
-			
+			Attempts to transfer its contents to sorted storages elsewhere on the seabase, helping maintain organization of resources.
 		</desc>
 		<pda>
 			
 		</pda>
-	</Name>
+	</ItemDistributor>
 	<Name>
 		<name>
 			

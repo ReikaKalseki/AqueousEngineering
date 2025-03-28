@@ -49,7 +49,7 @@ namespace ReikaKalseki.AqueousEngineering {
 			
 		}
 			
-	    public override void generate(List<GameObject> li) {	
+	    public override bool generate(List<GameObject> li) {	
 			for (int i = 0; i < 40; i++) {
 				GameObject go = ObjectUtil.createWorldObject(itemList.getRandomEntry());
 				if (!go)
@@ -64,7 +64,12 @@ namespace ReikaKalseki.AqueousEngineering {
 				prop.init("mountaincrates", 30);
 				li.Add(go);
 			}
-	    }
+			return true;
+		}
+		
+		public override LargeWorldEntity.CellLevel getCellLevel() {
+			return LargeWorldEntity.CellLevel.Medium;
+		}
 		
 		public static void addItem(string item, int amt) {
 			itemList.addEntry(item, amt);

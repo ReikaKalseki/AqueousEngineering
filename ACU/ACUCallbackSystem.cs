@@ -42,17 +42,19 @@ namespace ReikaKalseki.AqueousEngineering {
 			return toyValues.ContainsKey(tt);
 		}
 		
-		private readonly string xmlPathRoot;
+		private readonly string oldSaveDir = Path.Combine(Path.GetDirectoryName(AqueousEngineeringMod.modDLL.Location), "acu_data_cache");
+		private static readonly string saveFileName = "ACUCache.dat";
 		
 		private readonly Dictionary<Vector3, CachedACUData> cache = new Dictionary<Vector3, CachedACUData>();
 		
 		private ACUCallbackSystem() {
-			xmlPathRoot = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "acu_data_cache");
+			
 		}
 		
 		internal void register() {
 			IngameMenuHandler.Main.RegisterOnLoadEvent(loadSave);
 			IngameMenuHandler.Main.RegisterOnSaveEvent(save);
+			SNUtil.migrateSaveDataFolder(oldSaveDir, ".xml", saveFileName);
 		}
 		
 		internal class CreatureCache {
@@ -135,7 +137,7 @@ namespace ReikaKalseki.AqueousEngineering {
 		}
 		
 		private void loadSave() {
-			string path = Path.Combine(xmlPathRoot, SaveLoadManager.main.currentSlot+".xml");
+			string path = Path.Combine(SNUtil.getCurrentSaveDir(), saveFileName);
 			if (File.Exists(path)) {
 				XmlDocument doc = new XmlDocument();
 				doc.Load(path);
@@ -155,7 +157,7 @@ namespace ReikaKalseki.AqueousEngineering {
 		}
 		
 		private void save() {
-			string path = Path.Combine(xmlPathRoot, SaveLoadManager.main.currentSlot+".xml");
+			string path = Path.Combine(SNUtil.getCurrentSaveDir(), saveFileName);
 			XmlDocument doc = new XmlDocument();
 			XmlElement rootnode = doc.CreateElement("Root");
 			doc.AppendChild(rootnode);
@@ -164,7 +166,6 @@ namespace ReikaKalseki.AqueousEngineering {
 				go.saveToXML(e);
 				doc.DocumentElement.AppendChild(e);
 			}
-			Directory.CreateDirectory(xmlPathRoot);
 			doc.Save(path);
 		}
 		
