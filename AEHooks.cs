@@ -40,6 +40,7 @@ namespace ReikaKalseki.AqueousEngineering {
 			DIHooks.getFoodRateEvent += affectFoodRate;
 			DIHooks.onSleepEvent += onSleep;	    	
 			DIHooks.baseRebuildEvent += onBaseRebuild;
+			DIHooks.baseStrengthComputeEvent += onBaseHullCompute;
 	    	
 			//DIHooks.onRedundantScanEvent += ch => ch.preventNormalDrop = onRedundantScan();
 			CustomMachineLogic.getMachinePowerCostFactorEvent += getCustomMachinePowerCostMultiplier;
@@ -318,6 +319,14 @@ namespace ReikaKalseki.AqueousEngineering {
 		
 		public static void onBaseRebuild(Base b) {
 			MoonpoolRotationSystem.instance.rebuildBase(b);
+		}
+		
+		public static void onBaseHullCompute(DIHooks.BaseStrengthCalculation calc) {
+			BasePillarLogic[] arr = calc.component.baseComp.GetComponentsInChildren<BasePillarLogic>();
+			for (int i = 0; i < arr.Length; i++) {
+				float eff = i <= 1 ? 1 : 0; //FIXME not finished
+				calc.addBonusStrength(arr[i].gameObject, eff*AqueousEngineeringMod.config.getFloat(AEConfig.ConfigEntries.PILLARHULL));
+			}
 		}
 	}
 }

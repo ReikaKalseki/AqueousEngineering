@@ -19,6 +19,7 @@ namespace ReikaKalseki.AqueousEngineering
 			[ConfigEntry("ACU Creatures Make Sound", true)]ACUSOUND, //Whether to enable ambient creature noises for creatures in ACUs
 			[ConfigEntry("BioReactor Power Threshold", typeof(float), 90F, 5F, 100, 100)]BIOTHRESH, //What the base power percentage must fall below for bioreactors to activate.
 			[ConfigEntry("Nuclear Reactor Power Threshold", typeof(float), 75F, 5F, 100, 100)]NUCTHRESH, //What the base power percentage must fall below for nuclear reactors to activate.
+			[ConfigEntry("Base Pillar Hull Boost", typeof(int), 3, 1, 10, 0)]PILLARHULL, //How much hull reinforcement a pillar provides.
 		}
 	}
 }

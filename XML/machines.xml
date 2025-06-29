@@ -387,6 +387,17 @@
 			
 		</pda>
 	</ItemDistributor>
+	<BasePillar>
+		<name>
+			Reinforcement Pillar
+		</name>
+		<desc>
+			Buttresses interior spaces against exterior water pressure.
+		</desc>
+		<pda>
+			
+		</pda>
+	</BasePillar>
 	<Name>
 		<name>
 			
