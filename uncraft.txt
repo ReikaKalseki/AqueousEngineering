@@ -1,0 +1,228 @@
+diff --git a/Machines/DrillableGrinder.cs b/Machines/DrillableGrinder.cs
+index 2a80978..05cbda6 100644
+--- a/Machines/DrillableGrinder.cs
++++ b/Machines/DrillableGrinder.cs
+@@ -21,8 +21,64 @@ namespace ReikaKalseki.AqueousEngineering {
+ 		
+ 		public static event Action<DrillableGrindingResult> onDrillableGrindEvent;
+ 		
++		private static bool generatedUncraftingList;
++		internal static readonly Dictionary<TechType, UncraftingRecipe> uncraftingList = new Dictionary<TechType, UncraftingRecipe>();
++		public static readonly Dictionary<TechType, float> uncraftingIngredientRatios = new Dictionary<TechType, float>();
++		public static readonly HashSet<TechCategory> uncraftableCategories = new HashSet<TechCategory>();
++		public static readonly Dictionary<TechType, bool> uncraftabilityFlags = new Dictionary<TechType, bool>();
++		
+ 		static BaseDrillableGrinder() {
++			uncraftableCategories.Add(TechCategory.BasicMaterials);
++			uncraftableCategories.Add(TechCategory.AdvancedMaterials);
++			uncraftableCategories.Add(TechCategory.Electronics);
++			uncraftableCategories.Add(TechCategory.Equipment);
++			uncraftableCategories.Add(TechCategory.Tools);
++			uncraftableCategories.Add(TechCategory.VehicleUpgrades);
++			uncraftableCategories.Add(TechCategory.CyclopsUpgrades);
++			uncraftableCategories.Add(TechCategory.MapRoomUpgrades);
++			uncraftableCategories.Add(TechCategory.Workbench);
++			
++			uncraftingIngredientRatios[TechType.Titanium] = 1;
++			uncraftingIngredientRatios[TechType.Copper] = 1;
++			uncraftingIngredientRatios[TechType.Gold] = 1;
++			uncraftingIngredientRatios[TechType.Silver] = 1;
++			uncraftingIngredientRatios[TechType.Lead] = 1;
++			uncraftingIngredientRatios[TechType.Diamond] = 1;
++			uncraftingIngredientRatios[TechType.Lithium] = 1;
++			uncraftingIngredientRatios[TechType.Magnetite] = 1;
++			uncraftingIngredientRatios[TechType.UraniniteCrystal] = 1;
++			uncraftingIngredientRatios[TechType.Sulphur] = 1;
++			uncraftingIngredientRatios[TechType.CrashPowder] = 1;
++			uncraftingIngredientRatios[TechType.Salt] = 1;
++			uncraftingIngredientRatios[TechType.Kyanite] = 1;
++			uncraftingIngredientRatios[TechType.Nickel] = 1;
++			uncraftingIngredientRatios[TechType.Quartz] = 1;
++			uncraftingIngredientRatios[TechType.AluminumOxide] = 1;
++			uncraftingIngredientRatios[TechType.PrecursorIonCrystal] = 1;
++			uncraftingIngredientRatios[TechType.MercuryOre] = 1;
++			
++			uncraftingIngredientRatios[TechType.Battery] = 0;
++			uncraftingIngredientRatios[TechType.PrecursorIonBattery] = 0;
++			
++			uncraftabilityFlags[TechType.Titanium] = false;
++			uncraftabilityFlags[TechType.FiberMesh] = false;
++			uncraftabilityFlags[TechType.Lubricant] = false;
++			uncraftabilityFlags[TechType.Silicone] = false;
++			uncraftabilityFlags[TechType.Bleach] = false;
++			uncraftabilityFlags[TechType.Benzene] = false;
++			uncraftabilityFlags[TechType.HydrochloricAcid] = false;
++			uncraftabilityFlags[TechType.Polyaniline] = false;
++			uncraftabilityFlags[TechType.PrecursorKey_Purple] = false;
++			uncraftabilityFlags[TechType.PrecursorKey_Orange] = false;
++			uncraftabilityFlags[TechType.PrecursorKey_Blue] = false;
++			uncraftabilityFlags[TechType.PrecursorKey_White] = false;
++			uncraftabilityFlags[TechType.PrecursorKey_Red] = false;
++			uncraftabilityFlags[TechType.HatchingEnzymes] = false;
+ 			
++			//deprecated stuff
++			uncraftabilityFlags[TechType.PowerGlide] = false;
++			uncraftabilityFlags[TechType.LithiumIonBattery] = false;
++			uncraftabilityFlags[TechType.Transfuser] = false;
+ 		}
+ 		
+ 		public BaseDrillableGrinder(XMLLocale.LocaleEntry e) : base(e.key, e.name, e.desc, "51eba507-317c-46bf-adde-4459dc8e002e") {
+@@ -30,6 +86,121 @@ namespace ReikaKalseki.AqueousEngineering {
+ 			addIngredient(TechType.WiringKit, 1);
+ 			addIngredient(TechType.Diamond, 4);
+ 		}
++		
++		public static void buildUncraftingList() {
++			if (generatedUncraftingList)
++				return;
++			foreach (KeyValuePair<TechType, CraftData.TechData> rec in CraftData.techData) {
++				if (uncraftingList.ContainsKey(rec.Key)) //do not overwrite existing recipe
++					continue;
++				if (uncraftabilityFlags.ContainsKey(rec.Key) && !uncraftabilityFlags[rec.Key])
++					continue;
++				if (rec.Value.linkedItemCount > 0)
++					continue;
++				TechGroup grp;
++				TechCategory cat;
++				RecipeUtil.getRecipeCategory(rec.Key, out grp, out cat);
++				if (uncraftableCategories.Contains(cat)) {
++					registerUncrafting(UncraftingRecipe.createBasicUncrafting(rec.Key, rec.Value));
++				}
++			}
++			foreach (UncraftingRecipe r in uncraftingList.Values) {
++				r.buildRecursiveYields();
++			}
++			generatedUncraftingList = true;
++		}
++		
++		public static void registerUncrafting(UncraftingRecipe r) {
++			uncraftingList[r.item] = r;
++		}
++		
++		public static bool canUncraft(GameObject go, ref Pickupable pp) {
++			pp = go.FindAncestor<Pickupable>();
++			return pp && canUncraft(pp.GetTechType());
++		}
++		
++		public static bool canUncraft(TechType tt) {
++			buildUncraftingList();
++			return tt != TechType.None && uncraftingList.ContainsKey(tt);
++		}
++		
++		public class UncraftingRecipe {
++			
++			public readonly TechType item;
++			
++			public readonly Dictionary<TechType, float> directYields = new Dictionary<TechType, float>();
++			public readonly Dictionary<TechType, float> yields = new Dictionary<TechType, float>();
++			
++			private bool isFinalized;
++			
++			public UncraftingRecipe(TechType tt) {
++				item = tt;
++			}
++			
++			internal void buildRecursiveYields() {
++				if (isFinalized)
++					return;
++				//SNUtil.log("Computing final uncrafting recipe for "+item+" from "+directYields.toDebugString());
++				foreach (KeyValuePair<TechType, float> kvp in directYields) {
++					//SNUtil.log("Found recipe for "+kvp.Key.AsString()+": "+BaseDrillableGrinder.uncraftingList.ContainsKey(kvp.Key));
++					if (BaseDrillableGrinder.uncraftingList.ContainsKey(kvp.Key)) {
++						UncraftingRecipe rec = BaseDrillableGrinder.uncraftingList[kvp.Key];
++						if (!rec.isFinalized) {
++							rec.buildRecursiveYields();
++						}
++						foreach (KeyValuePair<TechType, float> kvp2 in rec.yields) {
++							addYield(kvp2.Key, kvp2.Value*kvp.Value);
++						}
++					}
++					else {
++						addYield(kvp.Key, kvp.Value);
++					}
++				}
++				isFinalized = true;
++				SNUtil.log("Finalized uncrafting recipe "+this);
++			}
++			
++			private void addYield(TechType tt, float amt) {
++				if (amt > 0.01F)
++					yields[tt] = (yields.ContainsKey(tt) ? yields[tt] : 0)+amt;
++			}
++			
++			public static UncraftingRecipe createBasicUncrafting(TechType tt, TechData td) {
++				UncraftingRecipe r = new UncraftingRecipe(tt);
++				foreach (Ingredient i in td.Ingredients) {
++					r.directYields[i.techType] = getDefaultYield(i.techType, i.amount);
++				}
++				return r;
++			}
++			
++			public static UncraftingRecipe createBasicUncrafting(TechType tt, CraftData.TechData td) {
++				UncraftingRecipe r = new UncraftingRecipe(tt);
++				foreach (CraftData.Ingredient i in td._ingredients) {	
++					r.directYields[i.techType] = getDefaultYield(i.techType, i.amount);
++				}
++				return r;
++			}
++			
++			private static float getDefaultYield(TechType tt, int amt) {
++				TechGroup grp;
++				TechCategory cat;
++				float ratio = 0.9F;
++				RecipeUtil.getRecipeCategory(tt, out grp, out cat);
++				if (uncraftingIngredientRatios.ContainsKey(tt))
++					ratio = uncraftingIngredientRatios[tt];
++				else if (cat == TechCategory.AdvancedMaterials)
++					ratio = 0.8F;
++				else if (cat == TechCategory.Electronics)
++					ratio = 0.5F;
++				return amt*ratio;
++			}
++			
++			public override string ToString() {
++				return string.Format("Uncrafting of {0}, Yields={1} via {2}", item, yields.toDebugString(), directYields.toDebugString());
++			}
++
++			
++		}
+ 
+ 		public override bool UnlockedAtStart {
+ 			get {
+@@ -154,6 +325,7 @@ namespace ReikaKalseki.AqueousEngineering {
+ 				}
+ 				else {
+ 					CustomGrindable cg = other.gameObject.FindAncestor<CustomGrindable>();
++					Pickupable pp = null;
+ 					if (cg) {
+ 						isGrinding = true;
+ 						int n = UnityEngine.Random.Range(cg.numberToYieldMin, cg.numberToYieldMax + 1);
+@@ -174,6 +346,28 @@ namespace ReikaKalseki.AqueousEngineering {
+ 							cg.gameObject.SendMessage("onDrilled");
+ 						UnityEngine.Object.Destroy(cg.gameObject);
+ 					}
++					else if (BaseDrillableGrinder.canUncraft(other.gameObject, ref pp)) {
++						TechType tt = pp.GetTechType();
++						isGrinding = true;
++						BaseDrillableGrinder.UncraftingRecipe r = BaseDrillableGrinder.uncraftingList[tt];
++						foreach (Pickupable pp2 in pp.GetComponentsInChildren<Pickupable>()) { //child items
++							if (pp2 && pp2 != pp) {
++								pp2.Drop();
++							}
++						}
++						foreach (KeyValuePair<TechType, float> kvp in r.yields) {
++							GameObject drop = ObjectUtil.lookupPrefab(kvp.Key);
++							if (drop) {
++								DrillableGrindingResult res = new DrillableGrindingResult(this, tt, pp, drop);
++								int n = (int)kvp.Value;
++								if (kvp.Value > n && UnityEngine.Random.Range(0F, 1F) <= kvp.Value-n)
++									n++;
++								res.dropCount = n;
++								doDrop(res);
++							}
++						}
++						UnityEngine.Object.Destroy(pp.gameObject);
++					}
+ 					else {
+ 						Player p = other.gameObject.FindAncestor<Player>();
+ 						if (p && p.IsSwimming()) {

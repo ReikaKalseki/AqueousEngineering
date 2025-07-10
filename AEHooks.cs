@@ -47,7 +47,7 @@ namespace ReikaKalseki.AqueousEngineering {
 		}
 		
 		public static void tickPlayer(Player ep) {
-			if (ep.currentSub && ep.currentSub.isBase) {
+			if (ep.currentSub && ep.currentSub.isBase && ep.currentSub is BaseRoot) {
 				float time = DayNightCycle.main.timePassedAsFloat;
 				if (time - lastPlayerRoomCheckTime >= 0.5F) {
 					currentPlayerRoom = ObjectUtil.getBaseRoom((BaseRoot)ep.currentSub, ep.transform.position);
@@ -323,10 +323,35 @@ namespace ReikaKalseki.AqueousEngineering {
 		
 		public static void onBaseHullCompute(DIHooks.BaseStrengthCalculation calc) {
 			BasePillarLogic[] arr = calc.component.baseComp.GetComponentsInChildren<BasePillarLogic>();
+			Dictionary<BaseCell, RoomPillarTracker> pillarsByRoom = new Dictionary<BaseCell, RoomPillarTracker>();
+			BaseRoot bb = calc.component.baseComp.GetComponent<BaseRoot>();
 			for (int i = 0; i < arr.Length; i++) {
-				float eff = i <= 1 ? 1 : 0; //FIXME not finished
-				calc.addBonusStrength(arr[i].gameObject, eff*AqueousEngineeringMod.config.getFloat(AEConfig.ConfigEntries.PILLARHULL));
+				BaseCell bc = ObjectUtil.getBaseRoom(bb, arr[i].gameObject);
+				RoomPillarTracker tr = pillarsByRoom.ContainsKey(bc) ? pillarsByRoom[bc] : null;
+				if (tr == null) {
+					tr = new RoomPillarTracker(bc);
+					pillarsByRoom[bc] = tr;
+				}
+				tr.pillars.Add(arr[i]);
 			}
+			foreach (RoomPillarTracker tr in pillarsByRoom.Values) {
+				float eff = 1;
+				foreach (BasePillarLogic lgc in tr.pillars) {
+					calc.addBonusStrength(lgc.gameObject, eff*AqueousEngineeringMod.config.getFloat(AEConfig.ConfigEntries.PILLARHULL));
+					eff *= 0.5F;
+				}
+			}
+		}
+		
+		class RoomPillarTracker {
+			
+			internal readonly BaseCell room;
+			internal readonly List<BasePillarLogic> pillars = new List<BasePillarLogic>();
+			
+			internal RoomPillarTracker(BaseCell bc) {
+				room = bc;
+			}
+			
 		}
 	}
 }

@@ -208,7 +208,7 @@ namespace ReikaKalseki.AqueousEngineering
 	    powerRelayBlock = createMachine<FloatingPowerRelay, FloatingPowerRelayLogic>("BaseFloatingPowerRelay");
 	    collectorTetherBlock = createMachine<ItemCollectorCyclopsTether, ItemCollectorCyclopsTetherLogic>("CyclopsCollectorTether");
 	    distributorBlock = createMachine<ItemDistributor, ItemDistributorLogic>("ItemDistributor");
-	    //pillarBlock = createMachine<BasePillar, BasePillarLogic>("BasePillar");
+	    pillarBlock = createMachine<BasePillar, BasePillarLogic>("BasePillar");
 	    string[] li = VanillaFlora.MUSHROOM_BUMP.getPrefabs(true, true).ToArray();
 	    repairBeaconFragments = new TechnologyFragment[li.Length-2];
 	    for (int i = 1; i < li.Length-1; i++) { //only idx 1,2,3 since 0 is rotated and tall and 4 has a light and is just 3 anyway

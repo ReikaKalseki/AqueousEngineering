@@ -26,6 +26,7 @@ namespace ReikaKalseki.AqueousEngineering
 				RenderUtil.setGlossiness(r, 9, 15, 0);
 			}
 			RenderUtil.swapToModdedTextures(r0, this);
+			ObjectUtil.removeComponent<Eatable>(go);
 		}
 
 		public override CraftTree.Type FabricatorType {

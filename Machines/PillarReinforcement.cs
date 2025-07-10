@@ -77,5 +77,9 @@ namespace ReikaKalseki.AqueousEngineering {
 		protected override void updateEntity(float seconds) {
 			
 		}
+		
+		protected override void onAttachToBase() {
+			DIHooks.recomputeBaseHullStrength(getSub().GetComponent<BaseHullStrength>());
+		}
 	}
 }
