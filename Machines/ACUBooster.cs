@@ -19,7 +19,7 @@ namespace ReikaKalseki.AqueousEngineering {
 		internal static readonly float POWER_COST = 0.0625F;
 		internal static readonly float CONSUMPTION_RATE = 15*60; //s
 		
-		internal static WorldCollectedItem fuel;
+		internal static readonly Dictionary<string, ACUFuel> fuels = new Dictionary<string, ACUFuel>();
 		
 		public ACUBooster(XMLLocale.LocaleEntry e) : base(e.key, e.name, e.desc, "5fc7744b-5a2c-4572-8e53-eebf990de434") {
 			addIngredient(TechType.Titanium, 1);
@@ -76,6 +76,20 @@ namespace ReikaKalseki.AqueousEngineering {
 		}
 		
 	}
+	
+	public class ACUFuel {
+		
+		public readonly WorldCollectedItem item;
+		public readonly float lifetimeModifier;
+		public readonly float effectStrength;
+		
+		public ACUFuel(WorldCollectedItem item, float s, float l) {
+			this.item = item;
+			lifetimeModifier = l;
+			effectStrength = s;
+		}
+		
+	}
 		
 	public class ACUBoosterLogic : CustomMachineLogic {
 		
@@ -119,25 +133,37 @@ namespace ReikaKalseki.AqueousEngineering {
 			if (!connectedACU) {
 				connectedACU = tryFindACU();
 			}
-			if (connectedACU && consumePower(ACUBooster.POWER_COST*seconds) && getStorage().container.GetCount(ACUBooster.fuel.TechType) > 0) {
-				//rotator.transform.position = connectedACU.transform.position+Vector3.down*1.45F;
-				//rotator.transform.localScale = new Vector3(13.8F, 1, 13.8F);
-				/*
-				foreach (WaterParkItem wp in connectedACU.items) {
-					if (wp && wp is WaterParkCreature) {
-						
-					}
-				}*/
-				ACUCallbackSystem.ACUCallback hook = connectedACU.GetComponent<ACUCallbackSystem.ACUCallback>();
-				if (hook) {
-					hook.boost();
-					float time = DayNightCycle.main.timePassedAsFloat;
-					if (time-lastFeedTime >= ACUBooster.CONSUMPTION_RATE) {
-						lastFeedTime = time;
-						getStorage().container.DestroyItem(ACUBooster.fuel.TechType);
+			if (connectedACU && consumePower(ACUBooster.POWER_COST*seconds)) {
+				ACUFuel fuel = tryFindFuel();
+				if (fuel != null) {
+					//rotator.transform.position = connectedACU.transform.position+Vector3.down*1.45F;
+					//rotator.transform.localScale = new Vector3(13.8F, 1, 13.8F);
+					/*
+					foreach (WaterParkItem wp in connectedACU.items) {
+						if (wp && wp is WaterParkCreature) {
+							
+						}
+					}*/
+					ACUCallbackSystem.ACUCallback hook = connectedACU.GetComponent<ACUCallbackSystem.ACUCallback>();
+					if (hook) {
+						hook.boost(fuel);
+						float time = DayNightCycle.main.timePassedAsFloat;
+						if (time-lastFeedTime >= ACUBooster.CONSUMPTION_RATE*fuel.lifetimeModifier) {
+							lastFeedTime = time;
+							getStorage().container.DestroyItem(fuel.item.TechType);
+						}
 					}
 				}
 			}
-		}	
+		}
+
+		private ACUFuel tryFindFuel() {
+			StorageContainer sc = getStorage();
+			foreach (ACUFuel f in ACUBooster.fuels.Values) {
+				if (sc.container.GetCount(f.item.TechType) > 0)
+					return f;
+			}
+			return null;
+		}
 	}
 }

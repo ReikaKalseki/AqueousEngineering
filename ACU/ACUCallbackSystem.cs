@@ -97,6 +97,7 @@ namespace ReikaKalseki.AqueousEngineering {
 			internal readonly Vector3 acuRoot;
 			
 			internal float lastPlanktonBoost;
+			internal float boostStrength;
 			internal float lastTick;
 			internal float nextSoundTime;
 			
@@ -108,6 +109,7 @@ namespace ReikaKalseki.AqueousEngineering {
 			
 			internal void loadFromXML(XmlElement e) {
 				lastPlanktonBoost = (float)e.getFloat("plankton", double.NaN);
+				boostStrength = (float)e.getFloat("boost", double.NaN);
 				lastTick = (float)e.getFloat("tick", double.NaN);
 				
 				foreach (XmlElement e2 in e.getDirectElementsByTagName("creatureStatus")) {
@@ -119,6 +121,7 @@ namespace ReikaKalseki.AqueousEngineering {
 			internal void saveToXML(XmlElement e) {
 				e.addProperty("position", acuRoot);
 				e.addProperty("plankton", lastPlanktonBoost);
+				e.addProperty("boost", boostStrength);
 				e.addProperty("tick", lastTick);
 				
 				foreach (CreatureCache go in creatureData.Values) {
@@ -399,11 +402,12 @@ namespace ReikaKalseki.AqueousEngineering {
 				if (cache == null)
 					return 0;
 				float dt = time-cache.lastPlanktonBoost;
-				return dt <= 15 ? 1-dt/15F : 0;
+				return dt <= 15 ? (1-dt/15F)*cache.boostStrength : 0;
 			}
 			
-			public void boost() {
+			public void boost(ACUFuel amt) {
 				cache.lastPlanktonBoost = DayNightCycle.main.timePassedAsFloat;
+				cache.boostStrength = amt.effectStrength;
 			}
 			
 			internal void printTerminalInfo() {/*

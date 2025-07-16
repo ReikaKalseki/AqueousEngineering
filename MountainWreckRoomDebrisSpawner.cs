@@ -51,7 +51,7 @@ namespace ReikaKalseki.AqueousEngineering {
 			
 	    public override bool generate(List<GameObject> li) {	
 			for (int i = 0; i < 40; i++) {
-				GameObject go = ObjectUtil.createWorldObject(itemList.getRandomEntry());
+				GameObject go = spawner(itemList.getRandomEntry());
 				if (!go)
 					continue;
 				go.transform.position = MathUtil.getRandomVectorAround(position, 8F);

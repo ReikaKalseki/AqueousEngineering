@@ -466,7 +466,7 @@ namespace ReikaKalseki.AqueousEngineering
 		if (plankton != null) {
 			SNUtil.log("Found plankton item. Adding compat machinery.");
 		    PlanktonFeeder.fuel = (WorldCollectedItem)plankton;
-		    ACUBooster.fuel = PlanktonFeeder.fuel;
+		    ACUBooster.fuels[PlanktonFeeder.fuel.ClassID] = new ACUFuel(PlanktonFeeder.fuel, 1, 1);
 	    	acuBoosterBlock = createMachine<ACUBooster, ACUBoosterLogic>("BaseACUBooster");
 		    planktonFeederBlock = createMachine<PlanktonFeeder, PlanktonFeederLogic>("BasePlanktonFeeder");
 		    if (motor != null)
@@ -476,6 +476,15 @@ namespace ReikaKalseki.AqueousEngineering
 	        	TechnologyUnlockSystem.instance.addDirectUnlock(tt, planktonFeederBlock.TechType);
         	TechnologyUnlockSystem.instance.addDirectUnlock(TechType.BaseWaterPark, acuBoosterBlock.TechType);
 	        TechnologyUnlockSystem.instance.addDirectUnlock(plankton.TechType, planktonFeederBlock.TechType);
+		}
+		else {
+			SNUtil.log("Plankton item not found.");
+		}
+		
+		Spawnable mushdisk = ItemRegistry.instance.getItem("treeMushroomSpores");
+		if (mushdisk != null) {
+			SNUtil.log("Found mushroom disk spore item. Adding compat.");
+		    ACUBooster.fuels[mushdisk.ClassID] = new ACUFuel((WorldCollectedItem)mushdisk, 5, 2);
 		}
 		else {
 			SNUtil.log("Plankton item not found.");
