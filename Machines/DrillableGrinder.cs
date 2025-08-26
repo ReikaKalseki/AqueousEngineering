@@ -265,7 +265,7 @@ namespace ReikaKalseki.AqueousEngineering {
 		public void freeze(float duration) {
 			if (shutdownCooldown <= 0) {
 				shutdownCooldown = duration;
-				SNUtil.writeToChat("Freezing " + this + " for " + duration);
+				//SNUtil.writeToChat("Freezing " + this + " for " + duration);
 			}
 		}
 

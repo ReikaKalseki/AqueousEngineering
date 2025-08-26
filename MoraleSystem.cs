@@ -86,18 +86,20 @@ namespace ReikaKalseki.AqueousEngineering {
 		public float currentMoraleBaseline { get; private set; }
 
 		private MoraleSystem() {
-			biomeEffect[VanillaBiomes.ALZ] = new AmbientMoraleInfluence(-50, -2, -20);
-			biomeEffect[VanillaBiomes.ILZ] = new AmbientMoraleInfluence(-30, 0, -10);
-			biomeEffect[VanillaBiomes.BLOODKELP] = new AmbientMoraleInfluence(-4, 0, -2);
-			biomeEffect[VanillaBiomes.BLOODKELPNORTH] = new AmbientMoraleInfluence(-5, 0, -2.5F);
+			biomeEffect[VanillaBiomes.ALZ] = new AmbientMoraleInfluence(-20, -2, -2);
+			biomeEffect[VanillaBiomes.ILZ] = new AmbientMoraleInfluence(-10, 0, -1);
+			biomeEffect[VanillaBiomes.BLOODKELP] = new AmbientMoraleInfluence(-1, 0, -0.5F);
+			biomeEffect[VanillaBiomes.BLOODKELPNORTH] = new AmbientMoraleInfluence(-1, 0, -0.75F);
 			biomeEffect[VanillaBiomes.COVE] = new AmbientMoraleInfluence(2, 2, 2);
-			biomeEffect[VanillaBiomes.CRASH] = new AmbientMoraleInfluence(-20, 0, -10);
-			biomeEffect[VanillaBiomes.DUNES] = new AmbientMoraleInfluence(-5, 0, -1);
+			biomeEffect[VanillaBiomes.CRASH] = new AmbientMoraleInfluence(-5, 0, -2);
+			biomeEffect[VanillaBiomes.DUNES] = new AmbientMoraleInfluence(-0.5F, 0, -1);
 			biomeEffect[VanillaBiomes.GRANDREEF] = new AmbientMoraleInfluence(0.5F, 1, 1);
 			biomeEffect[VanillaBiomes.JELLYSHROOM] = new AmbientMoraleInfluence(0, -40, 1);
 			biomeEffect[VanillaBiomes.SHALLOWS] = new AmbientMoraleInfluence(0.05F, -20, 0);
 
 			goalMorale["AuroraExplode"] = -20;
+
+			goalMorale["Goal_BiomeDunes"] = -20; //are you sure what you are doing is worth it
 
 			//"OMG RESCUE!"
 			this.registerBaselineAdjustment(ep => SNUtil.isSunbeamExpected() ? 200 : 0);
@@ -105,6 +107,8 @@ namespace ReikaKalseki.AqueousEngineering {
 			float sunbeamCrisisDuration = 3600; //1h
 			this.registerBaselineAdjustment("PDASunbeamDestroyEventInRange", -200, sunbeamCrisisDuration);
 			this.registerBaselineAdjustment("PDASunbeamDestroyEventOutOfRange", -200, sunbeamCrisisDuration);
+			goalMorale["PDASunbeamDestroyEventInRange"] = -200;
+			goalMorale["PDASunbeamDestroyEventOutOfRange"] = -200;
 
 			goalMorale["Precursor_Gun_DisableDenied"] = -100; //No rescue until cure
 
@@ -115,8 +119,8 @@ namespace ReikaKalseki.AqueousEngineering {
 			this.registerBaselineAdjustment("Lifepod2", GENERIC_DEAD_LIFEPOD_MORALE_IMPACT, GENERIC_DEAD_LIFEPOD_MORALE_DURATION); //pod12
 			this.registerBaselineAdjustment("LifepodCrashZone2", GENERIC_DEAD_LIFEPOD_MORALE_IMPACT, GENERIC_DEAD_LIFEPOD_MORALE_DURATION); //pod6 #2
 			this.registerBaselineAdjustment("LifepodSeaglide", GENERIC_DEAD_LIFEPOD_MORALE_IMPACT, GENERIC_DEAD_LIFEPOD_MORALE_DURATION); //pod17, ozzy
-			this.registerBaselineAdjustment("Lifepod3", GENERIC_DEAD_LIFEPOD_MORALE_IMPACT, GENERIC_DEAD_LIFEPOD_MORALE_DURATION); //; x2 strength since usually first
-			this.registerBaselineAdjustment("Lifepod1", GENERIC_DEAD_LIFEPOD_MORALE_IMPACT * 2, GENERIC_DEAD_LIFEPOD_MORALE_DURATION); //pod2
+			this.registerBaselineAdjustment("Lifepod3", GENERIC_DEAD_LIFEPOD_MORALE_IMPACT * 2, GENERIC_DEAD_LIFEPOD_MORALE_DURATION); //; x2 strength since usually first
+			this.registerBaselineAdjustment("Lifepod1", GENERIC_DEAD_LIFEPOD_MORALE_IMPACT, GENERIC_DEAD_LIFEPOD_MORALE_DURATION); //pod2
 			this.registerBaselineAdjustment("Lifepod4", GENERIC_DEAD_LIFEPOD_MORALE_IMPACT / 2F, GENERIC_DEAD_LIFEPOD_MORALE_DURATION * 0.67F); //pod13, khasar; half because Alterra vs Mongolians
 
 			goalMorale["LifepodDecoy"] = -25;
@@ -153,6 +157,11 @@ namespace ReikaKalseki.AqueousEngineering {
 			if (goalMorale.ContainsKey(goal))
 				throw new Exception("Goal '" + goal + "' already has a morale effect (" + instance.goalMorale[goal] + ")!");
 			goalMorale[goal] = effect;
+		}
+
+		public void registerBiomeEffect(BiomeBase bb, AmbientMoraleInfluence amb) {
+			if (!biomeEffect.ContainsKey(bb))
+				biomeEffect[bb] = amb;
 		}
 
 		public void registerBaselineAdjustment(ProgressionTrigger check, float effect) {
@@ -193,6 +202,8 @@ namespace ReikaKalseki.AqueousEngineering {
 		}
 
 		public void registerBaselineAdjustment(Func<Player, float> effect) {
+			if (effect == null)
+				throw new Exception("Invalid null effect!");
 			baselineEffects.Add(effect);
 		}
 
@@ -209,8 +220,11 @@ namespace ReikaKalseki.AqueousEngineering {
 		}
 
 		public void tick(Player ep) {
-			if (!ep || !ep.liveMixin || GameModeUtils.currentEffectiveMode == GameModeOption.Creative || GameModeUtils.currentEffectiveMode == GameModeOption.NoSurvival || !DIHooks.isWorldLoaded())
+			if (!ep || !ep.liveMixin || GameModeUtils.currentEffectiveMode == GameModeOption.Creative || GameModeUtils.currentEffectiveMode == GameModeOption.NoSurvival || !DIHooks.isWorldLoaded() || ep.cinematicModeActive) {
+				if (bar)
+					bar.gameObject.SetActive(false);
 				return;
+			}
 			if (!barsRoot) {
 				uGUI_OxygenBar o2bar = UnityEngine.Object.FindObjectOfType<uGUI_OxygenBar>();
 				if (o2bar) {
@@ -240,9 +254,15 @@ namespace ReikaKalseki.AqueousEngineering {
 				}
 			}
 
+			if (bar)
+				bar.gameObject.SetActive(true);
+
 			Vehicle v = ep.GetVehicle();
 			BiomeBase bb = BiomeBase.getBiome(ep.transform.position);
-			AmbientMoraleInfluence amb = biomeEffect.ContainsKey(bb) ? biomeEffect[bb] : null;
+			AmbientMoraleInfluence amb = bb != null && biomeEffect.ContainsKey(bb) ? biomeEffect[bb] : null;
+
+			if (printMoraleForDebug)
+				SNUtil.writeToChat("Morale UI initialized, applying sim");
 
 			float delta = 0;
 			float dT = Time.deltaTime;
@@ -255,7 +275,7 @@ namespace ReikaKalseki.AqueousEngineering {
 			}
 
 			if (printMoraleForDebug)
-				SNUtil.writeToChat("Biome " + bb.displayName + " morale ambient " + amb);
+				SNUtil.writeToChat("Biome " + bb + " morale ambient " + amb);
 
 			if (time - lastBaselineCheckTime > 1F) {
 				lastBaselineCheckTime = time;
@@ -303,6 +323,8 @@ namespace ReikaKalseki.AqueousEngineering {
 					delta += amb.moralePerSecondCyclops;
 			}
 			else if (v) {
+				if (printMoraleForDebug)
+					SNUtil.writeToChat("Vehicle is "+v+" with vel "+v.useRigidbody.velocity.magnitude.ToString());
 				if (v is SeaMoth sm) {
 					this.resetPrawnTime();
 					delta += (float)MathUtil.linterpolate(sm.useRigidbody.velocity.magnitude, 5, 20, 0, 2.5); //up to 2.5% per second if moving fast
@@ -323,7 +345,7 @@ namespace ReikaKalseki.AqueousEngineering {
 				}
 			}
 			else {
-				if ((amb != null && ep.IsSwimming()) || (!ep.precursorOutOfWater && ep.transform.position.y < -1))
+				if (amb != null && ep.IsSwimming() && !ep.precursorOutOfWater && ep.transform.position.y < -1)
 					delta += amb.moralePerSecondFreeDiving;
 				this.resetPrawnTime();
 			}
@@ -335,6 +357,9 @@ namespace ReikaKalseki.AqueousEngineering {
                 delta -= (float)MathUtil.linterpolate(temp, 40, 90, 0, 10, true);
             */
 			prawnMoraleCooldown = Mathf.Max(prawnMoraleCooldown - (dT / PRAWN_MORALE_COOLDOWN), 0);
+
+			if (printMoraleForDebug)
+				SNUtil.writeToChat("Core sim computed to delta "+delta);
 
 			Survival s = ep.GetComponent<Survival>();
 			float f = s ? Mathf.Min(s.water, s.food) : 1;
@@ -372,6 +397,10 @@ namespace ReikaKalseki.AqueousEngineering {
 			moralePercentage = Mathf.Clamp(f, 0, Mathf.Min(100, maxMorale));
 			if (bar)
 				bar.setValue(moralePercentage);
+		}
+
+		internal bool areFoodsDifferent(TechType item1, TechType item2) {
+			return item1.getFoodCategory() != item2.getFoodCategory();
 		}
 
 		class MoraleBar : uGUI_WaterBar {
@@ -491,18 +520,18 @@ namespace ReikaKalseki.AqueousEngineering {
 			}
 		}
 
-		class AmbientMoraleInfluence {
+		public class AmbientMoraleInfluence {
 
 			public readonly float moralePerSecondFreeDiving;
 			public readonly float moralePerSecondCyclops;
 			public readonly float moralePerSecondSeamoth;
 			public readonly float moralePerSecondPrawn;
 
-			internal AmbientMoraleInfluence(float m, float c, float v = 0) : this(m, c, v, v) {
+			public AmbientMoraleInfluence(float m, float c, float v = 0) : this(m, c, v, v) {
 
 			}
 
-			internal AmbientMoraleInfluence(float m, float c, float sm, float p) {
+			public AmbientMoraleInfluence(float m, float c, float sm, float p) {
 				moralePerSecondFreeDiving = m;
 				moralePerSecondCyclops = c;
 				moralePerSecondSeamoth = sm;

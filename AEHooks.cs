@@ -98,7 +98,7 @@ namespace ReikaKalseki.AqueousEngineering {
 		}
 
 		public static void onTechUnlocked(TechType tt, bool vb) {
-			MoraleSystem.instance.shiftMorale(5);
+			MoraleSystem.instance.shiftMorale(2.5F);
 		}
 
 		public static BaseCell getCurrentPlayerRoom() {
@@ -308,7 +308,7 @@ namespace ReikaKalseki.AqueousEngineering {
 							if (tt == TechType.BigFilteredWater || tt == TechType.DisinfectedWater || tt == TechType.FilteredWater || tt == TechType.StillsuitWater)
 								continue;
 							//SNUtil.writeToChat("ate "+evt.itemType+" @ "+evt.eventTime);
-							if (evt.itemType != tt) {
+							if (MoraleSystem.instance.areFoodsDifferent(evt.itemType, tt)) {
 								eatsSinceDifferent = back;
 								break;
 							}
