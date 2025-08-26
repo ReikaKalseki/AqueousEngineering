@@ -1,24 +1,27 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Xml;
 using System.Xml.Serialization;
-using UnityEngine;
-using UnityEngine.Serialization;
-using UnityEngine.Scripting;
-using UnityEngine.UI;
-using System.Collections.Generic;
-using ReikaKalseki.DIAlterra;
+
 using ReikaKalseki.AqueousEngineering;
+using ReikaKalseki.DIAlterra;
+
+using SMLHelper.V2.Assets;
 using SMLHelper.V2.Handlers;
 using SMLHelper.V2.Utility;
-using SMLHelper.V2.Assets;
+
+using UnityEngine;
+using UnityEngine.Scripting;
+using UnityEngine.Serialization;
+using UnityEngine.UI;
 
 namespace ReikaKalseki.AqueousEngineering {
-	
+
 	public class MountainWreckRoomDebrisSpawner : WorldGenerator {
-		
+
 		internal static readonly WeightedRandom<string> itemList = new WeightedRandom<string>();
-		
+
 		static MountainWreckRoomDebrisSpawner() {
 			addItem("8fb8a082-d40a-4473-99ec-1ded36cc6813", 6);
 			addItem("354ebf4e-def3-48a6-839d-bf0f478ca915", 6);
@@ -36,20 +39,20 @@ namespace ReikaKalseki.AqueousEngineering {
 			addItem("ebc835bd-221a-4722-b1d0-becf08bd2f2c", 6);
 			addItem("fb2886c4-7e03-4a47-a122-dc7242e7de5b", 6);
 		}
-	        
-	    public MountainWreckRoomDebrisSpawner(Vector3 pos) : base(pos) {
-			
-	    }
-		
+
+		public MountainWreckRoomDebrisSpawner(Vector3 pos) : base(pos) {
+
+		}
+
 		public override void saveToXML(XmlElement e) {
-			
+
 		}
-		
+
 		public override void loadFromXML(XmlElement e) {
-			
+
 		}
-			
-	    public override bool generate(List<GameObject> li) {	
+
+		public override bool generate(List<GameObject> li) {
 			for (int i = 0; i < 40; i++) {
 				GameObject go = spawner(itemList.getRandomEntry());
 				if (!go)
@@ -59,21 +62,21 @@ namespace ReikaKalseki.AqueousEngineering {
 				rb.isKinematic = false;
 				rb.velocity = MathUtil.getRandomVectorAround(Vector3.zero, 15);
 				go.EnsureComponent<WorldForces>().underwaterGravity = 3;
-				go.transform.localRotation = UnityEngine.Random.rotationUniform;					
+				go.transform.localRotation = UnityEngine.Random.rotationUniform;
 				PhysicsSettlingProp prop = go.EnsureComponent<PhysicsSettlingProp>();
 				prop.init("mountaincrates", 30);
 				li.Add(go);
 			}
 			return true;
 		}
-		
+
 		public override LargeWorldEntity.CellLevel getCellLevel() {
 			return LargeWorldEntity.CellLevel.Medium;
 		}
-		
+
 		public static void addItem(string item, int amt) {
 			itemList.addEntry(item, amt);
 		}
-			
+
 	}
 }

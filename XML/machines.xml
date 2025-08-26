@@ -398,6 +398,17 @@
 			
 		</pda>
 	</BasePillar>
+	<WirelessCharger>
+		<name>
+			Wireless Charger
+		</name>
+		<desc>
+			A battery charger that works at range, with reduced efficiency.
+		</desc>
+		<pda>
+			
+		</pda>
+	</WirelessCharger>
 	<Name>
 		<name>
 			

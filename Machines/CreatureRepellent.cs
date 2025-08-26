@@ -1,31 +1,31 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
-using System.Collections.Generic;
-
-using UnityEngine;
-
-using SMLHelper.V2.Handlers;
-using SMLHelper.V2.Assets;
-using SMLHelper.V2.Utility;
-using SMLHelper.V2.Crafting;
 
 using ReikaKalseki.DIAlterra;
 
+using SMLHelper.V2.Assets;
+using SMLHelper.V2.Crafting;
+using SMLHelper.V2.Handlers;
+using SMLHelper.V2.Utility;
+
+using UnityEngine;
+
 namespace ReikaKalseki.AqueousEngineering {
-	
+
 	public class BaseCreatureRepellent : CustomMachine<BaseCreatureRepellentLogic> {
-		
+
 		internal static readonly float POWER_COST = 0.25F; //per second
 		internal static readonly float POWER_COST_ACTIVE = 2.0F; //per second
 		internal static readonly float RANGE = 50F; //m
 		internal static readonly float RANGE_INNER = 20F; //m
-		
+
 		internal static readonly Color electricalColor = new Color(0.2f, 0.9f, 1f, 1f);
-		
+
 		internal static readonly Dictionary<TechType, CreatureEffectivity> effectivityMap = new Dictionary<TechType, CreatureEffectivity>();
 		internal static float maxRangeFactor = -1;
-		
+
 		static BaseCreatureRepellent() {
 			skipCreature(TechType.Peeper);
 			skipCreature(TechType.Oculus);
@@ -48,34 +48,34 @@ namespace ReikaKalseki.AqueousEngineering {
 			skipCreature(TechType.Cutefish);
 			skipCreature(TechType.Skyray);
 			skipCreature(TechType.Shuttlebug);
-			
+
 			addCreatureType(TechType.Gasopod, 0.5F, 0.5F, 0.75F);
 			addCreatureType(TechType.Shocker, 1, 0.5F, 0F);
 			addCreatureType(TechType.LavaLarva, 2, -1F, 0F);
-			
+
 			addCreatureType(TechType.Bleeder, 0.5F, 1F, 1F);
-			
+
 			addCreatureType(TechType.Jellyray, 1, 0.25F, 0.25F);
 			addCreatureType(TechType.GhostRayBlue, 1, 0.25F, 0.25F);
 			addCreatureType(TechType.GhostRayRed, 1, 0.25F, 0.25F);
-			
+
 			addCreatureType(TechType.GhostLeviathan, 2, 0.5F, 0.25F);
 			addCreatureType(TechType.GhostLeviathanJuvenile, 1.5F, 0.5F, 0.25F);
 			addCreatureType(TechType.ReaperLeviathan, 2, 0.67F, 1F);
 			addCreatureType(TechType.SeaDragon, 2, 0.33F, 0.5F);
-			
+
 			skipCreature(TechType.SeaTreader);
 		}
-		
+
 		private static void skipCreature(TechType c) {
 			addCreatureType(c, 0, 0, 0);
 		}
-		
+
 		private static void addCreatureType(TechType c, float r, float e, float d) {
 			effectivityMap[c] = new CreatureEffectivity(c, r, e, d);
 			maxRangeFactor = Mathf.Max(maxRangeFactor, r);
 		}
-		
+
 		private static readonly Vector3[] FIN_POSITIONS = new Vector3[]{
 			new Vector3(0, 0.25F, 0.7F),
 			new Vector3(0, 0.25F, -0.7F),
@@ -89,12 +89,12 @@ namespace ReikaKalseki.AqueousEngineering {
 			new Vector3(0, 90, 0),
 			new Vector3(180, 90, 0),
 		};
-		
+
 		public BaseCreatureRepellent(XMLLocale.LocaleEntry e) : base(e.key, e.name, e.desc, "4cb154ef-bdb6-4ff4-9107-f378ce21a9b7") {
-			addIngredient(TechType.Polyaniline, 1);
-			addIngredient(TechType.AdvancedWiringKit, 1);
-			addIngredient(TechType.PowerCell, 2);
-			
+			this.addIngredient(TechType.Polyaniline, 1);
+			this.addIngredient(TechType.AdvancedWiringKit, 1);
+			this.addIngredient(TechType.PowerCell, 2);
+
 			glowIntensity = 1;
 		}
 
@@ -103,23 +103,23 @@ namespace ReikaKalseki.AqueousEngineering {
 				return false;
 			}
 		}
-		
+
 		public override bool isOutdoors() {
 			return true;
 		}
-		
+
 		public override void initializeMachine(GameObject go) {
 			base.initializeMachine(go);
-			ObjectUtil.removeComponent<Bench>(go);
-						
+			go.removeComponent<Bench>();
+
 			BaseCreatureRepellentLogic lgc = go.GetComponent<BaseCreatureRepellentLogic>();
-			
-			go.GetComponent<Constructable>().model = ObjectUtil.getChildObject(go, "bench");
-			
+
+			go.GetComponent<Constructable>().model = go.getChildObject("bench");
+
 			go.transform.localScale = new Vector3(0.4F, 0.5F, 2);
-			
+
 			string name = "FinHolder";
-			GameObject child = ObjectUtil.getChildObject(go, name);
+			GameObject child = go.getChildObject(name);
 			if (child == null) {
 				child = new GameObject(name);
 				child.transform.SetParent(go.transform);
@@ -148,7 +148,7 @@ namespace ReikaKalseki.AqueousEngineering {
 					m.SetFloat(ShaderPropertyID._MyCullVariable, 0f);
 				}
 			}
-			
+
 			Renderer r = go.GetComponentInChildren<Renderer>();
 			//SNUtil.dumpTextures(r);
 			RenderUtil.swapToModdedTextures(r, this);/*
@@ -156,36 +156,36 @@ namespace ReikaKalseki.AqueousEngineering {
 			r.materials[0].SetFloat("_Fresnel", 1F);
 			r.materials[0].SetFloat("_SpecInt", 15F);
 			lgc.mainRenderer = r;*/
-			
+
 			//go.GetComponent<Constructable>().model = go;
 			//go.GetComponent<ConstructableBounds>().bounds.extents = new Vector3(1.5F, 0.5F, 1.5F);
 			//go.GetComponent<ConstructableBounds>().bounds.position = new Vector3(1, 1.0F, 0);
 		}
-		
+
 	}
-	
+
 	class CreatureEffectivity {
-		
+
 		internal readonly TechType creatureType;
 		internal readonly float rangeFactor;
 		internal readonly float effectivity;
 		internal readonly float damageFactor;
-		
+
 		internal CreatureEffectivity(TechType c, float r, float e, float d) {
 			creatureType = c;
 			rangeFactor = r;
 			effectivity = e;
 			damageFactor = d;
 		}
-		
+
 	}
-	
+
 	class RepellentFin : MonoBehaviour {
-		
+
 		private BaseCreatureRepellentLogic root;
 		private Rigidbody body;
 		private Renderer render;
-		
+
 		void Update() {
 			if (!root) {
 				root = gameObject.FindAncestor<BaseCreatureRepellentLogic>();
@@ -199,84 +199,84 @@ namespace ReikaKalseki.AqueousEngineering {
 			//body.WakeUp();
 			render.materials[0].SetColor(ShaderPropertyID._BorderColor, Color.Lerp(Color.black, BaseCreatureRepellent.electricalColor, root.getIntensity()));
 		}
-		
+
 		void OnCollisionStay(Collision c) {
 			if (root && root.isFunctional() && c.collider && ObjectUtil.isPlayerOrCreature(c.collider, true)) {
 				LiveMixin live = c.gameObject.FindAncestor<LiveMixin>();
 				if (live)
-					live.TakeDamage(8*Time.deltaTime, c.contacts[0].point, DamageType.Electrical, gameObject);
+					live.TakeDamage(8 * Time.deltaTime, c.contacts[0].point, DamageType.Electrical, gameObject);
 			}
 		}
-		
+
 	}
-		
+
 	public class BaseCreatureRepellentLogic : ToggleableMachineBase {
-		
+
 		private float cooldown;
 		private float lastTickTime;
-		
+
 		void Start() {
 			SNUtil.log("Reinitializing base repellent");
 			AqueousEngineeringMod.repellentBlock.initializeMachine(gameObject);
 		}
-		
+
 		internal float getIntensity() {
 			float time = DayNightCycle.main.timePassedAsFloat;
 			float dT = time-lastTickTime;
 			return (float)MathUtil.linterpolate(dT, 0.5, 2, 1, 0, true);
 		}
-		
+
 		public bool isFunctional() {
-			return cooldown <= 0.01F && DayNightCycle.main.timePassedAsFloat-lastTickTime <= 0.5F;
+			return cooldown <= 0.01F && DayNightCycle.main.timePassedAsFloat - lastTickTime <= 0.5F;
 		}
-		
+
 		protected override void load(System.Xml.XmlElement data) {
 			lastTickTime = (float)data.getFloat("last", float.NaN);
 			cooldown = (float)data.getFloat("cooldown", float.NaN);
 			isEnabled = data.getBoolean("toggled");
 		}
-		
+
 		protected override void save(System.Xml.XmlElement data) {
 			data.addProperty("last", lastTickTime);
 			data.addProperty("cooldown", cooldown);
 			data.addProperty("toggled", isEnabled);
 		}
-		
+
 		protected override HolographicControl getButtonType() {
 			return AqueousEngineeringMod.seabaseRepellentControl;
 		}
-		
+
 		protected override void updateEntity(float seconds) {
 			base.updateEntity(seconds);
 			//if (mainRenderer == null)
-			//	mainRenderer = ObjectUtil.getChildObject(gameObject, "model").GetComponent<Renderer>();
-						
+			//	mainRenderer = gameObject.getChildObject("model").GetComponent<Renderer>();
+
 			//SNUtil.writeToChat("I am ticking @ "+go.transform.position);
-			if (Vector3.Distance(Player.main.transform.position, transform.position) >= BaseCreatureRepellent.RANGE*4)
+			if (Vector3.Distance(Player.main.transform.position, transform.position) >= BaseCreatureRepellent.RANGE * 4)
 				return;
 			if (cooldown > 0) {
 				cooldown -= seconds;
 				return;
 			}
-			if (GameModeUtils.RequiresPower() && !consumePower(BaseCreatureRepellent.POWER_COST*seconds))
+			if (GameModeUtils.RequiresPower() && !this.consumePower(BaseCreatureRepellent.POWER_COST * seconds))
 				isEnabled = false;
 			if (isEnabled) {
 				lastTickTime = DayNightCycle.main.timePassedAsFloat;
 				bool flag = false;
-				WorldUtil.getGameObjectsNear(transform.position, BaseCreatureRepellent.RANGE*BaseCreatureRepellent.maxRangeFactor, go => flag |= tryRepel(go, seconds));
+				WorldUtil.getGameObjectsNear(transform.position, BaseCreatureRepellent.RANGE * BaseCreatureRepellent.maxRangeFactor, go => flag |= this.tryRepel(go, seconds));
 				if (Player.main.IsSwimming()) {
 					float ddp = Vector3.Distance(Player.main.transform.position, transform.position);
 					if (ddp <= 2.5F) {
-						Player.main.liveMixin.TakeDamage(8*seconds, Player.main.transform.position, DamageType.Electrical, gameObject);
+						Player.main.liveMixin.TakeDamage(8 * seconds, Player.main.transform.position, DamageType.Electrical, gameObject);
 					}
 				}
 				if (flag) {
-					if (!consumePower((BaseCreatureRepellent.POWER_COST_ACTIVE-BaseCreatureRepellent.POWER_COST)*seconds))
+					if (!this.consumePower((BaseCreatureRepellent.POWER_COST_ACTIVE - BaseCreatureRepellent.POWER_COST) * seconds))
 						cooldown = 5;
 				}
 			}
 		}
-		
+
 		private bool tryRepel(GameObject go, float seconds) {
 			Creature c = go.GetComponent<Creature>();
 			if (c && c.friend != Player.main.gameObject && (c.Aggression.Value > 0 || c.GetComponent<AggressiveWhenSeeTarget>())) {
@@ -300,15 +300,15 @@ namespace ReikaKalseki.AqueousEngineering {
 				f *= 2;
 				if (ce != null)
 					f *= ce.effectivity;
-				c.Scared.Add(f*seconds);
-				c.Aggression.Add(-f*seconds*0.4F);
-				if (c.Scared.Value > 0.5F && dd < r*0.5F) {
+				c.Scared.Add(f * seconds);
+				c.Aggression.Add(-f * seconds * 0.4F);
+				if (c.Scared.Value > 0.5F && dd < r * 0.5F) {
 					Vector3 vec = transform.position+((c.transform.position-transform.position)*3);
-					c.GetComponent<SwimBehaviour>().SwimTo(vec, 20*f);
+					c.GetComponent<SwimBehaviour>().SwimTo(vec, 20 * f);
 				}
 				if (dd <= 4F && c.liveMixin) {
 					float dmg = ce != null ? ce.damageFactor : 1;
-					c.liveMixin.TakeDamage(3*seconds*dmg, c.transform.position, DamageType.Electrical, gameObject);
+					c.liveMixin.TakeDamage(3 * seconds * dmg, c.transform.position, DamageType.Electrical, gameObject);
 				}
 				return true;
 			}

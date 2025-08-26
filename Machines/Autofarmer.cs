@@ -1,30 +1,30 @@
 ﻿using System;
-using System.IO;
-using System.Reflection;
-using System.Linq;
 using System.Collections.Generic;
-
-using UnityEngine;
-
-using SMLHelper.V2.Handlers;
-using SMLHelper.V2.Assets;
-using SMLHelper.V2.Utility;
-using SMLHelper.V2.Crafting;
+using System.IO;
+using System.Linq;
+using System.Reflection;
 
 using ReikaKalseki.DIAlterra;
 
+using SMLHelper.V2.Assets;
+using SMLHelper.V2.Crafting;
+using SMLHelper.V2.Handlers;
+using SMLHelper.V2.Utility;
+
+using UnityEngine;
+
 namespace ReikaKalseki.AqueousEngineering {
-	
+
 	public class Autofarmer : CustomMachine<AutofarmerLogic> {
-		
+
 		internal static readonly float POWER_COST = 1F;
-		
+
 		public Autofarmer(XMLLocale.LocaleEntry e) : base(e.key, e.name, e.desc, "f1cde32e-101a-4dd5-8084-8c950b9c2432") {
-			addIngredient(TechType.TitaniumIngot, 1);
-			addIngredient(TechType.AdvancedWiringKit, 1);
-			addIngredient(TechType.VehicleStorageModule, 1);
-			addIngredient(TechType.Knife, 1);
-			
+			this.addIngredient(TechType.TitaniumIngot, 1);
+			this.addIngredient(TechType.AdvancedWiringKit, 1);
+			this.addIngredient(TechType.VehicleStorageModule, 1);
+			this.addIngredient(TechType.Knife, 1);
+
 			glowIntensity = 2;
 		}
 
@@ -33,26 +33,26 @@ namespace ReikaKalseki.AqueousEngineering {
 				return false;
 			}
 		}
-		
+
 		public override bool isOutdoors() {
 			return true;
 		}
-		
+
 		public override void initializeMachine(GameObject go) {
 			base.initializeMachine(go);
-			ObjectUtil.removeComponent<Trashcan>(go);
-			
+			go.removeComponent<Trashcan>();
+
 			StorageContainer con = go.GetComponentInChildren<StorageContainer>();
-			initializeStorageContainer(con, 8, 8);
+			this.initializeStorageContainer(con, 8, 8);
 			con.errorSound = null;
-			
-			ObjectUtil.removeChildObject(go, "descent_trashcan_01/descent_trash_01");
-			ObjectUtil.removeChildObject(go, "descent_trashcan_01/descent_trash_02");
-			ObjectUtil.removeChildObject(go, "descent_trashcan_01/descent_trashcan_interior_01");
-			ObjectUtil.removeChildObject(go, "descent_trashcan_01/descent_trashcan_interior_02");
-						
+
+			go.removeChildObject("descent_trashcan_01/descent_trash_01");
+			go.removeChildObject("descent_trashcan_01/descent_trash_02");
+			go.removeChildObject("descent_trashcan_01/descent_trashcan_interior_01");
+			go.removeChildObject("descent_trashcan_01/descent_trashcan_interior_02");
+
 			AutofarmerLogic lgc = go.GetComponent<AutofarmerLogic>();
-			
+
 			Renderer r = go.GetComponentInChildren<Renderer>();
 			RenderUtil.swapToModdedTextures(r, this);
 			r.materials[0].SetColor("_Color", Color.white);
@@ -62,34 +62,34 @@ namespace ReikaKalseki.AqueousEngineering {
 			//SNUtil.dumpTextures(r);
 			r.materials[0].SetFloat("_Shininess", 7.5F);
 			lgc.mainRenderer = r;*/
-			
+
 			//go.GetComponent<Constructable>().model = go;
 			//go.GetComponent<ConstructableBounds>().bounds.extents = new Vector3(1.5F, 0.5F, 1.5F);
 			//go.GetComponent<ConstructableBounds>().bounds.position = new Vector3(1, 1.0F, 0);
 		}
-		
+
 	}
-		
+
 	public class AutofarmerLogic : CustomMachineLogic {
-		
+
 		private List<Planter> growbeds = new List<Planter>();
-		
+
 		private VFXElectricLine effect;
 		private float harvestTime;
-		
+
 		void Start() {
 			SNUtil.log("Reinitializing base farmer");
 			AqueousEngineeringMod.farmerBlock.initializeMachine(gameObject);
 		}
-		
+
 		private void OnDisable() {
-			UnityEngine.Object.DestroyImmediate(effect);
+			effect.destroy();
 		}
-		
+
 		protected override float getTickRate() {
 			return 5;
 		}
-		
+
 		protected override void updateEntity(float seconds) {
 			if (!effect) {
 				GameObject go = ObjectUtil.lookupPrefab("d11dfcc3-bce7-4870-a112-65a5dab5141b");
@@ -99,7 +99,6 @@ namespace ReikaKalseki.AqueousEngineering {
 				effect.transform.parent = transform;
 			}
 			if (growbeds.Count == 0) {
-				SubRoot sub = getSub();
 				if (sub) {
 					Planter[] all = sub.GetComponentsInChildren<Planter>();
 					foreach (Planter p in all) {
@@ -109,41 +108,41 @@ namespace ReikaKalseki.AqueousEngineering {
 					}
 				}
 			}
-			if (growbeds.Count > 0 && !getStorage().container.IsFull() && consumePower(Autofarmer.POWER_COST*seconds)) {
+			if (growbeds.Count > 0 && !storage.container.IsFull() && this.consumePower(Autofarmer.POWER_COST * seconds)) {
 				Planter p = growbeds[UnityEngine.Random.Range(0, growbeds.Count)];
 				if (p) {
-					tryHarvestFrom(p);
+					this.tryHarvestFrom(p);
 				}
 			}
-			tickFX();
+			this.tickFX();
 		}
-		
+
 		private void tickFX() {
 			float time = DayNightCycle.main.timePassedAsFloat;
-			if (time-harvestTime > 5) {
+			if (time - harvestTime > 5) {
 				effect.gameObject.SetActive(false);
 			}
 		}
-		
+
 		private void tryAllocateFX(GameObject go) {
 			effect.gameObject.SetActive(true);
 			effect.enabled = true;
-			effect.origin = transform.position+Vector3.up*0.75F;
-			effect.target = go.transform.position+Vector3.up*0.125F;
+			effect.origin = transform.position + (Vector3.up * 0.75F);
+			effect.target = go.transform.position + (Vector3.up * 0.125F);
 			harvestTime = DayNightCycle.main.timePassedAsFloat;
 		}
-		
+
 		private void tryHarvestFrom(Planter p) {
 			Planter.PlantSlot[] arr = UnityEngine.Random.Range(0, 2) == 0 ? p.bigPlantSlots : p.smallPlantSlots;
 			Planter.PlantSlot slot = arr[UnityEngine.Random.Range(0, arr.Length)];
 			if (slot != null && slot.isOccupied) {
 				Plantable pt = slot.plantable;
 				if (pt && pt.linkedGrownPlant) {
-					tryHarvestPlant(p, pt);
+					this.tryHarvestPlant(p, pt);
 				}
 			}
 		}
-		
+
 		private void tryHarvestPlant(Planter pl, Plantable pt) {
 			GrownPlant p = pt.linkedGrownPlant;
 			TechType tt = CraftData.GetTechType(p.gameObject);
@@ -160,7 +159,7 @@ namespace ReikaKalseki.AqueousEngineering {
 					drop = c.tryHarvest(p.gameObject);
 				}
 				else {
-					drop = getHarvest(p, tt, fp);
+					drop = this.getHarvest(p, tt, fp);
 					if (drop)
 						drop = UnityEngine.Object.Instantiate(drop);
 				}
@@ -183,7 +182,7 @@ namespace ReikaKalseki.AqueousEngineering {
 						ppb = UnityEngine.Object.Instantiate(ObjectUtil.lookupPrefab(td)).GetComponent<Pickupable>();
 					}
 					//SNUtil.log(""+ppb);
-					if (ppb && getStorage().container.AddItem(ppb) != null) {
+					if (ppb && storage.container.AddItem(ppb) != null) {
 						FMODAsset ass = SoundManager.buildSound(CraftData.pickupSoundList.ContainsKey(td) ? CraftData.pickupSoundList[td] : CraftData.defaultPickupSound);
 						if (ass != null) {
 							SoundManager.playSoundAt(ass, gameObject.transform.position);
@@ -199,26 +198,21 @@ namespace ReikaKalseki.AqueousEngineering {
 						}
 						//SNUtil.log("fx "+p);
 						if (p)
-							tryAllocateFX(p.gameObject);
+							this.tryAllocateFX(p.gameObject);
 						else
-							tryAllocateFX(fp.fruits[0].gameObject);
+							this.tryAllocateFX(fp.fruits[0].gameObject);
 					}
 					else if (ppb) {
-						UnityEngine.Object.Destroy(ppb.gameObject);
+						ppb.gameObject.destroy(false);
 					}
 				}
 			}
 		}
-		
+
 		private GameObject getHarvest(GrownPlant p, TechType tt, FruitPlant fp) {
 			if (fp) {
 				PickPrefab pp = fp.fruits[UnityEngine.Random.Range(0, fp.fruits.Length)];
-				if (pp && pp.isActiveAndEnabled) {
-					return pp.gameObject;
-				}
-				else {
-					return null;
-				}
+				return pp && pp.isActiveAndEnabled ? pp.gameObject : null;
 			}
 			switch (tt) {/*
 				case TechType.BloodVine:

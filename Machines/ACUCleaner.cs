@@ -1,27 +1,27 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
-using System.Collections.Generic;
-
-using UnityEngine;
-
-using SMLHelper.V2.Handlers;
-using SMLHelper.V2.Assets;
-using SMLHelper.V2.Utility;
-using SMLHelper.V2.Crafting;
 
 using ReikaKalseki.DIAlterra;
 
+using SMLHelper.V2.Assets;
+using SMLHelper.V2.Crafting;
+using SMLHelper.V2.Handlers;
+using SMLHelper.V2.Utility;
+
+using UnityEngine;
+
 namespace ReikaKalseki.AqueousEngineering {
-	
+
 	public class ACUCleaner : CustomMachine<ACUCleanerLogic> {
-		
+
 		internal static readonly float POWER_COST = 0.15F;
-		
+
 		public ACUCleaner(XMLLocale.LocaleEntry e) : base(e.key, e.name, e.desc, "5fc7744b-5a2c-4572-8e53-eebf990de434") {
-			addIngredient(TechType.Titanium, 5);
-			addIngredient(TechType.FiberMesh, 2);
-			addIngredient(TechType.ComputerChip, 1);
+			this.addIngredient(TechType.Titanium, 5);
+			this.addIngredient(TechType.FiberMesh, 2);
+			this.addIngredient(TechType.ComputerChip, 1);
 		}
 
 		public override bool UnlockedAtStart {
@@ -29,28 +29,28 @@ namespace ReikaKalseki.AqueousEngineering {
 				return false;
 			}
 		}
-		
+
 		public override bool isOutdoors() {
 			return false;
 		}
-		
+
 		public override void initializeMachine(GameObject go) {
 			base.initializeMachine(go);
-			ObjectUtil.removeChildObject(go, "Label");
-			
+			go.removeChildObject("Label");
+
 			GameObject mdl = RenderUtil.setModel(go, "model", ObjectUtil.lookupPrefab("c0175cf7-0b6a-4a1d-938f-dad0dbb6fa06"));
-			mdl.transform.localScale = Vector3.one*0.67F;
-			
+			mdl.transform.localScale = Vector3.one * 0.67F;
+
 			StorageContainer con = go.GetComponentInChildren<StorageContainer>();
-			initializeStorageContainer(con, 3, 5);
-						
+			this.initializeStorageContainer(con, 3, 5);
+
 			ACUCleanerLogic lgc = go.GetComponent<ACUCleanerLogic>();
-			
+
 			//GameObject air = ObjectUtil.lookupPrefab("7b4b90b8-6294-4354-9ebb-3e5aa49ae453");
-			//GameObject mdl = RenderUtil.setModel(go, "discovery_trashcan_01_d", ObjectUtil.getChildObject(air, "model"));
-			//lgc.rotator = UnityEngine.Object.Instantiate(ObjectUtil.getChildObject(ObjectUtil.getChildObject(air, "model"), "_pipes_floating_air_intake_turbine_geo"));
+			//GameObject mdl = RenderUtil.setModel(go, "discovery_trashcan_01_d", air.getChildObject("model"));
+			//lgc.rotator = UnityEngine.Object.Instantiate(ObjectUtil.getChildObject(air, "model").getChildObject("_pipes_floating_air_intake_turbine_geo"));
 			//lgc.rotator.transform.parent = go.transform;
-			
+
 			Constructable c = go.GetComponent<Constructable>();
 			c.model = mdl;
 			c.allowedOnCeiling = false;
@@ -58,41 +58,39 @@ namespace ReikaKalseki.AqueousEngineering {
 			c.allowedOnWall = true;
 			c.allowedOnConstructables = true;
 			c.allowedOutside = false;
-			
+
 			Renderer r = go.GetComponentInChildren<Renderer>();
 			//SNUtil.dumpTextures(r);
 			RenderUtil.swapToModdedTextures(r, this);
 			r.materials[0].SetFloat("_Shininess", 2.5F);
 			r.materials[0].SetFloat("_Fresnel", 0.8F);
 			r.materials[0].SetFloat("_SpecInt", 2.5F);
-			
+
 			//go.GetComponent<Constructable>().model = go;
 			//go.GetComponent<ConstructableBounds>().bounds.extents = new Vector3(1.5F, 0.5F, 1.5F);
 			//go.GetComponent<ConstructableBounds>().bounds.position = new Vector3(1, 1.0F, 0);
 		}
-		
+
 	}
-		
+
 	public class ACUCleanerLogic : CustomMachineLogic {
-		
+
 		private ACUCallbackSystem.ACUCallback connectedACU;
-		
+
 		//internal GameObject rotator;
-				
+
 		void Start() {
 			SNUtil.log("Reinitializing acu cleaner");
 			AqueousEngineeringMod.acuCleanerBlock.initializeMachine(gameObject);
 		}
-		
+
 		protected override float getTickRate() {
 			return 2;
 		}
-		
+
 		private ACUCallbackSystem.ACUCallback tryFindACU() {
-			SubRoot sub = getSub();
-			if (!sub) {
+			if (!sub)
 				return null;
-			}
 			foreach (WaterPark wp in sub.GetComponentsInChildren<WaterPark>()) {
 				if (Vector3.Distance(wp.transform.position, transform.position) <= 6) {
 					return wp.GetComponent<ACUCallbackSystem.ACUCallback>();
@@ -116,9 +114,9 @@ namespace ReikaKalseki.AqueousEngineering {
 		*/
 		protected override void updateEntity(float seconds) {
 			if (!connectedACU) {
-				connectedACU = tryFindACU();
+				connectedACU = this.tryFindACU();
 			}
-			if (connectedACU && consumePower(ACUCleaner.POWER_COST*seconds)) {
+			if (connectedACU && this.consumePower(ACUCleaner.POWER_COST * seconds)) {
 				//rotator.transform.position = connectedACU.transform.position+Vector3.down*1.45F;
 				//rotator.transform.localScale = new Vector3(13.8F, 1, 13.8F);
 				foreach (WaterParkItem wp in connectedACU.acu.items) {
@@ -126,7 +124,7 @@ namespace ReikaKalseki.AqueousEngineering {
 						Pickupable pp = wp.GetComponent<Pickupable>();
 						TechType tt = pp.GetTechType();
 						if (tt == TechType.SeaTreaderPoop || tt == AqueousEngineeringMod.poo.TechType || tt == TechType.StalkerTooth) {
-							InventoryItem ii = getStorage().container.AddItem(pp);
+							InventoryItem ii = storage.container.AddItem(pp);
 							if (ii != null) {
 								connectedACU.acu.RemoveItem(pp);
 								pp.PlayPickupSound();
@@ -140,11 +138,11 @@ namespace ReikaKalseki.AqueousEngineering {
 					float ch = connectedACU.gasopodCount*seconds*0.0008F; //0.08%/s per gasopod
 					if (UnityEngine.Random.Range(0F, 1F) <= ch) {
 						GameObject go = ObjectUtil.createWorldObject(TechType.GasPod);
-						getStorage().container.AddItem(go.GetComponent<Pickupable>());
+						storage.container.AddItem(go.GetComponent<Pickupable>());
 						go.SetActive(false);
 					}
 				}
 			}
-		}	
+		}
 	}
 }

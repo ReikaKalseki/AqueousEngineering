@@ -2,28 +2,28 @@
 using System.Collections.Generic;
 using System.Linq;
 
-using SMLHelper.V2.Assets;
-using SMLHelper.V2.Handlers;
-using SMLHelper.V2.Crafting;
-
-using UnityEngine;
 using ReikaKalseki.DIAlterra;
 
-namespace ReikaKalseki.AqueousEngineering
-{
+using SMLHelper.V2.Assets;
+using SMLHelper.V2.Crafting;
+using SMLHelper.V2.Handlers;
+
+using UnityEngine;
+
+namespace ReikaKalseki.AqueousEngineering {
 	public class ItemCollector : BasicCraftingItem {
-		
+
 		public ItemCollector(XMLLocale.LocaleEntry e) : base(e, "WorldEntities/Tools/Gravsphere") {
 			sprite = TextureManager.getSprite(AqueousEngineeringMod.modDLL, "Textures/Items/ItemCollector");
 			unlockRequirement = TechType.Unobtanium;
-			
+
 			craftingTime = 6;
 			inventorySize = new Vector2int(3, 3);
-			
-			addIngredient(TechType.Gravsphere, 1);
-			addIngredient(TechType.Titanium, 2);
-			addIngredient(TechType.Magnetite, 1);
-			addIngredient(TechType.Aerogel, 3);
+
+			this.addIngredient(TechType.Gravsphere, 1);
+			this.addIngredient(TechType.Titanium, 2);
+			this.addIngredient(TechType.Magnetite, 1);
+			this.addIngredient(TechType.Aerogel, 3);
 		}
 
 		public override void prepareGameObject(GameObject go, Renderer[] r0) {
@@ -55,61 +55,61 @@ namespace ReikaKalseki.AqueousEngineering
 
 		public override string[] StepsToFabricatorTab {
 			get {
-				return new string[]{"Machines"};
+				return new string[] { "Machines" };
 			}
 		}
-		
+
 		internal class ItemCollectorLogic : MonoBehaviour {
-			
+
 			private Gravsphere gravity;
 			private Rigidbody body;
-			
+
 			private float lastInventoryCheckTime = -1;
-			
+
 			private readonly List<StorageContainer> targetInventories = new List<StorageContainer>();
-			
+
 			internal static bool canGrab(GameObject go) {
 				//SNUtil.writeToChat("item collector tried to grab "+go);
 				Pickupable pp = go.FindAncestor<Pickupable>();
 				return (pp && pp.isPickupable && !pp.attached) || go.FindAncestor<BreakableResource>();
 			}
-			
+
 			void Update() {
 				if (!gravity)
-					gravity = GetComponent<Gravsphere>();
+					gravity = this.GetComponent<Gravsphere>();
 				if (!body)
-					body = GetComponent<Rigidbody>();
-				
+					body = this.GetComponent<Rigidbody>();
+
 				if (Player.main.currentSub && Player.main.currentSub.isCyclops && Vector3.Distance(transform.position, Player.main.currentSub.transform.position) <= 120) {
 					SubRoot sub = Player.main.currentSub;
 					CyclopsMotorMode mode = sub.GetComponentInChildren<CyclopsMotorMode>();
 					if (mode && mode.engineOn) {
 						ItemCollectorCyclopsTetherLogic lgc = sub.GetComponentInChildren<ItemCollectorCyclopsTetherLogic>();
 						if (lgc) {
-							lgc.itemCollector = gameObject;	
-							Vector3 tgt = sub.transform.position+sub.transform.up*-9-sub.transform.forward*18;
+							lgc.itemCollector = gameObject;
+							Vector3 tgt = sub.transform.position+(sub.transform.up*-9)-(sub.transform.forward*18);
 							Vector3 diff = tgt-transform.position;
-							body.velocity = diff.normalized*Mathf.Min(diff.sqrMagnitude*0.04F, 30);
-							lgc.lineRenderer.attachPoint.position = tgt+Vector3.up*2;
+							body.velocity = diff.normalized * Mathf.Min(diff.sqrMagnitude * 0.04F, 30);
+							lgc.lineRenderer.attachPoint.position = tgt + (Vector3.up * 2);
 						}
 					}
 				}
-				
+
 				float time = DayNightCycle.main.timePassedAsFloat;
-				if (time-lastInventoryCheckTime >= 1) {
+				if (time - lastInventoryCheckTime >= 1) {
 					lastInventoryCheckTime = time;
 					targetInventories.Clear();
 					WorldUtil.getGameObjectsNear(transform.position, 20, go => {
-						tryAddTarget(go.FindAncestor<StorageContainer>());
+						this.tryAddTarget(go.FindAncestor<StorageContainer>());
 						SubRoot sub = go.FindAncestor<SubRoot>();
 						if (sub) {
 							foreach (StorageContainer sc2 in sub.GetComponentsInChildren<StorageContainer>()) {
-								tryAddTarget(sc2);
+								this.tryAddTarget(sc2);
 							}
 						}
 					});
 				}
-				
+
 				if (gravity && targetInventories.Count > 0 && UnityEngine.Random.Range(0F, 1F) <= Time.deltaTime) {
 					Rigidbody rb = gravity.attractableList.GetRandom();
 					if (rb && rb.gameObject.activeInHierarchy) {
@@ -134,13 +134,13 @@ namespace ReikaKalseki.AqueousEngineering
 					}
 				}
 			}
-			
+
 			private void tryAddTarget(StorageContainer sc) {
 				if (sc && sc.name.ToLowerInvariant().Contains("locker") && !targetInventories.Contains(sc)) {
 					targetInventories.Add(sc);
 				}
 			}
-			
+
 		}
 	}
 }

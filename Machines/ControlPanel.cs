@@ -1,24 +1,24 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
-using System.Collections.Generic;
-
-using UnityEngine;
-
-using SMLHelper.V2.Handlers;
-using SMLHelper.V2.Assets;
-using SMLHelper.V2.Utility;
-using SMLHelper.V2.Crafting;
 
 using ReikaKalseki.DIAlterra;
 
+using SMLHelper.V2.Assets;
+using SMLHelper.V2.Crafting;
+using SMLHelper.V2.Handlers;
+using SMLHelper.V2.Utility;
+
+using UnityEngine;
+
 namespace ReikaKalseki.AqueousEngineering {
-	
+
 	public class BaseControlPanel : CustomMachine<BaseControlPanelLogic> {
-		
+
 		public BaseControlPanel(XMLLocale.LocaleEntry e) : base(e.key, e.name, e.desc, /*"cf522a95-3038-4759-a53c-8dad1242c8ed"*/"c5ae1472-0bdc-4203-8418-fb1f74c8edf5") {
-			addIngredient(TechType.WiringKit, 1);
-			addIngredient(TechType.Titanium, 1);
+			this.addIngredient(TechType.WiringKit, 1);
+			this.addIngredient(TechType.Titanium, 1);
 		}
 
 		public override bool UnlockedAtStart {
@@ -26,28 +26,28 @@ namespace ReikaKalseki.AqueousEngineering {
 				return true;
 			}
 		}
-		
+
 		public override bool isOutdoors() {
 			return false;
 		}
-		
+
 		public override void initializeMachine(GameObject go) {
 			base.initializeMachine(go);
-						
-			ObjectUtil.removeComponent<StorageContainer>(go);
+
+			go.removeComponent<StorageContainer>();
 			BaseControlPanelLogic lgc = go.GetComponent<BaseControlPanelLogic>();
-			
-			GameObject mdl = RenderUtil.setModel(go, "shelve_02", ObjectUtil.getChildObject(ObjectUtil.lookupPrefab("9460942c-2347-4b58-b9ff-0f7f693dc9ff"), "Starship_work_desk_01"));
+
+			GameObject mdl = RenderUtil.setModel(go, "shelve_02", ObjectUtil.lookupPrefab("9460942c-2347-4b58-b9ff-0f7f693dc9ff").getChildObject("Starship_work_desk_01"));
 			mdl.transform.localPosition = new Vector3(0, 0, 0);
 			mdl.transform.localScale = Vector3.one;
 			mdl.transform.SetParent(go.transform);
 			mdl.transform.localRotation = Quaternion.Euler(0, 0, 0);
-			
-			ObjectUtil.removeChildObject(go, "collisions");
+
+			go.removeChildObject("collisions");
 			BoxCollider b = go.EnsureComponent<BoxCollider>();
 			b.size = new Vector3(2.75F, 1, 1);
 			b.center = new Vector3(0.2F, 0, 0);
-			
+
 			Renderer r = mdl.GetComponentInChildren<Renderer>();
 			r.transform.localScale = new Vector3(1, 1, 0.1F);
 			//SNUtil.dumpTextures(r);
@@ -57,7 +57,7 @@ namespace ReikaKalseki.AqueousEngineering {
 			r.materials[0].SetFloat("_Fresnel", 1F);
 			r.materials[0].SetFloat("_SpecInt", 15F);
 			lgc.mainRenderer = r;*/
-			
+
 			Constructable c = go.GetComponent<Constructable>();
 			c.allowedInBase = true;
 			c.allowedInSub = false;
@@ -69,37 +69,37 @@ namespace ReikaKalseki.AqueousEngineering {
 			c.rotationEnabled = true;
 			c.model = mdl;
 		}
-		
+
 	}
-		
+
 	public class BaseControlPanelLogic : CustomMachineLogic {
-		
+
 		private static float[] offsets = new float[]{0, -0.125F, 0.33F, 0.5F};
-		
+
 		private HolographicControl.HolographicControlTag[] buttons = null;
-		
+
 		private float lastButtonValidityCheck = -1;
-		
+
 		private readonly HashSet<string> activeButtons = new HashSet<string>();
-		
+
 		void Start() {
 			SNUtil.log("Reinitializing base control panel");
 			AqueousEngineeringMod.controlsBlock.initializeMachine(gameObject);
 		}
-		
+
 		protected override void load(System.Xml.XmlElement data) {
 			activeButtons.Clear();
 			foreach (System.Xml.XmlElement e in data.getDirectElementsByTagName("activeButton")) {
 				activeButtons.Add(e.InnerText);
 			}
-			SNUtil.log("Loaded control panel with active buttons "+activeButtons.toDebugString(), AqueousEngineeringMod.modDLL);
+			SNUtil.log("Loaded control panel with active buttons " + activeButtons.toDebugString(), AqueousEngineeringMod.modDLL);
 			if (buttons != null) {
 				foreach (HolographicControl.HolographicControlTag tag in buttons) {
 					tag.setState(activeButtons.Contains(tag.GetComponentInParent<PrefabIdentifier>().ClassId));
 				}
 			}
 		}
-		
+
 		protected override void save(System.Xml.XmlElement data) {
 			foreach (string s in activeButtons) {
 				System.Xml.XmlElement e = data.OwnerDocument.CreateElement("activeButton");
@@ -107,9 +107,9 @@ namespace ReikaKalseki.AqueousEngineering {
 				data.AppendChild(e);
 			}
 		}
-		
+
 		public void addButton(HolographicControl control) {
-			GameObject box = ObjectUtil.getChildObject(gameObject, "ButtonHolder");
+			GameObject box = gameObject.getChildObject("ButtonHolder");
 			if (!box) {
 				box = new GameObject("ButtonHolder");
 				box.transform.SetParent(transform);
@@ -117,29 +117,29 @@ namespace ReikaKalseki.AqueousEngineering {
 			box.transform.localPosition = Vector3.zero;
 			box.transform.localRotation = Quaternion.identity;
 			HolographicControl.HolographicControlTag com = HolographicControl.addButton(box, control);
-			updateButtons();
+			this.updateButtons();
 			if (activeButtons.Contains(control.ClassID)) {
 				com.setState(true);
 				//activeButtons.Remove(control.ClassID);
 			}
-			SNUtil.log("Added button "+control.ClassID+" to control panel; active: "+com.getState(), AqueousEngineeringMod.modDLL);
+			SNUtil.log("Added button " + control.ClassID + " to control panel; active: " + com.getState(), AqueousEngineeringMod.modDLL);
 		}
-		
+
 		void updateButtons() {
-			buttons = GetComponentsInChildren<HolographicControl.HolographicControlTag>();
-			float offset = -0.4F+buttons.Length*0.3125F;//0.33F; //-0.125 for 1, 0.33 for 2, 0.5 for 3;
+			buttons = this.GetComponentsInChildren<HolographicControl.HolographicControlTag>();
+			float offset = -0.4F+(buttons.Length*0.3125F);//0.33F; //-0.125 for 1, 0.33 for 2, 0.5 for 3;
 			if (buttons.Length < offsets.Length)
 				offset = offsets[buttons.Length];
 			for (int i = 0; i < buttons.Length; i++) {
 				HolographicControl.HolographicControlTag tag = buttons[i];
-				float f = (2F/buttons.Length)*i-offset;
+				float f = (2F/buttons.Length*i)-offset;
 				tag.transform.parent.localPosition = new Vector3(f, 0, 0.1F);
 				tag.transform.parent.localScale = new Vector3(2, 2, 1F);
 				tag.transform.localRotation = Quaternion.identity;
 				tag.transform.parent.localRotation = Quaternion.identity;
 			}
 		}
-		
+
 		void SetHolographicControlState(HolographicControl.HolographicControlTag tag) {
 			string id = tag.GetComponentInParent<PrefabIdentifier>().ClassId;
 			if (tag.getState())
@@ -147,10 +147,10 @@ namespace ReikaKalseki.AqueousEngineering {
 			else
 				activeButtons.Remove(id);
 		}
-		
+
 		protected override void updateEntity(float seconds) {
 			float time = DayNightCycle.main.timePassedAsFloat;
-			if (time-lastButtonValidityCheck >= 1 && buttons != null) {
+			if (time - lastButtonValidityCheck >= 1 && buttons != null) {
 				lastButtonValidityCheck = time;
 				bool changed = false;
 				foreach (HolographicControl.HolographicControlTag tag in buttons) {
@@ -161,8 +161,8 @@ namespace ReikaKalseki.AqueousEngineering {
 					}
 				}
 				if (changed)
-					updateButtons();
+					this.updateButtons();
 			}
-		}	
+		}
 	}
 }
