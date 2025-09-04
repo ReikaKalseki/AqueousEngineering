@@ -62,7 +62,7 @@ namespace ReikaKalseki.AqueousEngineering {
 			int n = 15;
 			for (int i = pi.Length; i < n; i++) {
 				GameObject fin = ObjectUtil.createWorldObject("cf522a95-3038-4759-a53c-8dad1242c8ed");
-				RenderUtil.convertToModel(fin);
+				fin.convertToModel();
 				fin.EnsureComponent<AmpeelCoil>();
 				fin.transform.SetParent(child.transform);
 				fin.transform.localScale = new Vector3(0.09F, 0.13F, 0.05F);

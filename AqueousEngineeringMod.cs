@@ -256,7 +256,6 @@ namespace ReikaKalseki.AqueousEngineering {
 
 			ACUCallbackSystem.instance.register();
 			NuclearReactorFuelSystem.instance.register();
-			MoraleSystem.instance.register();
 
 			NuclearReactorFuelSystem.instance.registerReactorFuelRelative(cooledRod.TechType, 2F, 0.8F, 0.75F, TechType.DepletedReactorRod);
 			NuclearReactorFuelSystem.instance.registerReactorFuelRelative(fulguriteRod.TechType, 0.25F, 2.5F, 1.5F, TechType.DepletedReactorRod);
@@ -301,7 +300,6 @@ namespace ReikaKalseki.AqueousEngineering {
 			ConsoleCommandsHandler.Main.RegisterConsoleCommand<Action>("debugACU", ACUCallbackSystem.instance.debugACU);
 			ConsoleCommandsHandler.Main.RegisterConsoleCommand<Action>("sunbeamModel", createSunbeamModel);
 			ConsoleCommandsHandler.Main.RegisterConsoleCommand<Action<bool>>("debugRooms", arg => BaseRoomSpecializationSystem.debugRoomCompute = arg);
-			ConsoleCommandsHandler.Main.RegisterConsoleCommand<Action<bool>>("debugMorale", arg => MoraleSystem.printMoraleForDebug = arg);
 
 			if (config.getBoolean(AEConfig.ConfigEntries.ACUSOUND))
 				WaterParkCreature.behavioursToDisableInside[0] = typeof(AqueousEngineeringMod); //replace with a non-MB class that will never be present
@@ -511,14 +509,6 @@ namespace ReikaKalseki.AqueousEngineering {
 			TechType baseglass = SNUtil.getTechType("BaseGlass");
 			if (baseglass != TechType.None) {
 				RecipeUtil.addIngredient(shieldedRod.TechType, baseglass, 1);
-			}
-
-			Type t = InstructionHandlers.getTypeBySimpleName("Agony.RadialTabs.GhostMoving");
-			if (t != null) {
-				InstructionHandlers.patchMethod(harmony, t, "OnUpdate", codes => {
-					int idx = InstructionHandlers.getInstruction(codes, 0, 0, OpCodes.Ldfld, t.FullName, "_speed");
-					codes.Insert(idx+1, InstructionHandlers.createMethodCall("ReikaKalseki.AqueousEngineering.AEHooks", "getRadialTabAnimSpeed", false, new Type[] { typeof(float) }));
-				});
 			}
 		}
 

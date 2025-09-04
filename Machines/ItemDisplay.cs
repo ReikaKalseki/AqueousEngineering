@@ -78,7 +78,7 @@ namespace ReikaKalseki.AqueousEngineering {
 			base.initializeMachine(go);
 			go.removeComponent<Trashcan>();
 
-			GameObject mdl = RenderUtil.setModel(go, "model", ObjectUtil.lookupPrefab("0fbf203a-a940-4b6e-ac63-0fe2737d84c2").getChildObject("model/Base_interior_Planter_Pot_03"));
+			GameObject mdl = go.setModel("model", ObjectUtil.lookupPrefab("0fbf203a-a940-4b6e-ac63-0fe2737d84c2").getChildObject("model/Base_interior_Planter_Pot_03"));
 			mdl.removeChildObject("pot_generic_plant_03");
 			mdl.transform.localScale = new Vector3(0.75F, 0.75F, 1.5F);
 			mdl.transform.localRotation = Quaternion.Euler(-90, 0, 0);
@@ -154,7 +154,7 @@ namespace ReikaKalseki.AqueousEngineering {
 			base.initStorage(sc);
 			sc.container.onAddItem += this.updateStoredItem;
 			sc.container.onRemoveItem += ii => this.setDisplay(null);
-			sc.container.isAllowedToAdd = new IsAllowedToAdd((pp, vb) => storage.container.GetItemTypes().Count == 0);
+			sc.container.isAllowedToAdd = new IsAllowedToAdd((pp, vb) => storage.isEmpty());
 		}
 
 		private void OnDestroy() {
@@ -263,7 +263,7 @@ namespace ReikaKalseki.AqueousEngineering {
 				renderSizeScale *= WaterParkCreature.waterParkCreatureParameters[tt].maxSize / WaterParkCreature.waterParkCreatureParameters[tt].outsideSize * 0.33F;
 			}
 			GameObject renderObj = UnityEngine.Object.Instantiate(go);
-			RenderUtil.convertToModel(renderObj);
+			renderObj.convertToModel();
 			display = new GameObject(DISPLAY_OBJECT_NAME);
 			renderObj.transform.SetParent(display.transform);
 			display.SetActive(true);

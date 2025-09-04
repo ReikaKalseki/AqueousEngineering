@@ -632,11 +632,11 @@ namespace ReikaKalseki.AqueousEngineering {
 			return rt ? rt.getType() : RoomTypes.UNSPECIALIZED;
 		}
 
-		internal RoomTypes getPlayerRoomType(Player ep) {
+		public RoomTypes getPlayerRoomType(Player ep) {
 			return this.getPlayerRoomType(ep, out float deco, out float decoThresh);
 		}
 
-		internal RoomTypes getPlayerRoomType(Player ep, out float deco, out float decoThresh) {
+		public RoomTypes getPlayerRoomType(Player ep, out float deco, out float decoThresh) {
 			BaseCell bc = AEHooks.getCurrentPlayerRoom();
 			decoThresh = this.getDecoThreshold(bc);
 			if (!bc) {

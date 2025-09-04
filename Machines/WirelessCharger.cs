@@ -41,7 +41,7 @@ namespace ReikaKalseki.AqueousEngineering {
 			go.removeComponent<PowerFX>();
 			go.removeComponent<PowerSystemPreview>();
 
-			GameObject mdl = RenderUtil.setModel(go, "Power_Transmitter", ObjectUtil.lookupPrefab("67744b32-93c2-4aba-8a18-ffb87204a8eb").getChildObject("model/LED_light"));
+			GameObject mdl = go.setModel("Power_Transmitter", ObjectUtil.lookupPrefab("67744b32-93c2-4aba-8a18-ffb87204a8eb").getChildObject("model/LED_light"));
 			mdl.removeChildObject("*");
 			mdl.transform.localScale = new Vector3(2.5F, 2.5F, 1.5F);
 			mdl.transform.localRotation = Quaternion.Euler(-90, 0, 0);

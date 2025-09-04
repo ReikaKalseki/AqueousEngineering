@@ -51,7 +51,7 @@ namespace ReikaKalseki.AqueousEngineering {
 			StorageContainer con = go.GetComponentInChildren<StorageContainer>();
 			this.initializeStorageContainer(con, 2, 2);
 
-			GameObject mdl = RenderUtil.setModel(go, "bedc40fb-bd97-4b4d-a943-d39360c9c7bd", ObjectUtil.lookupPrefab("??").getChildObject("??"));
+			GameObject mdl = go.setModel("bedc40fb-bd97-4b4d-a943-d39360c9c7bd", ObjectUtil.lookupPrefab("??").getChildObject("??"));
 			mdl.transform.localRotation = Quaternion.Euler(-90, 180, 0);
 			mdl.transform.localPosition = new Vector3(0, -0.05F, 0);
 			mdl.transform.localScale = new Vector3(1.5F, 0.5F, 0.5F);

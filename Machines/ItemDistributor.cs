@@ -40,7 +40,7 @@ namespace ReikaKalseki.AqueousEngineering {
 			StorageContainer con = go.GetComponentInChildren<StorageContainer>();
 			this.initializeStorageContainer(con, 5, 5);
 
-			GameObject mdl = RenderUtil.setModel(go, "model", ObjectUtil.lookupPrefab("c5ae1472-0bdc-4203-8418-fb1f74c8edf5"));
+			GameObject mdl = go.setModel("model", ObjectUtil.lookupPrefab("c5ae1472-0bdc-4203-8418-fb1f74c8edf5"));
 			mdl.transform.localScale = new Vector3(1, 2, 1);
 
 			Constructable c = go.GetComponent<Constructable>();

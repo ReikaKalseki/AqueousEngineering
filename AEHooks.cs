@@ -27,8 +27,6 @@ namespace ReikaKalseki.AqueousEngineering {
 		private static BaseCell currentPlayerRoom;
 		private static float lastPlayerRoomCheckTime;
 
-		private static float lastCuddlefishPlay;
-
 		static AEHooks() {
 			SNUtil.log("Initializing AEHooks");
 			DIHooks.onWorldLoadedEvent += onWorldLoaded;
@@ -42,44 +40,13 @@ namespace ReikaKalseki.AqueousEngineering {
 			DIHooks.gravTrapAttemptEvent += gravTryAttract;
 			DIHooks.onSkyApplierSpawnEvent += onSkyApplierSpawn;
 			DIHooks.onPlayerTickEvent += tickPlayer;
-			DIHooks.getFoodRateEvent += affectFoodRate;
-			DIHooks.getSwimSpeedEvent += affectSwimSpeed;
 			DIHooks.craftTimeEvent += affectCraftTime;
 			DIHooks.onSleepEvent += onSleep;
-			DIHooks.onEatEvent += onEat;
 			DIHooks.baseRebuildEvent += onBaseRebuild;
 			DIHooks.baseStrengthComputeEvent += onBaseHullCompute;
-			DIHooks.scanCompleteEvent += onScanComplete;
-			DIHooks.respawnEvent += onRespawn;
-			DIHooks.reaperGrabVehicleEvent += onReaperGrab;
-			DIHooks.onPlayWithCuddlefish += onCuddlefishPlay;
-			DIHooks.onRocketStageCompletedEvent += onRocketStageComplete;
-			KnownTech.onAdd += onTechUnlocked;
 
 			//DIHooks.onRedundantScanEvent += ch => ch.preventNormalDrop = onRedundantScan();
 			CustomMachineLogic.getMachinePowerCostFactorEvent += getCustomMachinePowerCostMultiplier;
-		}
-
-		private static void onRocketStageComplete(Rocket r, int stage, bool anyComplete) {
-			MoraleSystem.instance.shiftMorale(anyComplete ? 20 : 5);
-		}
-
-		private static void onCuddlefishPlay(CuteFishHandTarget target, Player player, CuteFishHandTarget.CuteFishCinematic cinematic) {
-			float time = DayNightCycle.main.timePassedAsFloat;
-			if (time - lastCuddlefishPlay < 600) //10 min
-				return;
-			lastCuddlefishPlay = time;
-			MoraleSystem.instance.shiftMorale(25);
-		}
-
-		private static void onReaperGrab(ReaperLeviathan leviathan, Vehicle vehicle) {
-			MoraleSystem.instance.shiftMorale(vehicle == Player.main.GetVehicle() ? -40 : -20);
-		}
-
-		private static void onRespawn(Survival survival, Player player, bool post) {
-			if (post) {
-				MoraleSystem.instance.reset();
-			}
 		}
 
 		public static void tickPlayer(Player ep) {
@@ -90,15 +57,6 @@ namespace ReikaKalseki.AqueousEngineering {
 					lastPlayerRoomCheckTime = time;
 				}
 			}
-			MoraleSystem.instance.tick(ep);
-		}
-
-		public static void onScanComplete(PDAScanner.EntryData e) {
-			MoraleSystem.instance.shiftMorale(1);
-		}
-
-		public static void onTechUnlocked(TechType tt, bool vb) {
-			MoraleSystem.instance.shiftMorale(2.5F);
 		}
 
 		public static BaseCell getCurrentPlayerRoom() {
@@ -107,8 +65,6 @@ namespace ReikaKalseki.AqueousEngineering {
 
 		public static void onWorldLoaded() {
 			OutdoorPot.updateLocale();
-
-			MoraleSystem.instance.reset();
 
 			string s = AqueousEngineeringMod.machineLocale.getEntry("BaseRepairBeacon").getField<string>("frag");
 			foreach (TechnologyFragment f in AqueousEngineeringMod.repairBeaconFragments)
@@ -277,75 +233,6 @@ namespace ReikaKalseki.AqueousEngineering {
 			//SNUtil.writeToChat("Slept in "+BaseRoomSpecializationSystem.instance.getSavedType(bed));
 			if (BaseRoomSpecializationSystem.instance.getSavedType(bed, out float deco, out float thresh) == BaseRoomSpecializationSystem.RoomTypes.LEISURE)
 				Player.main.gameObject.AddComponent<HealingOverTime>().setValues(Mathf.Min(20, 15 + deco - thresh), bed.kSleepRealTimeDuration).activate();
-			MoraleSystem.instance.shiftMorale(AqueousEngineeringMod.config.getInt(AEConfig.ConfigEntries.SLEEPMORALE));
-		}
-
-		public static void onEat(Survival s, GameObject go) {
-			if (go) {
-				Pickupable pp = go.GetComponent<Pickupable>();
-				if (pp) {
-					TechType tt = pp.GetTechType();
-					if (tt == TechType.BigFilteredWater || tt == TechType.DisinfectedWater || tt == TechType.FilteredWater)
-						return;
-					int morale;
-					if (tt == TechType.StillsuitWater) {
-						morale = -50;
-					}
-					else if (tt == TechType.Bladderfish) {
-						morale = -40;
-					}
-					else if (tt.isRawFish()) {
-						morale = -25;
-					}
-					else {
-						ReadOnlyCollection<ConsumableTracker.ConsumeItemEvent> li = ConsumableTracker.instance.getEvents();
-						int eatsSinceDifferent = 999999;
-						int back = 1;
-						for (int i = li.Count - 2; i >= 0; i--) { //this event is already in the list so start an extra item back
-							ConsumableTracker.ConsumeItemEvent evt = li[i];
-							if (!evt.isEating)
-								continue;
-							if (tt == TechType.BigFilteredWater || tt == TechType.DisinfectedWater || tt == TechType.FilteredWater || tt == TechType.StillsuitWater)
-								continue;
-							//SNUtil.writeToChat("ate "+evt.itemType+" @ "+evt.eventTime);
-							if (MoraleSystem.instance.areFoodsDifferent(evt.itemType, tt)) {
-								eatsSinceDifferent = back;
-								break;
-							}
-							back++;
-						}
-						string msg;
-						switch (back) {
-							case 1: //different from last item -> boost
-								morale = 10;
-								msg = "Morale boost from dietary variety";
-								break;
-							case 2: //if same as last two items then no effect
-							case 3:
-								morale = 0;
-								msg = "Dietary variety recommended for optimum morale";
-								break;
-							case 4: //if have to go back five items then small penalty
-							case 5:
-								morale = -10;
-								msg = "Lack of dietary variety slightly harming morale";
-								break;
-							case 6: //if have to go back five items then moderate penalty
-							case 7:
-							case 8:
-								morale = -20;
-								msg = "Lack of dietary variety substantially harming morale";
-								break;
-							default: //eight or more and you are always eating the same thing, so big penalty
-								morale = -40;
-								msg = "Lack of dietary variety severely harming morale";
-								break;
-						}
-						SNUtil.writeToChat(msg);
-					}
-					MoraleSystem.instance.shiftMorale(morale);
-				}
-			}
 		}
 
 		public static void affectFoodRate(DIHooks.FoodRateCalculation calc) {
@@ -355,56 +242,11 @@ namespace ReikaKalseki.AqueousEngineering {
 				calc.rate *= Mathf.Max(0.2F, 0.33F - (0.02F * (deco - thresh)));
 			else if (type == BaseRoomSpecializationSystem.RoomTypes.WORK)
 				calc.rate *= 0.8F - (0.01F * Mathf.Min(5, deco));
-			float morale = MoraleSystem.instance.moralePercentage;
-			if (morale < 40) {
-				calc.rate *= Mathf.Lerp(2.5F, 1, morale / 40F);
-			}
-			else if (morale > 80) {
-				calc.rate *= Mathf.Lerp(1, 0.5F, (morale - 80F) / 20F);
-			}
-		}
-
-		private static void affectSwimSpeed(DIHooks.SwimSpeedCalculation calc) {
-			float morale = MoraleSystem.instance.moralePercentage;
-			if (morale < 25) {
-				calc.setValue(calc.getValue() * Mathf.Lerp(1, 0.5F, morale / 25F));
-			}
 		}
 
 		private static void affectCraftTime(DIHooks.CraftTimeCalculation calc) {
-			float morale = MoraleSystem.instance.moralePercentage;
-			float f = 1;
-			if (morale < 10) {
-				f = Mathf.Lerp(10F, 4F, morale / 10F);
-			}
-			else if (morale < 25) {
-				f = (float)MathUtil.linterpolate(morale, 10, 25, 4, 1.5, true);
-			}
-			else if (morale < 50) {
-				f = (float)MathUtil.linterpolate(morale, 25, 50, 1.5, 1, true);
-			}
-			else if (morale >= 90) {
-				f = (float)MathUtil.linterpolate(morale, 90, 100, 1, 0.5F, true);
-			}
 			if (BaseRoomSpecializationSystem.instance.getSavedType(calc.crafter) == BaseRoomSpecializationSystem.RoomTypes.WORK)
-				f /= 1.5F;
-			calc.craftingDuration *= f;
-			//SNUtil.writeToChat("Morale is " + morale.ToString("0.0") + " -> "+f.ToString("0.00")+"x duration");
-		}
-
-		public static float getRadialTabAnimSpeed(float orig) {
-			float morale = MoraleSystem.instance.moralePercentage;
-			float f = 1;
-			if (morale < 10) {
-				f = Mathf.Lerp(0.125F, 0.33F, morale / 10F);
-			}
-			else if (morale < 25) {
-				f = (float)MathUtil.linterpolate(morale, 10, 25, 0.33, 0.67, true);
-			}
-			else if (morale < 50) {
-				f = (float)MathUtil.linterpolate(morale, 25, 50, 0.67, 1, true);
-			}
-			return f * orig;
+				calc.craftingDuration /= 1.5F;
 		}
 
 		public static void onConstructionComplete(Constructable c, bool complete) {
@@ -460,10 +302,6 @@ namespace ReikaKalseki.AqueousEngineering {
 				PrefabIdentifier pi = dmg.target.FindAncestor<PrefabIdentifier>();
 				if (pi && pi.ClassId == AqueousEngineeringMod.collector.ClassID)
 					dmg.setValue(0);
-			}
-			if (dmg.target.isPlayer()) {
-				float dmgRef = Mathf.Clamp(dmg.getAmount(), 0, 50);
-				MoraleSystem.instance.shiftMorale(-Mathf.Lerp(5, 80, dmgRef / 50F));
 			}
 		}
 

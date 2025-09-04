@@ -37,7 +37,7 @@ namespace ReikaKalseki.AqueousEngineering {
 			go.removeComponent<StorageContainer>();
 			BaseControlPanelLogic lgc = go.GetComponent<BaseControlPanelLogic>();
 
-			GameObject mdl = RenderUtil.setModel(go, "shelve_02", ObjectUtil.lookupPrefab("9460942c-2347-4b58-b9ff-0f7f693dc9ff").getChildObject("Starship_work_desk_01"));
+			GameObject mdl = go.setModel("shelve_02", ObjectUtil.lookupPrefab("9460942c-2347-4b58-b9ff-0f7f693dc9ff").getChildObject("Starship_work_desk_01"));
 			mdl.transform.localPosition = new Vector3(0, 0, 0);
 			mdl.transform.localScale = Vector3.one;
 			mdl.transform.SetParent(go.transform);

@@ -39,7 +39,7 @@ namespace ReikaKalseki.AqueousEngineering {
 
 			FloatingPowerRelayLogic lgc = go.GetComponent<FloatingPowerRelayLogic>();
 
-			GameObject mdl = RenderUtil.setModel(go, "Power_Transmitter", ObjectUtil.lookupPrefab(TechType.Gravsphere).getChildObject("gravSphere_anim"));
+			GameObject mdl = go.setModel("Power_Transmitter", ObjectUtil.lookupPrefab(TechType.Gravsphere).getChildObject("gravSphere_anim"));
 			GameObject inner = mdl.getChildObject("Gravsphere");
 			foreach (Renderer rr in inner.GetComponentsInChildren<Renderer>()) {
 				if (rr.gameObject != inner)

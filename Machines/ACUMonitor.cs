@@ -40,7 +40,7 @@ namespace ReikaKalseki.AqueousEngineering {
 			go.removeComponent<Radio>();
 			go.removeChildObject("xFlare");
 
-			GameObject mdl = RenderUtil.setModel(go, "Mesh", ObjectUtil.lookupPrefab("b460a6a6-2a05-472c-b4bf-c76ae49d9a29"));
+			GameObject mdl = go.setModel("Mesh", ObjectUtil.lookupPrefab("b460a6a6-2a05-472c-b4bf-c76ae49d9a29"));
 
 			ACUMonitorLogic lgc = go.GetComponent<ACUMonitorLogic>();
 
@@ -76,7 +76,7 @@ namespace ReikaKalseki.AqueousEngineering {
 		//internal GameObject rotator;
 
 		void Start() {
-			SNUtil.log("Reinitializing acu cleaner");
+			SNUtil.log("Reinitializing acu monitor");
 			AqueousEngineeringMod.acuMonitorBlock.initializeMachine(gameObject);
 		}
 

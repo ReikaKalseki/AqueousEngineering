@@ -38,7 +38,7 @@ namespace ReikaKalseki.AqueousEngineering {
 			base.initializeMachine(go);
 			go.removeChildObject("Label");
 
-			GameObject mdl = RenderUtil.setModel(go, "model", ObjectUtil.lookupPrefab("c0175cf7-0b6a-4a1d-938f-dad0dbb6fa06"));
+			GameObject mdl = go.setModel("model", ObjectUtil.lookupPrefab("c0175cf7-0b6a-4a1d-938f-dad0dbb6fa06"));
 			mdl.transform.localScale = Vector3.one * 0.67F;
 
 			StorageContainer con = go.GetComponentInChildren<StorageContainer>();
@@ -47,7 +47,7 @@ namespace ReikaKalseki.AqueousEngineering {
 			ACUCleanerLogic lgc = go.GetComponent<ACUCleanerLogic>();
 
 			//GameObject air = ObjectUtil.lookupPrefab("7b4b90b8-6294-4354-9ebb-3e5aa49ae453");
-			//GameObject mdl = RenderUtil.setModel(go, "discovery_trashcan_01_d", air.getChildObject("model"));
+			//GameObject mdl = go.setModel("discovery_trashcan_01_d", air.getChildObject("model"));
 			//lgc.rotator = UnityEngine.Object.Instantiate(ObjectUtil.getChildObject(air, "model").getChildObject("_pipes_floating_air_intake_turbine_geo"));
 			//lgc.rotator.transform.parent = go.transform;
 
