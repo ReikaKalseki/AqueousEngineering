@@ -502,8 +502,15 @@ namespace ReikaKalseki.AqueousEngineering {
 
 			TechType refuel = SNUtil.getTechType("ReplenishReactorRod");
 			if (refuel != TechType.None) {
+				SNUtil.log("Moving reactor rod recharge to nuclear tab");
 				CraftTreeHandler.RemoveNode(CraftTree.Type.Fabricator, "Resources", "Electronics", "ReplenishReactorRod");
+				refuel.preventCraftNodeAddition();
 				CraftTreeHandler.AddCraftingNode(CraftTree.Type.Fabricator, refuel, "Resources", "Nuclear");
+				RecipeUtil.setItemCategory(refuel, TechGroup.Resources, nuclearCategory);
+				//KnownTechHandler.SetCompoundUnlock(refuel, TechType.Unobtanium);
+				KnownTechHandler.SetAnalysisTechEntry(TechType.Unobtanium, new TechType[]{refuel});
+				refuel.removeUnlockTrigger();
+				TechnologyUnlockSystem.instance.addDirectUnlock(TechType.ReactorRod, refuel);
 			}
 
 			TechType baseglass = SNUtil.getTechType("BaseGlass");
