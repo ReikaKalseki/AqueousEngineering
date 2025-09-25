@@ -451,8 +451,11 @@ namespace ReikaKalseki.AqueousEngineering {
 					Pickupable pp = wp.gameObject.GetComponentInChildren<Pickupable>();
 					TechType tt = pp ? pp.GetTechType() : TechType.None;
 					if (tt != TechType.None) {
-						sizes[tt] = wp.GetSize();
-						counts.add(tt);
+						int sz = wp.GetSize();
+						if (sz > 0) {
+							sizes[tt] = sz;
+							counts.add(tt);
+						}
 					}
 				}
 				StringBuilder sb = new StringBuilder();

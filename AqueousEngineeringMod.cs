@@ -496,6 +496,7 @@ namespace ReikaKalseki.AqueousEngineering {
 			//BaseRoomSpecializationSystem.instance.registerModdedObject(roomDataBlock, 0, BaseRoomSpecializationSystem.RoomTypes.UNSPECIALIZED);
 			BaseRoomSpecializationSystem.instance.registerModdedObject(repairBlock, -0.1F, BaseRoomSpecializationSystem.RoomTypes.MECHANICAL);
 			BaseRoomSpecializationSystem.instance.registerModdedObject(batteryBlock, 0, BaseRoomSpecializationSystem.RoomTypes.POWER);
+			BaseRoomSpecializationSystem.instance.registerModdedObject(wirelessChargerBlock, 0.5F, BaseRoomSpecializationSystem.RoomTypes.POWER);
 
 			if (WirelessCharger.unlockTrigger != TechType.None)
 				TechnologyUnlockSystem.instance.addDirectUnlock(WirelessCharger.unlockTrigger, wirelessChargerBlock.TechType);

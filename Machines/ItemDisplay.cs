@@ -130,7 +130,10 @@ namespace ReikaKalseki.AqueousEngineering {
 		private GameObject display;
 		private Renderer displayRender;
 		private SkyApplier displaySky;
-		private TechType displayType;
+		
+		public TechType displayType { get; private set; }
+
+		public Pickupable currentItem { get { return displayType == TechType.None ? null : storage.container.GetItems(displayType)[0].item; } }
 
 		private float additionalRenderSpace = 0.075F;
 		private float rotationSpeedScale = 1;
@@ -238,10 +241,6 @@ namespace ReikaKalseki.AqueousEngineering {
 			else if (speed < target) {
 				speed = Mathf.Min(target, speed + 0.15F);
 			}
-		}
-
-		public TechType getCurrentItem() {
-			return displayType;
 		}
 
 		private void setDisplay(Pickupable pp) {

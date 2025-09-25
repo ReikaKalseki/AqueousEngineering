@@ -6,6 +6,8 @@ using System.Linq;
 using ReikaKalseki.AqueousEngineering;
 using ReikaKalseki.DIAlterra;
 
+using RootMotion.FinalIK;
+
 using SMLHelper.V2.Assets;
 using SMLHelper.V2.Handlers;
 using SMLHelper.V2.Utility;
@@ -120,16 +122,16 @@ namespace ReikaKalseki.AqueousEngineering {
 
 			decoRatings[STANDING_LOCKER_PREFAB] = 0.1F;
 
-			decoRatings["cdb374fd-4f38-4bef-86a3-100cc87155b6"] = 0.25F; //double bed + extra sheet
-			decoRatings["c3994649-d0da-4f8c-bb77-1590f50838b9"] = 0.1F; //bed
-			decoRatings["dffaf40f-9fbc-4553-9b35-3f939c76c283"] = 0.2F; //double bed
+			decoRatings["cdb374fd-4f38-4bef-86a3-100cc87155b6"] = 0.33F; //double bed + extra sheet
+			decoRatings["c3994649-d0da-4f8c-bb77-1590f50838b9"] = 0.15F; //bed
+			decoRatings["dffaf40f-9fbc-4553-9b35-3f939c76c283"] = 0.25F; //double bed
 
 			decoRatings["336f276f-9546-40d0-98cb-974994dee3bf"] = 0.15F; //prawn poster
 			decoRatings["d76dd251-492d-4bf9-8adb-25e59d709df2"] = 0.15F; //prawn poster 2
-			decoRatings["876cbea4-b4bf-4311-8264-5118bfef291c"] = 0.4F; //aurora poster
+			decoRatings["876cbea4-b4bf-4311-8264-5118bfef291c"] = 0.75F; //aurora poster
 			decoRatings["72da21f9-f3e2-4183-ac57-d3679fb09122"] = 0.05F; //shooter poster
 			decoRatings["d809cb15-6784-4f7c-bf5d-f7d0c5bf8546"] = 0.15F; //cat poster
-			decoRatings["c0d320d2-537e-4128-90ec-ab1466cfbbc3"] = 1F; //toy aurora
+			decoRatings["c0d320d2-537e-4128-90ec-ab1466cfbbc3"] = 1.25F; //toy aurora
 
 			decoRatings["1d1898ca-8436-4fe4-aaf4-a1d9fa6d58cb"] = 1; //bar table
 			decoRatings["51eba507-317c-46bf-adde-4459dc8e002e"] = -2; //vending machine
@@ -142,19 +144,19 @@ namespace ReikaKalseki.AqueousEngineering {
 			decoRatings["274bd60f-16c4-4810-911b-c5562fe7c2d8"] = 0.5F; //wall mounted plant shelf
 																		//decoRatings["b343166e-3a17-4a1c-85d1-05dee8ec1575"] = 0.25F; //sign //made content sensitive
 			decoRatings["07a05a2f-de55-4c60-bfda-cedb3ab72b88"] = 0.25F; //jack eye
-			decoRatings["4b8cd269-6646-42d0-b8a0-9a40ef0c07d0"] = 0.5F; //toy car
-			decoRatings["7cdcbed0-7d20-43c4-beb4-f1ad539b2a76"] = 0.5F; //toy car
-			decoRatings["ad5e149b-d35c-4b46-bb4e-b4c0a9c6e668"] = 0.25F; //markiplier
-			decoRatings["cb89366d-eac0-4011-8665-fafde75b215c"] = 0.25F; //markiplier
-			decoRatings["f7e26c44-bb28-4979-8f83-76ed529979fc"] = 0.25F; //markiplier
+			decoRatings["4b8cd269-6646-42d0-b8a0-9a40ef0c07d0"] = 0.75F; //toy car
+			decoRatings["7cdcbed0-7d20-43c4-beb4-f1ad539b2a76"] = 0.75F; //toy car
+			decoRatings["ad5e149b-d35c-4b46-bb4e-b4c0a9c6e668"] = -0.25F; //markiplier
+			decoRatings["cb89366d-eac0-4011-8665-fafde75b215c"] = -0.25F; //markiplier
+			decoRatings["f7e26c44-bb28-4979-8f83-76ed529979fc"] = -0.25F; //markiplier
 			decoRatings["c96baff4-0993-4893-8345-adb8709901a7"] = 0.33F; //toy cat
 			decoRatings["7ea4a91e-80fc-43aa-8ce3-5d52bd19e278"] = 0.33F; //"gorge toy"
 
 			decoRatings["0fbf203a-a940-4b6e-ac63-0fe2737d84c2"] = 0.25F; //chic pot
 
-			decoRatings["2cee55bc-6136-47c5-a1ed-14c8f3203856"] = 0.5F; //lab parts
-			decoRatings["9c5f22de-5049-48bb-ad1e-0d78c894210e"] = 0.5F; //lab parts
-			decoRatings["3fd9050b-4baf-4a78-a883-e774c648887c"] = 0.75F; //lab parts
+			decoRatings["2cee55bc-6136-47c5-a1ed-14c8f3203856"] = 0.6F; //lab parts
+			decoRatings["9c5f22de-5049-48bb-ad1e-0d78c894210e"] = 0.6F; //lab parts
+			decoRatings["3fd9050b-4baf-4a78-a883-e774c648887c"] = 0.8F; //lab parts
 
 			decoRatings["1faf2b57-ff4f-4ea5-a715-7cc5ff6aae60"] = 0.05F; //lab containers
 			decoRatings["1b0b7f6d-9793-469c-9872-dfe690834fee"] = 0.05F; //lab containers
@@ -163,18 +165,18 @@ namespace ReikaKalseki.AqueousEngineering {
 			decoRatings["d6389e01-f2cd-4f9d-a495-0867753e44f0"] = 0.05F; //lab containers
 			decoRatings["e7f9c5e7-3906-4efd-b239-28783bce17a5"] = 0.05F; //lab containers
 
-			decoRatings["a36047b0-1533-4718-8879-d6ba9229c978"] = 1.5F; //large lab glass tube
+			decoRatings["a36047b0-1533-4718-8879-d6ba9229c978"] = 2.0F; //large lab glass tube
 
 			decoRatings["ResourceMonitorBuildableSmall"] = 0.05F;
 			decoRatings["ResourceMonitorBuildableLarge"] = 0.1F;
 
 			//FCS
-			decoRatings["NeonPlanter"] = 0.5F;
+			decoRatings["NeonPlanter"] = 0.75F;
 			decoRatings["FireExtinguisherRefueler"] = -0.25F;
 			decoRatings["DSSFloorServerRack"] = 0.125F;
 			decoRatings["TrashReceptacle"] = -1;
 			decoRatings["Curtain"] = 0.33F;
-			decoRatings["QuantumPowerBankCharger"] = 0.67F;
+			decoRatings["QuantumPowerBankCharger"] = 0.75F;
 			decoRatings["QuantumTeleporter"] = 2.0F;
 			decoRatings["FCSStove"] = 0.1F;
 			decoRatings["FCSShower"] = 0.33F;
@@ -187,14 +189,14 @@ namespace ReikaKalseki.AqueousEngineering {
 			decoRatings["mountSmartTV"] = 0.75F;
 			decoRatings["neonTable01"] = 1;
 			decoRatings["neonTable02"] = 1;
-			decoRatings["FCSRug"] = 0.33F;
+			decoRatings["FCSRug"] = 0.4F;
 			decoRatings["FCSCrewLocker"] = 0.25F;
 			decoRatings["Sofa1"] = 0.25F;
 			decoRatings["Sofa2"] = 0.25F;
 			decoRatings["Sofa3"] = 0.25F;
-			decoRatings["NeonBarStool"] = 0.1F;
+			decoRatings["NeonBarStool"] = 0.15F;
 			decoRatings["FCSCrewBunkBed"] = 0.1F;
-			decoRatings["DisplayBoard"] = 0.4F;
+			decoRatings["DisplayBoard"] = 0.5F;
 			decoRatings["PatreonStatue"] = 0.25F;
 			decoRatings["ahsLeftCornerwGlassRailing"] = 0.1F;
 			decoRatings["ahsRightCornerwGlassRailing"] = 0.1F;
@@ -218,9 +220,10 @@ namespace ReikaKalseki.AqueousEngineering {
 			itemDecoRatings[TechType.PrecursorKey_Orange] = 1.5F;
 			itemDecoRatings[TechType.PrecursorKey_Purple] = 1.5F;
 			itemDecoRatings[TechType.PrecursorIonPowerCell] = 1.25F;
+			itemDecoRatings[TechType.PrecursorIonCrystal] = 2F;
 			itemDecoRatings[TechType.Kyanite] = 1.5F;
-			itemDecoRatings[TechType.Diamond] = 0.5F;
-			itemDecoRatings[TechType.AluminumOxide] = 0.5F;
+			itemDecoRatings[TechType.Diamond] = 0.67F;
+			itemDecoRatings[TechType.AluminumOxide] = 0.67F;
 
 			itemDecoRatings[TechType.Peeper] = 0.05F;
 			itemDecoRatings[TechType.Boomerang] = 0.05F;
@@ -229,20 +232,20 @@ namespace ReikaKalseki.AqueousEngineering {
 			itemDecoRatings[TechType.Oculus] = 0.1F;
 			itemDecoRatings[TechType.Hoopfish] = 0.2F;
 			itemDecoRatings[TechType.Hoverfish] = 0.2F;
-			itemDecoRatings[TechType.LavaBoomerang] = 0.15F;
+			itemDecoRatings[TechType.LavaBoomerang] = 0.25F;
 			itemDecoRatings[TechType.Eyeye] = -0.05F;
 			itemDecoRatings[TechType.LavaEyeye] = -0.05F;
 			itemDecoRatings[TechType.GarryFish] = -0.1F;
 			itemDecoRatings[TechType.Spadefish] = -0.1F;
-			itemDecoRatings[TechType.Reginald] = 0;
+			itemDecoRatings[TechType.Reginald] = 0.02F;
 
 			itemDecoRatings[TechType.CreepvineSeedCluster] = 0.1F;
-			itemDecoRatings[TechType.CreepvinePiece] = 0;
+			itemDecoRatings[TechType.CreepvinePiece] = 0.05F;
 			itemDecoRatings[TechType.Creepvine] = 0.05F;
 			itemDecoRatings[TechType.BloodOil] = -0.25F;
 			itemDecoRatings[TechType.BloodVine] = -0.25F;
-			itemDecoRatings[TechType.SnakeMushroomSpore] = 0.25F;
-			itemDecoRatings[TechType.SnakeMushroom] = 0.25F;
+			itemDecoRatings[TechType.SnakeMushroomSpore] = 0.4F;
+			itemDecoRatings[TechType.SnakeMushroom] = 0.4F;
 			itemDecoRatings[TechType.EyesPlantSeed] = 0F;
 			itemDecoRatings[TechType.EyesPlant] = 0F;
 			itemDecoRatings[TechType.GabeSFeatherSeed] = 0.1F;
@@ -251,48 +254,48 @@ namespace ReikaKalseki.AqueousEngineering {
 			itemDecoRatings[TechType.RedGreenTentacle] = 0.1F;
 			itemDecoRatings[TechType.SpikePlantSeed] = -0.2F;
 			itemDecoRatings[TechType.SpikePlant] = -0.2F;
-			itemDecoRatings[TechType.MembrainTreeSeed] = 0.2F;
-			itemDecoRatings[TechType.MembrainTree] = 0.2F;
+			itemDecoRatings[TechType.MembrainTreeSeed] = 0.25F;
+			itemDecoRatings[TechType.MembrainTree] = 0.25F;
 			itemDecoRatings[TechType.RedConePlantSeed] = 0.1F;
 			itemDecoRatings[TechType.RedConePlant] = 0.1F;
 			itemDecoRatings[TechType.KooshChunk] = 0F;
-			itemDecoRatings[TechType.SpottedLeavesPlantSeed] = 0F;
-			itemDecoRatings[TechType.SpottedLeavesPlant] = 0F;
-			itemDecoRatings[TechType.PurpleFanSeed] = 0F;
-			itemDecoRatings[TechType.PurpleFan] = 0F;
+			itemDecoRatings[TechType.SpottedLeavesPlantSeed] = 0.05F;
+			itemDecoRatings[TechType.SpottedLeavesPlant] = 0.05F;
+			itemDecoRatings[TechType.PurpleFanSeed] = 0.02F;
+			itemDecoRatings[TechType.PurpleFan] = 0.02F;
 			itemDecoRatings[TechType.PurpleBranchesSeed] = 0F;
 			itemDecoRatings[TechType.PurpleBranches] = 0F;
-			itemDecoRatings[TechType.PurpleStalkSeed] = 0.25F;
-			itemDecoRatings[TechType.PurpleStalk] = 0.25F;
+			itemDecoRatings[TechType.PurpleStalkSeed] = 0.33F;
+			itemDecoRatings[TechType.PurpleStalk] = 0.33F;
 			itemDecoRatings[TechType.AcidMushroomSpore] = 0F;
 			itemDecoRatings[TechType.WhiteMushroomSpore] = 0F;
 			itemDecoRatings[TechType.AcidMushroom] = 0F;
 			itemDecoRatings[TechType.WhiteMushroom] = 0F;
-			itemDecoRatings[TechType.RedBasketPlantSeed] = 0.33F;
-			itemDecoRatings[TechType.RedBasketPlant] = 0.33F;
+			itemDecoRatings[TechType.RedBasketPlantSeed] = 0.75F;
+			itemDecoRatings[TechType.RedBasketPlant] = 0.75F;
 			itemDecoRatings[TechType.ShellGrassSeed] = 0.05F;
 			itemDecoRatings[TechType.ShellGrass] = 0.05F;
-			itemDecoRatings[TechType.RedRollPlantSeed] = 0.2F;
-			itemDecoRatings[TechType.RedRollPlant] = 0.2F;
-			itemDecoRatings[TechType.RedBushSeed] = 0.05F;
-			itemDecoRatings[TechType.RedBush] = 0.05F;
-			itemDecoRatings[TechType.SeaCrownSeed] = 0.15F;
-			itemDecoRatings[TechType.SeaCrown] = 0.15F;
+			itemDecoRatings[TechType.RedRollPlantSeed] = 0.25F;
+			itemDecoRatings[TechType.RedRollPlant] = 0.25F;
+			itemDecoRatings[TechType.RedBushSeed] = 0.02F;
+			itemDecoRatings[TechType.RedBush] = 0.02F;
+			itemDecoRatings[TechType.SeaCrownSeed] = 0.2F;
+			itemDecoRatings[TechType.SeaCrown] = 0.2F;
 			itemDecoRatings[TechType.PurpleTentacleSeed] = 0.1F;
 			itemDecoRatings[TechType.PurpleTentacle] = 0.1F;
 			itemDecoRatings[TechType.BluePalmSeed] = 0.05F;
 			itemDecoRatings[TechType.BluePalm] = 0.05F;
-			itemDecoRatings[TechType.SmallFanSeed] = 0.05F;
-			itemDecoRatings[TechType.SmallFan] = 0.05F;
+			itemDecoRatings[TechType.SmallFanSeed] = 0.02F;
+			itemDecoRatings[TechType.SmallFan] = 0.02F;
 
-			itemDecoRatings[TechType.PinkFlowerSeed] = 0.1F;
-			itemDecoRatings[TechType.PinkFlower] = 0.1F;
+			itemDecoRatings[TechType.PinkFlowerSeed] = 0.2F;
+			itemDecoRatings[TechType.PinkFlower] = 0.2F;
 			itemDecoRatings[TechType.PurpleRattleSpore] = -0.05F;
 			itemDecoRatings[TechType.PurpleRattle] = -0.05F;
 			itemDecoRatings[TechType.PurpleVegetablePlant] = -0.1F;
 			itemDecoRatings[TechType.PurpleVegetable] = -0.1F;
-			itemDecoRatings[TechType.PurpleVasePlantSeed] = 0.4F;
-			itemDecoRatings[TechType.PurpleVasePlant] = 0.4F;
+			itemDecoRatings[TechType.PurpleVasePlantSeed] = 0.5F;
+			itemDecoRatings[TechType.PurpleVasePlant] = 0.5F;
 			itemDecoRatings[TechType.HangingFruit] = 0.5F;
 			itemDecoRatings[TechType.HangingFruitTree] = 0.5F;
 			itemDecoRatings[TechType.OrangeMushroomSpore] = -0.25F;
@@ -303,18 +306,18 @@ namespace ReikaKalseki.AqueousEngineering {
 			itemDecoRatings[TechType.SmallMelon] = 0F;
 			itemDecoRatings[TechType.Melon] = 0F;
 			itemDecoRatings[TechType.MelonPlant] = 0F;
-			itemDecoRatings[TechType.BulboTreePiece] = 0F;
-			itemDecoRatings[TechType.BulboTree] = 0F;
+			itemDecoRatings[TechType.BulboTreePiece] = 0.05F;
+			itemDecoRatings[TechType.BulboTree] = 0.05F;
 			itemDecoRatings[TechType.JellyPlantSeed] = -0.2F;
 			itemDecoRatings[TechType.JellyPlant] = -0.2F;
 			itemDecoRatings[TechType.FernPalmSeed] = 0.1F;
 			itemDecoRatings[TechType.FernPalm] = 0.1F;
 		}
 
-		private float getDecoThreshold(BaseCell cell) {
+		private float getLeisureDecoThreshold(BaseCell cell) {
 			float val = AqueousEngineeringMod.config.getFloat(AEConfig.ConfigEntries.LEISUREDECO);
 			if (QModManager.API.QModServices.Main.ModPresent("FCSAlterraHub"))
-				val *= 1.25F;
+				val = val * 1.25F + 5;
 			if (this.isLargeRoom(cell))
 				val *= 1.5F;
 			return val;
@@ -364,13 +367,12 @@ namespace ReikaKalseki.AqueousEngineering {
 			//	options.Add(RoomTypes.POWER);
 			int lockerCount = 0;
 			int agriCount = 0;
-			decoRating = 0;
+			DecoRatingTracker deco = new DecoRatingTracker();
 			bool large = this.isLargeRoom(bc);
-			CountMap<TechType> itemDisplays = new CountMap<TechType>();
 			foreach (PrefabIdentifier pi in li) {
 				Constructable cc = pi.GetComponent<Constructable>();
 				if (cc && !cc.constructed) {
-					decoRating -= 2F;
+					deco.addDeco(-2F);
 					continue;
 				}
 				RoomTypes[] obj = this.getObjectType(pi);
@@ -382,41 +384,37 @@ namespace ReikaKalseki.AqueousEngineering {
 					lockerCount++;
 				if (Array.IndexOf(obj, RoomTypes.AGRICULTURAL) >= 0)
 					agriCount++;
-				decoRating += this.getDecoRating(pi, itemDisplays, large);
-				if (debug)
-					SNUtil.log(pi.name + ": " + this.getObjectType(pi).toDebugString() + ", deco value = " + this.getDecoRating(pi, null, large));
+				this.getDecoRating(pi, deco, large, debug);
 				//SNUtil.writeToChat("Cell "+bc.transform.position+": Object "+pi.name+" > "+getObjectType(pi).toDebugString()+" #"+getDecoRating(pi));
 			}
 			bool hasGlassRoof = bc.gameObject.getChildObject("BaseRoomInteriorTopGlass") != null;
-			int plantPanels = bc.gameObject.getChildObjects("BaseRoomPlanterSide(Clone)").Count;
-			int windows = bc.gameObject.getChildObjects("BaseRoomWindowSide(Clone)").Count;
+			int plantPanels = bc.gameObject.getChildObjects("BaseRoomPlanterSide").Count;
+			int windows = bc.gameObject.getChildObjects("BaseRoomWindowSide").Count;
 			bool sideWindows = windows > 0;
 			if (hasGlassRoof)
 				windows += 3; //counts as 3 windows
-			decoRating += plantPanels * 1.5F; //plant panels, 1.5 each
+			deco.addDeco(plantPanels * 1.5F); //plant panels, 1.5 each
 			if (!AqueousEngineeringMod.config.getBoolean(AEConfig.ConfigEntries.ROOMENVIRODECO))
 				windows = 0;
 			if (windows > 0) {
-				decoRating += windows * this.getWindowDecoValue(bb, bc, hasGlassRoof, debug); //windows, rating is base location dependent
+				deco.addDeco(windows * this.getWindowDecoValue(bb, bc, hasGlassRoof, debug)); //windows, rating is base location dependent
 				if (sideWindows) {
-					float decoAdd = 0;
 					HashSet<int> seen = new HashSet<int>();
 					WorldUtil.getObjectsNear<GameObject>(bc.transform.position, 25, go => {
 						if (go.activeSelf && !seen.Contains(go.GetInstanceID()) && Mathf.Abs(go.transform.position.y - bc.transform.position.y) <= 10) {
 							seen.Add(go.GetInstanceID());
 							Planter p = go.GetComponent<Planter>();
 							if (p && !p.isIndoor) {
-								float add = this.getInventoryDecoValue(p.GetComponent<StorageContainer>())*0.8F;
-								decoAdd += add;
-								if (debug)
-									SNUtil.log("Found nearby exterior planter " + p.name + ": +" + add + " (" + p.GetComponent<StorageContainer>().container.GetItemTypes().Select<TechType, string>(tt => Language.main.Get(tt.AsString())).toDebugString());
+								this.getInventoryDecoValue(p.GetComponent<StorageContainer>(), deco, debug/*, 0.8F*/);
+								//if (debug)
+								//	SNUtil.log("Found nearby exterior planter " + p.name + ": +" + add + " (" + p.GetComponent<StorageContainer>().container.GetItemTypes().Select<TechType, string>(tt => Language.main.Get(tt.AsString())).toDebugString());
 
 							}
 						}
 					});
-					decoRating += decoAdd;
 				}
 			}
+			decoRating = deco.totalRating;
 			if (debug)
 				SNUtil.writeToChat("Room at " + bc.transform.position + " has options " + options.toDebugString() + " & deco value " + decoRating + " (" + plantPanels + "/" + windows + "*" + this.getWindowDecoValue(bb, bc, hasGlassRoof, debug) + ")");
 			int lockerThresh = large ? 8 : 5;
@@ -427,7 +425,7 @@ namespace ReikaKalseki.AqueousEngineering {
 					options.Add(RoomTypes.STORAGE);
 				}
 			}
-			if (decoRating < this.getDecoThreshold(bc))
+			if (decoRating < this.getLeisureDecoThreshold(bc))
 				options.Remove(RoomTypes.LEISURE);
 			if (agriCount < (large ? 5 : 3))
 				options.Remove(RoomTypes.AGRICULTURAL);
@@ -529,67 +527,78 @@ namespace ReikaKalseki.AqueousEngineering {
 			return true;
 		}
 
-		private float getDecoRating(PrefabIdentifier pi, CountMap<TechType> itemDisplays, bool largeRoom) {
+		private void getDecoRating(PrefabIdentifier pi, DecoRatingTracker deco, bool largeRoom, bool debug) {
 			PictureFrame pf = pi.GetComponent<PictureFrame>();
-			if (pf)
-				return pf.current == PictureFrame.State.None ? -1 : 3;
+			if (pf) {
+				deco.addObject(pi, pf.current == PictureFrame.State.None ? -1 : 3, debug, 9999);
+				return;
+			}
 			Sign sg = pi.GetComponent<Sign>();
 			if (sg) {
 				string text = sg.GetComponentInChildren<uGUI_SignInput>().text;
-				return string.IsNullOrEmpty(text) || text.Equals("sign", StringComparison.InvariantCultureIgnoreCase) ? 0 : 0.25F;
+				float amt = string.IsNullOrEmpty(text) || text.Equals("sign", StringComparison.InvariantCultureIgnoreCase) ? 0 : 0.25F;
+				if (amt > 0) {
+					deco.addObject(pi, amt, debug);
+				}
+				return;
 			}
-			if (pi.ClassId == STANDING_LOCKER_PREFAB && QModManager.API.QModServices.Main.ModPresent("lockerMod")) //locker content display
-				return this.getInventoryDecoValue(pi.GetComponent<StorageContainer>()) * 0.2F; //20% value since it contains many many items, and they are small
+			if (pi.ClassId == STANDING_LOCKER_PREFAB && QModManager.API.QModServices.Main.ModPresent("lockerMod")) { //locker content display
+				this.getInventoryDecoValue(pi.GetComponent<StorageContainer>(), deco, debug, 0.2F); //20% value since it contains many many items, and they are small
+			}
 			ItemDisplayLogic disp = pi.GetComponent<ItemDisplayLogic>();
 			if (disp) {
-				TechType tt = disp.getCurrentItem();
-				if (tt == TechType.None)
-					return -0.25F;
-				if (itemDisplays != null)
-					itemDisplays.add(tt);
-				return this.getItemDecoValue(disp.getCurrentItem()) * this.getRepeatedDecoPenaltyFactor(itemDisplays == null ? 0 : itemDisplays.getCount(tt), 1);
+				TechType tt = disp.displayType;
+				Pickupable pp = disp.currentItem;
+				float amt = 0;
+				if (tt == TechType.None || !pp)
+					amt = -0.25F;
+				else
+					amt = this.getItemDecoValue(disp.displayType);
+				if (amt > 0)
+					deco.addObject(tt, pp.gameObject, amt, debug, 1);
+				else
+					deco.addObject(pi, amt, debug);
+				return;
 			}
 			Planter p = pi.GetComponent<Planter>();
 			if (p) {
-				return this.getDecoRating(pi.ClassId) + this.getInventoryDecoValue(p.GetComponent<StorageContainer>());
+				deco.addObject(pi, this.getDecoRating(pi.ClassId), debug);
+				this.getInventoryDecoValue(p.GetComponent<StorageContainer>(), deco, debug, repLimit:3);
+				return;
 			}
 			Aquarium a = pi.GetComponent<Aquarium>();
-			if (a)
-				return 1 + this.getInventoryDecoValue(a.GetComponent<StorageContainer>()); //even empty has some value
+			if (a) {
+				deco.addObject(pi, 2, debug); //even empty has some value
+				this.getInventoryDecoValue(a.GetComponent<StorageContainer>(), deco, debug, repLimit: 3);
+				return;
+			}
 			ACUCallbackSystem.ACUCallback wp = pi.GetComponent<ACUCallbackSystem.ACUCallback>();
-			return wp ? this.getACUDecoValue(wp, largeRoom) : this.getDecoRating(pi.ClassId);
+			if (wp) {
+				this.getACUDecoValue(wp, largeRoom, deco, debug);
+				return;
+			}
+			deco.addObject(pi, this.getDecoRating(pi.ClassId), debug);
+		}
+
+		private void getInventoryDecoValue(StorageContainer sc, DecoRatingTracker deco, bool debug, float factor = 1, int repLimit = 2) {
+			getInventoryDecoValue(sc.storageRoot.GetComponentsInChildren<Pickupable>(true), deco, debug, factor, repLimit);
+		}
+
+		private void getInventoryDecoValue(IEnumerable<Pickupable> li, DecoRatingTracker deco, bool debug, float factor = 1, int repLimit = 2) {
+			foreach (Pickupable pp in li) {
+				deco.addObject(pp.GetTechType(), pp.gameObject, this.getItemDecoValue(pp) * factor, debug, repLimit);
+			}
+		}
+
+		private void getACUDecoValue(ACUCallbackSystem.ACUCallback wp, bool largeRoom, DecoRatingTracker deco, bool debug) {
+			float baseVal = wp.consistentBiome ? BiomeBase.getBiome(wp.currentTheme.baseBiome).sceneryValue * (largeRoom ? 3 : 2) : 1;
+			deco.addDeco(baseVal); //even empty has some value; can do directly since never more than one ACU per room
+			getInventoryDecoValue(wp.acu.items.Select(wpi => wpi.GetComponent<Pickupable>()), deco, debug, 0.5F);
+			getInventoryDecoValue(wp.acu.planter.GetComponent<StorageContainer>(), deco, debug);
 		}
 
 		private float getDecoRating(string classID) {
 			return decoRatings.ContainsKey(classID) ? decoRatings[classID] : 0;
-		}
-
-		private float getRepeatedDecoPenaltyFactor(int idx, int safe = 2) { //idx being "this is the Nth", start penalizing on the third by default (up to 'safe' is unpenalized)
-			return idx <= safe ? 1 : 1F / (1F + (0.5F * (idx - safe))); //67% for 3rd, 50% for 4th, 40% for 5th, 33% for 6th, etc
-		}
-
-		private float getInventoryDecoValue(StorageContainer sc) {
-			float ret = 0;
-			CountMap<TechType> counts = new CountMap<TechType>();
-			foreach (Pickupable pp in sc.storageRoot.GetComponentsInChildren<Pickupable>(true)) {
-				TechType tt = pp.GetTechType();
-				counts.add(tt);
-				ret += this.getItemDecoValue(pp) * this.getRepeatedDecoPenaltyFactor(counts.getCount(tt));
-			}
-			return ret;
-		}
-
-		private float getACUDecoValue(ACUCallbackSystem.ACUCallback wp, bool largeRoom) {
-			float val = wp.consistentBiome ? BiomeBase.getBiome(wp.currentTheme.baseBiome).sceneryValue*(largeRoom ? 3 : 2) : 0;
-			CountMap<TechType> counts = new CountMap<TechType>();
-			foreach (WaterParkItem wpi in wp.acu.items) {
-				Pickupable pp = wpi.GetComponent<Pickupable>();
-				TechType tt = pp.GetTechType();
-				counts.add(tt);
-				val += this.getItemDecoValue(pp) * this.getRepeatedDecoPenaltyFactor(counts.getCount(tt), 5);
-			}
-			val += this.getInventoryDecoValue(wp.acu.planter.GetComponent<StorageContainer>());
-			return val;
 		}
 
 		private float getItemDecoValue(Pickupable pp) {
@@ -605,12 +614,12 @@ namespace ReikaKalseki.AqueousEngineering {
 			return itemDecoRatings.ContainsKey(tt) ? itemDecoRatings[tt] : 0;
 		}
 
-		private RoomTypes[] getObjectType(PrefabIdentifier pi) {
-			return pi.GetComponent<Charger>()
-				? (new RoomTypes[] { RoomTypes.MECHANICAL })
-				: pi.GetComponent<Crafter>()
-				? (new RoomTypes[] { RoomTypes.WORK })
-				: objectTypeMappings.ContainsKey(pi.ClassId) ? objectTypeMappings[pi.ClassId] : (new RoomTypes[] { RoomTypes.UNSPECIALIZED });
+		internal RoomTypes[] getObjectType(PrefabIdentifier pi) {
+			return getObjectType(pi.gameObject, pi.ClassId);
+		}
+
+		internal RoomTypes[] getObjectType(GameObject go, string id) {
+			return go.GetComponent<Charger>() ? (new RoomTypes[] { RoomTypes.MECHANICAL }) : go.GetComponent<Crafter>() ? (new RoomTypes[] { RoomTypes.WORK }) : objectTypeMappings.ContainsKey(id) ? objectTypeMappings[id] : (new RoomTypes[] { RoomTypes.UNSPECIALIZED });
 		}
 
 		internal RoomTypes getSavedType(Component go) {
@@ -627,7 +636,7 @@ namespace ReikaKalseki.AqueousEngineering {
 						rt = bc.GetComponent<RoomTypeTracker>();
 				}
 			}
-			decoThresh = rt ? this.getDecoThreshold(rt.getRoom()) : 9999;
+			decoThresh = rt ? this.getLeisureDecoThreshold(rt.getRoom()) : 9999;
 			deco = rt ? rt.getDecorationValue() : 0;
 			return rt ? rt.getType() : RoomTypes.UNSPECIALIZED;
 		}
@@ -638,7 +647,7 @@ namespace ReikaKalseki.AqueousEngineering {
 
 		public RoomTypes getPlayerRoomType(Player ep, out float deco, out float decoThresh) {
 			BaseCell bc = AEHooks.getCurrentPlayerRoom();
-			decoThresh = this.getDecoThreshold(bc);
+			decoThresh = this.getLeisureDecoThreshold(bc);
 			if (!bc) {
 				deco = 0;
 				return RoomTypes.UNSPECIALIZED;
@@ -685,7 +694,7 @@ namespace ReikaKalseki.AqueousEngineering {
 			if (debugRoomCompute || (notify && AqueousEngineeringMod.config.getBoolean(AEConfig.ConfigEntries.ROOMCHAT) && (prev != type || !Mathf.Approximately(prevD, deco)))) {
 				string msg = "This room is now "+name+", with a decoration rating of "+deco.ToString("0.00");
 				if (deco > 0)
-					msg += " (" + (deco * 100F / this.getDecoThreshold(cell)).ToString("0.00") + "%)";
+					msg += " (" + (deco * 100F / this.getLeisureDecoThreshold(cell)).ToString("0.00") + "%)";
 				SNUtil.writeToChat(msg);
 				if (debugRoomCompute)
 					SNUtil.log(cell.transform.GetChild(0).gameObject.name + ": " + msg);
@@ -751,6 +760,45 @@ namespace ReikaKalseki.AqueousEngineering {
 				}
 				instance.updateRoom(gameObject);
 				this.destroy(false);
+			}
+
+		}
+
+		class DecoRatingTracker {
+
+			internal float totalRating { get; private set; }
+			private readonly Dictionary<string, float> totalContribution = new Dictionary<string, float>();
+			private readonly CountMap<string> objectCount = new CountMap<string>();
+
+			internal void addDeco(float amt) {
+				totalRating += amt;
+			}
+
+			internal void addObject(TechType tt, GameObject go, float deco, bool debug, int repLimit = 2) {
+				addObject(CraftData.GetClassIdForTechType(tt), go, deco, debug, repLimit);
+			}
+
+			internal void addObject(PrefabIdentifier pi, float deco, bool debug, int repLimit = 2) {
+				addObject(pi.ClassId, pi.gameObject, deco, debug, repLimit);
+			}
+
+			internal void addObject(string id, GameObject go, float deco, bool debug, int repLimit = 2) { //start penalizing on the third by default
+				if (string.IsNullOrEmpty(id))
+					return;
+				int hasc = objectCount[id];
+				if (deco > 0 && hasc > 0) {
+					deco *= getRepeatedDecoPenaltyFactor(hasc+1, repLimit);
+				}
+				totalRating += deco;
+				float has = totalContribution.ContainsKey(id) ? totalContribution[id] : 0;
+				totalContribution[id] = has+deco;
+				objectCount.add(id);
+				if (debug)
+					SNUtil.log("Processed room data for "+go.name + ": " + instance.getObjectType(go, id).toDebugString() + ", deco value = " + deco);
+			}
+
+			private float getRepeatedDecoPenaltyFactor(int idx, int safe) { //idx being "this is the Nth" (up to 'safe' is unpenalized)
+				return idx <= safe ? 1 : 1F / (1F + (0.5F * (idx - safe))); //67% for 3rd, 50% for 4th, 40% for 5th, 33% for 6th, etc
 			}
 
 		}
