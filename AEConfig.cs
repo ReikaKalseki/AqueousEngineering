@@ -20,8 +20,6 @@ namespace ReikaKalseki.AqueousEngineering {
 			[ConfigEntry("Nuclear Reactor Power Threshold", typeof(float), 75F, 5F, 100, 100)]NUCTHRESH, //What the base power percentage must fall below for nuclear reactors to activate.
 			[ConfigEntry("Base Pillar Hull Boost", typeof(float), 3, 1, 10, float.NaN)]PILLARHULL, //How much hull reinforcement a pillar provides at base.
 			[ConfigEntry("Base Pillar Limit", typeof(int), 1, 1, 5, float.NaN)]PILLARLIM, //How many pillars a room can have before their hull bonus begins to drop.
-			[ConfigEntry("Sleep Morale Restoration", typeof(int), 25, 5, 50, float.NaN)]SLEEPMORALE, //How much morale sleeping restores.
-			[ConfigEntry("Deco Morale Decay/Gain Speed", typeof(float), 1, 0.1F, 10, float.NaN)]MORALESPEED, //A multiplier for how fast morale decays or grows based on deco rating.
 		}
 	}
 }

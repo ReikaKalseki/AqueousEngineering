@@ -45,7 +45,7 @@ namespace ReikaKalseki.AqueousEngineering {
 
 			GameObject mdl2 = go.getChildObject("bench2");
 			if (!mdl2) {
-				mdl2 = UnityEngine.Object.Instantiate(mdl).setName("bench2");
+				mdl2 = mdl.clone().setName("bench2");
 				mdl2.transform.SetParent(mdl.transform.parent);
 			}
 			mdl2.transform.localScale = new Vector3(0.8F, 0.6F, 1.83F);

@@ -261,7 +261,7 @@ namespace ReikaKalseki.AqueousEngineering {
 			if (WaterParkCreature.waterParkCreatureParameters.ContainsKey(tt)) {
 				renderSizeScale *= WaterParkCreature.waterParkCreatureParameters[tt].maxSize / WaterParkCreature.waterParkCreatureParameters[tt].outsideSize * 0.33F;
 			}
-			GameObject renderObj = UnityEngine.Object.Instantiate(go);
+			GameObject renderObj = go.clone();
 			renderObj.convertToModel();
 			display = new GameObject(DISPLAY_OBJECT_NAME);
 			renderObj.transform.SetParent(display.transform);

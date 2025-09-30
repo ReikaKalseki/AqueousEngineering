@@ -62,7 +62,7 @@ namespace ReikaKalseki.AqueousEngineering {
 
 			Constructable ctr = go.EnsureComponent<Constructable>();/*
 			ctr.CopyFields(ObjectUtil.lookupPrefab(baseTemplate.prefab).GetComponent<Constructable>());
-			ctr.model = UnityEngine.Object.Instantiate(ObjectUtil.lookupPrefab(baseTemplate.prefab).GetComponent<Constructable>().model);
+			ctr.model = ObjectUtil.lookupPrefab(baseTemplate.prefab).GetComponent<Constructable>().model.clone();
 			ctr.model.transform.SetParent(go.transform);
 			ctr.model.transform.localPosition = Vector3.zero;
 			ctr.techType = TechType;*/
@@ -74,7 +74,7 @@ namespace ReikaKalseki.AqueousEngineering {
 			ctr.allowedOutside = false;
 			ctr.allowedOnCeiling = false;
 			ctr.forceUpright = true;
-			//ctr.model = UnityEngine.Object.Instantiate(ObjectUtil.lookupPrefab(baseTemplate.prefab).GetComponent<Constructable>().model);
+			//ctr.model = ObjectUtil.lookupPrefab(baseTemplate.prefab).GetComponent<Constructable>().model.clone();
 			//ctr.model.SetActive(true);
 		}
 

@@ -298,7 +298,7 @@ namespace ReikaKalseki.AqueousEngineering {
 				drills.Clear();
 				for (int i = 0; i < 3; i++) {
 					GameObject air = ObjectUtil.lookupPrefab("7b4b90b8-6294-4354-9ebb-3e5aa49ae453");
-					GameObject turbine = UnityEngine.Object.Instantiate(air.getChildObject("model/_pipes_floating_air_intake_turbine_geo"));
+					GameObject turbine = air.getChildObject("model/_pipes_floating_air_intake_turbine_geo").clone();
 					turbine.transform.SetParent(transform);
 					turbine.transform.localScale = new Vector3(0.7F, 10F, 0.7F);
 					turbine.transform.localPosition = new Vector3(1.35F, (i * 0.31F) + 1.23F, 0.77F);
@@ -453,7 +453,7 @@ namespace ReikaKalseki.AqueousEngineering {
 			//SNUtil.writeToChat("Post-Event Drop: "+res.drop+" x"+res.dropCount);
 			if (res.drop) {
 				for (int a = 0; a < res.dropCount; a++) {
-					GameObject use = UnityEngine.Object.Instantiate(res.drop);
+					GameObject use = res.drop.clone();
 					use.SetActive(true);
 					use.transform.position = aoe.transform.position + (Vector3.down * 0.7F) + (transform.forward * 0.25F);
 					use.transform.rotation = UnityEngine.Random.rotationUniform;

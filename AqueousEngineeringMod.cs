@@ -314,7 +314,7 @@ namespace ReikaKalseki.AqueousEngineering {
 			GameObject pfb = ObjectUtil.createWorldObject("c0d320d2-537e-4128-90ec-ab1466cfbbc3");
 			pfb.transform.position = Player.main.transform.position + (Camera.main.transform.forward * 5);
 			ParticleSystemRenderer r = VFXSunbeam.main.shipPrefab.getChildObject("xShip").GetComponent<ParticleSystemRenderer>();
-			Renderer r2 = UnityEngine.Object.Instantiate(r);
+			Renderer r2 = r.clone();
 			Mesh m = r.mesh;
 			MeshRenderer[] r0 = pfb.GetComponentsInChildren<MeshRenderer>();
 			Transform mdl = r0[0].transform.parent;

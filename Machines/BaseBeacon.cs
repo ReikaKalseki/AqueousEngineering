@@ -108,7 +108,7 @@ namespace ReikaKalseki.AqueousEngineering {
 			if (!effect) {
 				GameObject go = ObjectUtil.createWorldObject("d11dfcc3-bce7-4870-a112-65a5dab5141b", true, false);
 				go.SetActive(false);
-				effect = UnityEngine.Object.Instantiate(go.GetComponent<Gravsphere>().pads[0].vfxHaloRenderer);
+				effect = go.GetComponent<Gravsphere>().pads[0].vfxHaloRenderer.clone();
 				effect.transform.parent = transform;
 				effect.GetComponent<FollowTransform>().parent = transform;
 				effect.gameObject.SetActive(true);

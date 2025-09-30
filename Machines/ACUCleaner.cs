@@ -48,7 +48,7 @@ namespace ReikaKalseki.AqueousEngineering {
 
 			//GameObject air = ObjectUtil.lookupPrefab("7b4b90b8-6294-4354-9ebb-3e5aa49ae453");
 			//GameObject mdl = go.setModel("discovery_trashcan_01_d", air.getChildObject("model"));
-			//lgc.rotator = UnityEngine.Object.Instantiate(ObjectUtil.getChildObject(air, "model").getChildObject("_pipes_floating_air_intake_turbine_geo"));
+			//lgc.rotator = ObjectUtil.getChildObject(air, "model").getChildObject("_pipes_floating_air_intake_turbine_geo").clone();
 			//lgc.rotator.transform.parent = go.transform;
 
 			Constructable c = go.GetComponent<Constructable>();

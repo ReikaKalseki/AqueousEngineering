@@ -41,7 +41,7 @@ namespace ReikaKalseki.AqueousEngineering {
 
 			//GameObject mdl = ObjectUtil.lookupPrefab("0f779340-8064-4308-8baa-6be9324a1e05").getChildObject("Starship_tech_box_01_02/Starship_tech_box_01_01");
 			GameObject mdl = go.setModel("shelve_02", ObjectUtil.lookupPrefab("0f779340-8064-4308-8baa-6be9324a1e05").getChildObject("Starship_tech_box_01_02/Starship_tech_box_01_01"));
-			//mdl = UnityEngine.Object.Instantiate(mdl);
+			//mdl = mdl.clone();
 			mdl.transform.localPosition = new Vector3(0, -0.12F, 0.08F);
 			mdl.transform.localScale = Vector3.one;
 			mdl.transform.SetParent(go.transform);

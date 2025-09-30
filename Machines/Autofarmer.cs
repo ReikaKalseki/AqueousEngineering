@@ -94,7 +94,7 @@ namespace ReikaKalseki.AqueousEngineering {
 			if (!effect) {
 				GameObject go = ObjectUtil.lookupPrefab("d11dfcc3-bce7-4870-a112-65a5dab5141b");
 				go = go.GetComponent<Gravsphere>().vfxPrefab;
-				go = UnityEngine.Object.Instantiate(go);
+				go = go.clone();
 				effect = go.GetComponent<VFXElectricLine>();
 				effect.transform.parent = transform;
 			}
@@ -161,7 +161,7 @@ namespace ReikaKalseki.AqueousEngineering {
 				else {
 					drop = this.getHarvest(p, tt, fp);
 					if (drop)
-						drop = UnityEngine.Object.Instantiate(drop);
+						drop = drop.clone();
 				}
 				//SNUtil.log("drops "+drop);
 				if (drop) {
@@ -173,13 +173,13 @@ namespace ReikaKalseki.AqueousEngineering {
 					}
 					else if (td == TechType.JellyPlantSeed || td == TechType.WhiteMushroomSpore || td == TechType.AcidMushroomSpore) {
 						td = tt;
-						drop = UnityEngine.Object.Instantiate(ObjectUtil.lookupPrefab(tt));
+						drop = ObjectUtil.lookupPrefab(tt).clone();
 					}
 					//SNUtil.log("DT "+td+" > "+drop);
 					drop.SetActive(false);
 					Pickupable ppb = drop.GetComponent<Pickupable>();
 					if (!ppb) {
-						ppb = UnityEngine.Object.Instantiate(ObjectUtil.lookupPrefab(td)).GetComponent<Pickupable>();
+						ppb = ObjectUtil.createWorldObject(td).GetComponent<Pickupable>();
 					}
 					//SNUtil.log(""+ppb);
 					if (ppb && storage.container.AddItem(ppb) != null) {

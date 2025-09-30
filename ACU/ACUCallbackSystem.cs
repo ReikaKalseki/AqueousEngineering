@@ -546,22 +546,23 @@ namespace ReikaKalseki.AqueousEngineering {
 					WaterParkCreature wpc = acu.items.GetRandom() as WaterParkCreature;
 					if (wpc) {
 						bool flag = false;
+						FMOD_CustomEmitter emit = null;
 						FMOD_CustomLoopingEmitter[] ca = wpc.GetComponentsInChildren<FMOD_CustomLoopingEmitter>();
 						if (ca != null && ca.Length > 0) {
-							ca.GetRandom().Play();
-							flag = true;
+							emit = ca.GetRandom();
 						}
 						else {
 							AttackLastTarget[] a = wpc.GetComponentsInChildren<AttackLastTarget>();
-							if (a != null && a.Length > 0) {
-								FMOD_CustomEmitter emit = a.GetRandom().attackStartSound;
-								if (emit) {
-									emit.Play();
-									flag = true;
-								}
-							}
+							if (a != null && a.Length > 0)
+								emit = a.GetRandom().attackStartSound;
 						}
-						cache.nextSoundTime = flag ? time + UnityEngine.Random.Range(1F, 5F) : time + UnityEngine.Random.Range(1F, 2F);
+						if (emit) {
+							emit.Play();
+							if (emit.evt.isValid())
+								emit.evt.setVolume(0.4F);
+							flag = true;
+						}
+						cache.nextSoundTime = flag ? time + UnityEngine.Random.Range(5F, 15F) : time + UnityEngine.Random.Range(2F, 5F);
 					}
 				}
 
