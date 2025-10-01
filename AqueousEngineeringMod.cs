@@ -510,7 +510,7 @@ namespace ReikaKalseki.AqueousEngineering {
 				RecipeUtil.setItemCategory(refuel, TechGroup.Resources, nuclearCategory);
 				//KnownTechHandler.SetCompoundUnlock(refuel, TechType.Unobtanium);
 				KnownTechHandler.SetAnalysisTechEntry(TechType.Unobtanium, new TechType[]{refuel});
-				refuel.removeUnlockTrigger();
+				refuel.removeUnlockTrigger(new TechTrigger(TechType.BaseNuclearReactor));
 				TechnologyUnlockSystem.instance.addDirectUnlock(TechType.ReactorRod, refuel);
 			}
 
