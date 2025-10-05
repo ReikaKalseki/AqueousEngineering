@@ -21,13 +21,14 @@ namespace ReikaKalseki.AqueousEngineering {
 		public static class ACUHook {
 
 			static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions) {
+				InstructionHandlers.logPatchStart(MethodBase.GetCurrentMethod(), instructions);
 				InsnList codes = new InsnList(instructions);
 				try {
 					codes.patchInitialHook(new CodeInstruction(OpCodes.Ldarg_0), InstructionHandlers.createMethodCall("ReikaKalseki.AqueousEngineering.AEHooks", "tickACU", false, typeof(WaterPark)));
-					FileLog.Log("Done patch " + MethodBase.GetCurrentMethod().DeclaringType);
+					InstructionHandlers.logCompletedPatch(MethodBase.GetCurrentMethod(), instructions);
 				}
 				catch (Exception e) {
-					FileLog.Log("Caught exception when running patch " + MethodBase.GetCurrentMethod().DeclaringType + "!");
+					InstructionHandlers.logErroredPatch(MethodBase.GetCurrentMethod());
 					FileLog.Log(e.Message);
 					FileLog.Log(e.StackTrace);
 					FileLog.Log(e.ToString());
@@ -41,16 +42,17 @@ namespace ReikaKalseki.AqueousEngineering {
 		public static class ACUBreedHook {
 
 			static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions) {
+				InstructionHandlers.logPatchStart(MethodBase.GetCurrentMethod(), instructions);
 				InsnList codes = new InsnList();
 				try {
 					codes.add(OpCodes.Ldarg_0);
 					codes.add(OpCodes.Ldarg_1);
 					codes.invoke("ReikaKalseki.AqueousEngineering.AEHooks", "tryBreedACU", false, new Type[] { typeof(WaterPark), typeof(WaterParkCreature) });
 					codes.add(OpCodes.Ret);
-					FileLog.Log("Done patch " + MethodBase.GetCurrentMethod().DeclaringType);
+					InstructionHandlers.logCompletedPatch(MethodBase.GetCurrentMethod(), instructions);
 				}
 				catch (Exception e) {
-					FileLog.Log("Caught exception when running patch " + MethodBase.GetCurrentMethod().DeclaringType + "!");
+					InstructionHandlers.logErroredPatch(MethodBase.GetCurrentMethod());
 					FileLog.Log(e.Message);
 					FileLog.Log(e.StackTrace);
 					FileLog.Log(e.ToString());
@@ -64,15 +66,16 @@ namespace ReikaKalseki.AqueousEngineering {
 		public static class WaterParkItemDroppabilityHook {
 
 			static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions) {
+				InstructionHandlers.logPatchStart(MethodBase.GetCurrentMethod(), instructions);
 				InsnList codes = new InsnList();
 				try {
 					codes.add(OpCodes.Ldarg_0);
 					codes.invoke("ReikaKalseki.AqueousEngineering.AEHooks", "canAddItemToACU", false, typeof(Pickupable));
 					codes.add(OpCodes.Ret);
-					FileLog.Log("Done patch " + MethodBase.GetCurrentMethod().DeclaringType);
+					InstructionHandlers.logCompletedPatch(MethodBase.GetCurrentMethod(), instructions);
 				}
 				catch (Exception e) {
-					FileLog.Log("Caught exception when running patch " + MethodBase.GetCurrentMethod().DeclaringType + "!");
+					InstructionHandlers.logErroredPatch(MethodBase.GetCurrentMethod());
 					FileLog.Log(e.Message);
 					FileLog.Log(e.StackTrace);
 					FileLog.Log(e.ToString());
@@ -86,13 +89,14 @@ namespace ReikaKalseki.AqueousEngineering {
 		public static class TerrainGrassHook {
 
 			static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions) {
+				InstructionHandlers.logPatchStart(MethodBase.GetCurrentMethod(), instructions);
 				InsnList codes = new InsnList(instructions);
 				try {
 					codes.patchEveryReturnPre(new CodeInstruction(OpCodes.Ldarg_1), InstructionHandlers.createMethodCall("ReikaKalseki.AqueousEngineering.AEHooks", "onChunkGenGrass", false, typeof(IVoxelandChunk2)));
-					FileLog.Log("Done patch " + MethodBase.GetCurrentMethod().DeclaringType);
+					InstructionHandlers.logCompletedPatch(MethodBase.GetCurrentMethod(), instructions);
 				}
 				catch (Exception e) {
-					FileLog.Log("Caught exception when running patch " + MethodBase.GetCurrentMethod().DeclaringType + "!");
+					InstructionHandlers.logErroredPatch(MethodBase.GetCurrentMethod());
 					FileLog.Log(e.Message);
 					FileLog.Log(e.StackTrace);
 					FileLog.Log(e.ToString());
@@ -106,6 +110,7 @@ namespace ReikaKalseki.AqueousEngineering {
 		public static class CameraFuzzHook {
 
 			static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions) {
+				InstructionHandlers.logPatchStart(MethodBase.GetCurrentMethod(), instructions);
 				InsnList codes = new InsnList(instructions);
 				try {
 					for (int i = 0; i < codes.Count; i++) {
@@ -117,10 +122,10 @@ namespace ReikaKalseki.AqueousEngineering {
 							}
 						}
 					}
-					FileLog.Log("Done patch " + MethodBase.GetCurrentMethod().DeclaringType);
+					InstructionHandlers.logCompletedPatch(MethodBase.GetCurrentMethod(), instructions);
 				}
 				catch (Exception e) {
-					FileLog.Log("Caught exception when running patch " + MethodBase.GetCurrentMethod().DeclaringType + "!");
+					InstructionHandlers.logErroredPatch(MethodBase.GetCurrentMethod());
 					FileLog.Log(e.Message);
 					FileLog.Log(e.StackTrace);
 					FileLog.Log(e.ToString());
@@ -134,6 +139,7 @@ namespace ReikaKalseki.AqueousEngineering {
 		public static class NuclearReactorPowerHook {
 
 			static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions) {
+				InstructionHandlers.logPatchStart(MethodBase.GetCurrentMethod(), instructions);
 				InsnList codes = new InsnList(instructions);
 				try {
 					PatchLib.addPowerGenHook("BaseNuclearReactor", codes);
@@ -154,13 +160,14 @@ namespace ReikaKalseki.AqueousEngineering {
 		public static class BioReactorPowerHook {
 
 			static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions) {
+				InstructionHandlers.logPatchStart(MethodBase.GetCurrentMethod(), instructions);
 				InsnList codes = new InsnList(instructions);
 				try {
 					PatchLib.addPowerGenHook("BaseBioReactor", codes);
-					FileLog.Log("Done patch " + MethodBase.GetCurrentMethod().DeclaringType);
+					InstructionHandlers.logCompletedPatch(MethodBase.GetCurrentMethod(), instructions);
 				}
 				catch (Exception e) {
-					FileLog.Log("Caught exception when running patch " + MethodBase.GetCurrentMethod().DeclaringType + "!");
+					InstructionHandlers.logErroredPatch(MethodBase.GetCurrentMethod());
 					FileLog.Log(e.Message);
 					FileLog.Log(e.StackTrace);
 					FileLog.Log(e.ToString());
@@ -174,6 +181,7 @@ namespace ReikaKalseki.AqueousEngineering {
 		public static class WaterFilterPowerCostHook {
 
 			static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions) {
+				InstructionHandlers.logPatchStart(MethodBase.GetCurrentMethod(), instructions);
 				InsnList codes = new InsnList(instructions);
 				try {
 					for (int i = codes.Count - 1; i >= 0; i--) {
@@ -183,10 +191,10 @@ namespace ReikaKalseki.AqueousEngineering {
 						});
 						}
 					}
-					FileLog.Log("Done patch " + MethodBase.GetCurrentMethod().DeclaringType);
+					InstructionHandlers.logCompletedPatch(MethodBase.GetCurrentMethod(), instructions);
 				}
 				catch (Exception e) {
-					FileLog.Log("Caught exception when running patch " + MethodBase.GetCurrentMethod().DeclaringType + "!");
+					InstructionHandlers.logErroredPatch(MethodBase.GetCurrentMethod());
 					FileLog.Log(e.Message);
 					FileLog.Log(e.StackTrace);
 					FileLog.Log(e.ToString());
@@ -200,6 +208,7 @@ namespace ReikaKalseki.AqueousEngineering {
 		public static class ChargerSpeedHook {
 
 			static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions) {
+				InstructionHandlers.logPatchStart(MethodBase.GetCurrentMethod(), instructions);
 				InsnList codes = new InsnList(instructions);
 				try {
 					for (int i = codes.Count - 1; i >= 0; i--) {
@@ -209,10 +218,10 @@ namespace ReikaKalseki.AqueousEngineering {
 						});
 						}
 					}
-					FileLog.Log("Done patch " + MethodBase.GetCurrentMethod().DeclaringType);
+					InstructionHandlers.logCompletedPatch(MethodBase.GetCurrentMethod(), instructions);
 				}
 				catch (Exception e) {
-					FileLog.Log("Caught exception when running patch " + MethodBase.GetCurrentMethod().DeclaringType + "!");
+					InstructionHandlers.logErroredPatch(MethodBase.GetCurrentMethod());
 					FileLog.Log(e.Message);
 					FileLog.Log(e.StackTrace);
 					FileLog.Log(e.ToString());
@@ -226,13 +235,14 @@ namespace ReikaKalseki.AqueousEngineering {
 		public static class PlaceableDecoHook {
 
 			static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions) {
+				InstructionHandlers.logPatchStart(MethodBase.GetCurrentMethod(), instructions);
 				InsnList codes = new InsnList(instructions);
 				try {
 					codes.patchInitialHook(new CodeInstruction(OpCodes.Ldarg_0), InstructionHandlers.createMethodCall("ReikaKalseki.AqueousEngineering.AEHooks", "onPlacedItem", false, typeof(PlaceTool)));
-					FileLog.Log("Done patch " + MethodBase.GetCurrentMethod().DeclaringType);
+					InstructionHandlers.logCompletedPatch(MethodBase.GetCurrentMethod(), instructions);
 				}
 				catch (Exception e) {
-					FileLog.Log("Caught exception when running patch " + MethodBase.GetCurrentMethod().DeclaringType + "!");
+					InstructionHandlers.logErroredPatch(MethodBase.GetCurrentMethod());
 					FileLog.Log(e.Message);
 					FileLog.Log(e.StackTrace);
 					FileLog.Log(e.ToString());
@@ -246,14 +256,15 @@ namespace ReikaKalseki.AqueousEngineering {
 		public static class NuclearReactorHook {
 
 			static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions) {
+				InstructionHandlers.logPatchStart(MethodBase.GetCurrentMethod(), instructions);
 				InsnList codes = new InsnList(instructions);
 				try {
 					codes.patchInitialHook(new CodeInstruction(OpCodes.Ldarg_0), InstructionHandlers.createMethodCall("ReikaKalseki.AqueousEngineering.AEHooks", "onNuclearReactorSpawn", false, typeof(BaseNuclearReactor)));
-					FileLog.Log("Done patch " + MethodBase.GetCurrentMethod().DeclaringType);
+					InstructionHandlers.logCompletedPatch(MethodBase.GetCurrentMethod(), instructions);
 					//FileLog.Log("Codes are "+InstructionHandlers.toString(codes));
 				}
 				catch (Exception e) {
-					FileLog.Log("Caught exception when running patch " + MethodBase.GetCurrentMethod().DeclaringType + "!");
+					InstructionHandlers.logErroredPatch(MethodBase.GetCurrentMethod());
 					FileLog.Log(e.Message);
 					FileLog.Log(e.StackTrace);
 					FileLog.Log(e.ToString());
@@ -267,14 +278,15 @@ namespace ReikaKalseki.AqueousEngineering {
 		public static class NuclearReactorOverride {
 
 			static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions) {
+				InstructionHandlers.logPatchStart(MethodBase.GetCurrentMethod(), instructions);
 				InsnList codes = new InsnList();
 				try {
 					codes.add(OpCodes.Ret);
-					FileLog.Log("Done patch " + MethodBase.GetCurrentMethod().DeclaringType);
+					InstructionHandlers.logCompletedPatch(MethodBase.GetCurrentMethod(), instructions);
 					//FileLog.Log("Codes are "+InstructionHandlers.toString(codes));
 				}
 				catch (Exception e) {
-					FileLog.Log("Caught exception when running patch " + MethodBase.GetCurrentMethod().DeclaringType + "!");
+					InstructionHandlers.logErroredPatch(MethodBase.GetCurrentMethod());
 					FileLog.Log(e.Message);
 					FileLog.Log(e.StackTrace);
 					FileLog.Log(e.ToString());
@@ -288,14 +300,15 @@ namespace ReikaKalseki.AqueousEngineering {
 		public static class ReactorSlotHook {
 
 			static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions) {
+				InstructionHandlers.logPatchStart(MethodBase.GetCurrentMethod(), instructions);
 				InsnList codes = new InsnList(instructions);
 				try {
 					codes.patchInitialHook(new CodeInstruction(OpCodes.Ldarg_0), new CodeInstruction(OpCodes.Ldarg_1), InstructionHandlers.createMethodCall("ReikaKalseki.AqueousEngineering.AEHooks", "onEquipmentSlotActivated", false, typeof(uGUI_EquipmentSlot), typeof(bool)));
-					FileLog.Log("Done patch " + MethodBase.GetCurrentMethod().DeclaringType);
+					InstructionHandlers.logCompletedPatch(MethodBase.GetCurrentMethod(), instructions);
 					//FileLog.Log("Codes are "+InstructionHandlers.toString(codes));
 				}
 				catch (Exception e) {
-					FileLog.Log("Caught exception when running patch " + MethodBase.GetCurrentMethod().DeclaringType + "!");
+					InstructionHandlers.logErroredPatch(MethodBase.GetCurrentMethod());
 					FileLog.Log(e.Message);
 					FileLog.Log(e.StackTrace);
 					FileLog.Log(e.ToString());
