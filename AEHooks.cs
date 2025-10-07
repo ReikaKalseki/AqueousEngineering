@@ -54,6 +54,8 @@ namespace ReikaKalseki.AqueousEngineering {
 				float time = DayNightCycle.main.timePassedAsFloat;
 				if (time - lastPlayerRoomCheckTime >= 0.5F) {
 					currentPlayerRoom = ObjectUtil.getBaseRoom((BaseRoot)ep.currentSub, ep.transform.position);
+					if (currentPlayerRoom && DIHooks.getWorldAge() >= 15 && currentPlayerRoom.gameObject.getChildObject("BaseRoom"))
+						PDAManager.getPage("ROOMTYPESPDAPAGE").unlock();
 					lastPlayerRoomCheckTime = time;
 				}
 			}

@@ -116,7 +116,11 @@ namespace ReikaKalseki.AqueousEngineering {
 			roomLocale.load();
 			acuLocale.load();
 
-			XMLLocale.LocaleEntry e = itemLocale.getEntry("CraftingNodes");
+			XMLLocale.LocaleEntry e = roomLocale.getEntry("ROOMTYPESPDAPAGE");
+			PDAManager.PDAPage page = PDAManager.createPage(e);
+			page.register();
+
+			e = itemLocale.getEntry("CraftingNodes");
 			nuclearCategory = TechCategoryHandler.Main.AddTechCategory("Nuclear", e.getField<string>("nuclear"));
 			TechCategoryHandler.Main.TryRegisterTechCategoryToTechGroup(TechGroup.Resources, nuclearCategory);
 			CraftTreeHandler.Main.AddTabNode(CraftTree.Type.Fabricator, "Nuclear", e.getField<string>("nuclear"), TextureManager.getSprite(modDLL, "Textures/NuclearTab"), "Resources");
@@ -286,7 +290,7 @@ namespace ReikaKalseki.AqueousEngineering {
 			StoryHandler.instance.registerTrigger(new MultiTechTrigger(collector.TechType, TechType.Cyclops), new TechUnlockEffect(collectorTetherBlock.TechType, 1, 10));
 
 			e = machineLocale.getEntry("BaseACUMonitor");
-			PDAManager.PDAPage page = PDAManager.createPage(e.key+"PDA", e.getField<string>("pdatitle"), e.pda, e.getField<string>("category"));
+			page = PDAManager.createPage(e.key+"PDA", e.getField<string>("pdatitle"), e.pda, e.getField<string>("category"));
 			page.register();
 
 			BaseRoomSpecializationSystem.instance.registerModdedObject(toy, 0.25F, BaseRoomSpecializationSystem.RoomTypes.ACU);

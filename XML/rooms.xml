@@ -98,15 +98,53 @@
 			
 		</pda>
 	</Name>
-	<Name>
+	<ROOMTYPESPDAPAGE>
 		<name>
-			
+			Room Specialization
 		</name>
 		<desc>
 			
 		</desc>
 		<pda>
+			Rooms in your seabase can be specialized towards one of several purposes, granting you or their contents improved functionality. To specialize a room, it consist only of things tailored towards that specialization - with a small amount of leeway given to some always-useful buildables, like lockers.
 			
+			Some room types also have a decoration level threshold, in particular leisure rooms.
+			
+			Only full-size general-purpose rooms can be specialized, not corridors, nor specialized rooms like scanner rooms or moonpools.
+			
+			Unspecialized rooms, which are the default, carry no bonuses.
+			
+			Potential specializations are as follows:
+			
+			Storage
+			- Grants bonus storage capacity to lockers
+			
+			Power
+			- +25% power output from generators
+			
+			Mechanical
+			- -20% machine energy consumption
+			- +50% charger speed
+			
+			Agricultural
+			- +33% yield from plant harvests
+			- +25% food and water value to food crops harvested
+			
+			Working
+			- Reduced food and water consumption rate (amount depends on decoration rating)
+			- -33% fabricator time
+			
+			Leisure
+			- Greatly reduced food and water consumption rate (amount depends on decoration rating)
+			- Sleeping in beds grants health regeneration
+			- Large morale bonuses
+			
+			ACU
+			- ACU internal capacity +50%
+			- ACU ecosystem is slightly more tolerant and productive
 		</pda>
-	</Name>
+		<category>
+			Advanced
+		</category>
+	</ROOMTYPESPDAPAGE>
 </Root>
