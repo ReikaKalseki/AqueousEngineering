@@ -237,7 +237,7 @@ namespace ReikaKalseki.AqueousEngineering {
 
 	}
 
-	public class BaseDrillableGrinderLogic : CustomMachineLogic {
+	public class BaseDrillableGrinderLogic : CustomMachineLogic, DIHooks.StasisReactant {
 
 		private bool isReady;
 		private bool isGrinding;
@@ -258,7 +258,7 @@ namespace ReikaKalseki.AqueousEngineering {
 			AqueousEngineeringMod.grinderBlock.initializeMachine(gameObject);
 		}
 
-		public override void onStasisHit(StasisSphere s) {
+		public void onStasisHit(StasisSphere s) {
 			this.freeze(s.getLifespan() + 0.5F);
 		}
 
