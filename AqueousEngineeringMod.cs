@@ -118,6 +118,7 @@ namespace ReikaKalseki.AqueousEngineering {
 
 			XMLLocale.LocaleEntry e = roomLocale.getEntry("ROOMTYPESPDAPAGE");
 			PDAManager.PDAPage page = PDAManager.createPage(e);
+			page.format(false, false, BaseRoomSpecializationSystem.instance.getLeisureDecoThreshold(false), BaseRoomSpecializationSystem.instance.getLeisureDecoThreshold(true), "%");
 			page.register();
 
 			e = itemLocale.getEntry("CraftingNodes");
@@ -304,6 +305,7 @@ namespace ReikaKalseki.AqueousEngineering {
 			ConsoleCommandsHandler.Main.RegisterConsoleCommand<Action>("debugACU", ACUCallbackSystem.instance.debugACU);
 			ConsoleCommandsHandler.Main.RegisterConsoleCommand<Action>("sunbeamModel", createSunbeamModel);
 			ConsoleCommandsHandler.Main.RegisterConsoleCommand<Action<bool>>("debugRooms", arg => BaseRoomSpecializationSystem.debugRoomCompute = arg);
+			ConsoleCommandsHandler.Main.RegisterConsoleCommand<Action>("debugRoom", BaseRoomSpecializationSystem.debugRoomValues);
 
 			if (config.getBoolean(AEConfig.ConfigEntries.ACUSOUND))
 				WaterParkCreature.behavioursToDisableInside[0] = typeof(AqueousEngineeringMod); //replace with a non-MB class that will never be present

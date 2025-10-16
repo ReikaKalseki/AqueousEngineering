@@ -17,10 +17,12 @@ namespace ReikaKalseki.AqueousEngineering {
 
 	public class AmpeelAntenna : CustomMachine<AmpeelAntennaLogic> {
 
-		internal static readonly float POWER_GEN = 3F; //max, per s per ampeel
-		internal static readonly float POWER_FALLOFF = 0.12F; //per meter
-		internal static readonly float RANGE = POWER_GEN/POWER_FALLOFF;
-		internal static readonly float INTERVAL = 0.25F;
+		public static readonly float POWER_GEN = 3F; //max, per s per ampeel
+		public static readonly float POWER_FALLOFF = 0.12F; //per meter
+		public static float ACU_COEFFICIENT = 0.4F;
+		public static readonly float RANGE = POWER_GEN/POWER_FALLOFF;
+		public static readonly float INTERVAL = 0.25F;
+		public static readonly float AMPEEL_CAP = 25;
 
 		public AmpeelAntenna(XMLLocale.LocaleEntry e) : base(e.key, e.name, e.desc, "4cb154ef-bdb6-4ff4-9107-f378ce21a9b7") {
 			this.addIngredient(TechType.CopperWire, 6);
@@ -86,9 +88,39 @@ namespace ReikaKalseki.AqueousEngineering {
 			//go.GetComponent<ConstructableBounds>().bounds.position = new Vector3(1, 1.0F, 0);
 		}
 
+		public static float computeACUValue(WaterPark acu) {
+			float ampeels = 0;
+			float exponent = 1;
+			foreach (WaterParkItem wp in acu.items) {
+				if (wp is WaterParkCreature wpc) {
+					Shocker s = wpc.GetComponent<Shocker>();
+					AmpeelAntennaCreature aac = wpc.GetComponent<AmpeelAntennaCreature>();
+					if (s && s.liveMixin.IsAlive()) {
+						ampeels += s.liveMixin.GetHealthFraction();
+					}
+					else if (aac != null && aac.live && aac.live.IsAlive()) {
+						float f = aac.live.GetHealthFraction();
+						ampeels += aac.ampeelValue * f;
+						exponent += aac.powerExponentAddition * f;
+					}
+				}
+			}
+			return Mathf.Min(AMPEEL_CAP, Mathf.Pow(ampeels, exponent)) * ACU_COEFFICIENT * POWER_GEN;
+		}
+
 	}
 
 	class AmpeelCoil : MonoBehaviour {
+
+	}
+
+	public interface AmpeelAntennaCreature {
+
+		LiveMixin live { get; }
+
+		float ampeelValue { get; }
+
+		float powerExponentAddition { get; }
 
 	}
 
@@ -146,23 +178,25 @@ namespace ReikaKalseki.AqueousEngineering {
 					this.setupSky();
 			}
 			if (sub && sub.powerRelay.GetPower() < sub.powerRelay.GetMaxPower()) {
-				HashSet<Shocker> set = WorldUtil.getObjectsNearWithComponent<Shocker>(gameObject.transform.position, AmpeelAntenna.RANGE);
-				foreach (Shocker c in set) {
-					if (this.isValid(c)) {
-						float dd = connectedACU ? 0 : Vector3.Distance(c.transform.position, transform.position);
-						if (dd >= AmpeelAntenna.RANGE)
-							continue;
-						sub.powerRelay.AddEnergy(seconds * c.liveMixin.GetHealthFraction() * (connectedACU ? 0.4F : 1) * (AmpeelAntenna.POWER_GEN - (AmpeelAntenna.POWER_FALLOFF * dd)), out float trash);
+				float toAdd = 0;
+				if (connectedACU) {
+					toAdd = AmpeelAntenna.computeACUValue(connectedACU);
+				}
+				else {
+					HashSet<Shocker> set = WorldUtil.getObjectsNearWithComponent<Shocker>(gameObject.transform.position, AmpeelAntenna.RANGE);
+					foreach (Shocker c in set) {
+						if (c && c.liveMixin.IsAlive()) {
+							float dd = Vector3.Distance(c.transform.position, transform.position);
+							if (dd >= AmpeelAntenna.RANGE)
+								continue;
+							toAdd += c.liveMixin.GetHealthFraction() * (AmpeelAntenna.POWER_GEN - dd*AmpeelAntenna.POWER_FALLOFF);
+						}
 					}
 				}
+				if (toAdd > 0) {
+					sub.powerRelay.AddEnergy(seconds * toAdd, out float trash);
+				}
 			}
-		}
-
-		private bool isValid(Shocker c) {
-			if (!c.liveMixin.IsAlive())
-				return false;
-			WaterParkCreature wp = c.gameObject.GetComponent<WaterParkCreature>();
-			return !wp ? !connectedACU : wp.currentWaterPark == connectedACU;
 		}
 	}
 }

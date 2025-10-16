@@ -154,7 +154,8 @@ namespace ReikaKalseki.AqueousEngineering {
 
 		private void AddPower() {
 			if (powerSource && buildable.constructed) {
-				thermalComponent.powerSource.AddEnergy(AqueousEngineeringMod.config.getInt(AEConfig.ConfigEntries.ATPTAPRATE), out float trash);
+				DIHooks.addPowerToSeabaseDelegate(thermalComponent.powerSource, AqueousEngineeringMod.config.getInt(AEConfig.ConfigEntries.ATPTAPRATE), out float trash, this);
+				//thermalComponent.powerSource.AddEnergy(AqueousEngineeringMod.config.getInt(AEConfig.ConfigEntries.ATPTAPRATE), out float trash);
 			}
 		}
 

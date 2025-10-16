@@ -227,7 +227,7 @@ namespace ReikaKalseki.AqueousEngineering {
 		}
 
 		public static float getReactorGeneration(float orig, MonoBehaviour reactor) { //either bio or nuclear
-																					  //SNUtil.writeToChat("Reactor gen "+orig+" in "+BaseRoomSpecializationSystem.instance.getSavedType(reactor));
+			//SNUtil.writeToChat("Reactor gen "+orig+" in "+BaseRoomSpecializationSystem.instance.getSavedType(reactor));
 			return BaseRoomSpecializationSystem.instance.getSavedType(reactor) == BaseRoomSpecializationSystem.RoomTypes.POWER ? orig * 1.25F : orig;
 		}
 

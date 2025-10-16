@@ -314,11 +314,15 @@ namespace ReikaKalseki.AqueousEngineering {
 			itemDecoRatings[TechType.FernPalm] = 0.1F;
 		}
 
-		private float getLeisureDecoThreshold(BaseCell cell) {
+		public float getLeisureDecoThreshold(BaseCell cell) {
+			return getLeisureDecoThreshold(this.isLargeRoom(cell));
+		}
+
+		public float getLeisureDecoThreshold(bool large) {
 			float val = AqueousEngineeringMod.config.getFloat(AEConfig.ConfigEntries.LEISUREDECO);
 			if (QModManager.API.QModServices.Main.ModPresent("FCSAlterraHub"))
 				val = val * 1.25F + 5;
-			if (this.isLargeRoom(cell))
+			if (large)
 				val *= 1.5F;
 			return val;
 		}
@@ -688,7 +692,7 @@ namespace ReikaKalseki.AqueousEngineering {
 			float prevD = tr ? tr.getDecorationValue() : 0;
 			List<PrefabIdentifier> li = ObjectUtil.getBaseObjectsInRoom(bb, cell);
 			//SNUtil.writeToChat("Checking room type for "+go);
-			RoomTypes type = this.getType(bb, cell, li, out float deco);
+			RoomTypes type = this.getType(bb, cell, li, out float deco, debugRoomCompute);
 			//SNUtil.writeToChat("Room at "+cell.transform.position+" is now type "+type+"; decoration rating = "+deco.ToString("0.00"));
 			string name = AqueousEngineeringMod.roomLocale.getEntry(Enum.GetName(typeof(RoomTypes), type)).desc;
 			if (debugRoomCompute || (notify && AqueousEngineeringMod.config.getBoolean(AEConfig.ConfigEntries.ROOMCHAT) && (prev != type || !Mathf.Approximately(prevD, deco)))) {

@@ -114,32 +114,32 @@
 			
 			Unspecialized rooms, which are the default, carry no bonuses.
 			
-			Potential specializations are as follows:
+			Potential specializations, along with their requirements and bonuses, are as follows:
 			
-			Storage
+			Storage (Storage-only devices, several in number)
 			- Grants bonus storage capacity to lockers
 			
-			Power
+			Power (Power and energy handling equipment only)
 			- +25% power output from generators
 			
-			Mechanical
+			Mechanical (Processing/Acquisition machinery only)
 			- -20% machine energy consumption
 			- +50% charger speed
 			
-			Agricultural
+			Agricultural (Farming equipment only)
 			- +33% yield from plant harvests
 			- +25% food and water value to food crops harvested
 			
-			Working
+			Working (Workshop-type equipment and decorations)
 			- Reduced food and water consumption rate (amount depends on decoration rating)
 			- -33% fabricator time
 			
-			Leisure
+			Leisure (No machinery, relaxation items, {0} or {1} deco rating (small/large rooms))
 			- Greatly reduced food and water consumption rate (amount depends on decoration rating)
 			- Sleeping in beds grants health regeneration
 			- Large morale bonuses
 			
-			ACU
+			ACU (ACUs and support infrastructure)
 			- ACU internal capacity +50%
 			- ACU ecosystem is slightly more tolerant and productive
 		</pda>

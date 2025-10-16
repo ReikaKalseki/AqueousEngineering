@@ -332,6 +332,7 @@
 			ACU Stack Height: $height
 			Occupancy: $count/$capacity
 			Stalker Toy Value: $stalkerToy
+			Potential Ampeel Antenna Power Yield: $ampeelYield/s
 		</pda>
 		<category>
 			DownloadedData

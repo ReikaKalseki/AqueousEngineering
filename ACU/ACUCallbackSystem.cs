@@ -430,6 +430,7 @@ namespace ReikaKalseki.AqueousEngineering {
 				values["infected"] = infectedTotal.ToString("0.00");
 				values["bonus"] = (currentBonus * 100).ToString("0.00");
 				values["stalkerToy"] = stalkerToyValue.ToString("0.0");
+				values["ampeelYield"] = AmpeelAntenna.computeACUValue(acu).ToString("0.00");
 				values["height"] = acu.height;
 				values["count"] = acu.usedSpace;
 				values["capacity"] = acu.wpPieceCapacity * acu.height;
