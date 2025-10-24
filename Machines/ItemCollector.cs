@@ -111,11 +111,11 @@ namespace ReikaKalseki.AqueousEngineering {
 				}
 
 				if (gravity && targetInventories.Count > 0 && UnityEngine.Random.Range(0F, 1F) <= Time.deltaTime) {
-					Rigidbody rb = gravity.attractableList.GetRandom();
-					if (rb && rb.gameObject.activeInHierarchy) {
+					Rigidbody rb = gravity.attractableList.getRandomEntry();
+					if (rb && rb.gameObject.activeInHierarchy && !rb.GetComponent<WaterParkItem>()) {
 						Pickupable pp = rb.GetComponent<Pickupable>();
 						if (pp && Vector3.Distance(pp.transform.position, transform.position) <= 8) {
-							StorageContainer sc = targetInventories.GetRandom();
+							StorageContainer sc = targetInventories.getRandomEntry();
 							if (sc && sc.container.AddItem(pp) != null) {
 								pp.PlayPickupSound();
 								pp.gameObject.SetActive(false);
