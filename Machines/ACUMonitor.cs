@@ -103,11 +103,11 @@ namespace ReikaKalseki.AqueousEngineering {
 
 		public void OnHandHover(GUIHand hand) {
 			if (connectedACU) {
-				HandReticle.main.SetInteractText(AqueousEngineeringMod.acuMonitorBlock.locale.getField<string>("tooltip"), false);
+				HandReticle.main.SetInteractText(AqueousEngineeringMod.acuMonitorBlock.locale.getString("tooltip"), false);
 				HandReticle.main.SetIcon(HandReticle.IconType.Interact);
 			}
 			else {
-				HandReticle.main.SetInteractText(AqueousEngineeringMod.acuMonitorBlock.locale.getField<string>("noacu"), false);
+				HandReticle.main.SetInteractText(AqueousEngineeringMod.acuMonitorBlock.locale.getString("noacu"), false);
 				HandReticle.main.SetIcon(HandReticle.IconType.HandDeny);
 			}
 		}

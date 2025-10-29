@@ -68,7 +68,7 @@ namespace ReikaKalseki.AqueousEngineering {
 		public static void onWorldLoaded() {
 			OutdoorPot.updateLocale();
 
-			string s = AqueousEngineeringMod.machineLocale.getEntry("BaseRepairBeacon").getField<string>("frag");
+			string s = AqueousEngineeringMod.machineLocale.getEntry("BaseRepairBeacon").getString("frag");
 			foreach (TechnologyFragment f in AqueousEngineeringMod.repairBeaconFragments)
 				LanguageHandler.Main.SetLanguageLine(f.fragmentPrefab.TechType.AsString(), s);
 		}

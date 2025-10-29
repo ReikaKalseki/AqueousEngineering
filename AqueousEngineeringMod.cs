@@ -122,9 +122,9 @@ namespace ReikaKalseki.AqueousEngineering {
 			page.register();
 
 			e = itemLocale.getEntry("CraftingNodes");
-			nuclearCategory = TechCategoryHandler.Main.AddTechCategory("Nuclear", e.getField<string>("nuclear"));
+			nuclearCategory = TechCategoryHandler.Main.AddTechCategory("Nuclear", e.getString("nuclear"));
 			TechCategoryHandler.Main.TryRegisterTechCategoryToTechGroup(TechGroup.Resources, nuclearCategory);
-			CraftTreeHandler.Main.AddTabNode(CraftTree.Type.Fabricator, "Nuclear", e.getField<string>("nuclear"), TextureManager.getSprite(modDLL, "Textures/NuclearTab"), "Resources");
+			CraftTreeHandler.Main.AddTabNode(CraftTree.Type.Fabricator, "Nuclear", e.getString("nuclear"), TextureManager.getSprite(modDLL, "Textures/NuclearTab"), "Resources");
 
 			poo = new MiniPoo(itemLocale.getEntry("MiniPoop"));
 			poo.Patch();
@@ -247,7 +247,7 @@ namespace ReikaKalseki.AqueousEngineering {
 			int count = 0;
 			foreach (TechnologyFragment f in repairBeaconFragments) {
 				count += worldgen.getCount(f.fragmentPrefab.ClassID);
-				f.fragmentPrefab.setDisplayName(machineLocale.getEntry("BaseRepairBeacon").getField<string>("frag"));
+				f.fragmentPrefab.setDisplayName(machineLocale.getEntry("BaseRepairBeacon").getString("frag"));
 			}
 			SNUtil.log("Found " + count + " " + repairBlock.ClassID + " fragments to use", modDLL);
 			PDAHandler.EditFragmentsToScan(GenUtil.getFragment(repairBlock.TechType, 0).TechType, count);
@@ -291,7 +291,7 @@ namespace ReikaKalseki.AqueousEngineering {
 			StoryHandler.instance.registerTrigger(new MultiTechTrigger(collector.TechType, TechType.Cyclops), new TechUnlockEffect(collectorTetherBlock.TechType, 1, 10));
 
 			e = machineLocale.getEntry("BaseACUMonitor");
-			page = PDAManager.createPage(e.key+"PDA", e.getField<string>("pdatitle"), e.pda, e.getField<string>("category"));
+			page = PDAManager.createPage(e.key+"PDA", e.getString("pdatitle"), e.pda, e.getString("category"));
 			page.register();
 
 			BaseRoomSpecializationSystem.instance.registerModdedObject(toy, 0.25F, BaseRoomSpecializationSystem.RoomTypes.ACU);

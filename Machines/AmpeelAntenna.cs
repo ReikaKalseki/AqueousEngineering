@@ -19,10 +19,10 @@ namespace ReikaKalseki.AqueousEngineering {
 
 		public static readonly float POWER_GEN = 3F; //max, per s per ampeel
 		public static readonly float POWER_FALLOFF = 0.12F; //per meter
-		public static float ACU_COEFFICIENT = 0.4F;
+		public static float ACU_COEFFICIENT = 0.2F;
 		public static readonly float RANGE = POWER_GEN/POWER_FALLOFF;
 		public static readonly float INTERVAL = 0.25F;
-		public static readonly float AMPEEL_CAP = 25;
+		public static readonly float AMPEEL_CAP = 25; //ACU cap: 15/s
 
 		public AmpeelAntenna(XMLLocale.LocaleEntry e) : base(e.key, e.name, e.desc, "4cb154ef-bdb6-4ff4-9107-f378ce21a9b7") {
 			this.addIngredient(TechType.CopperWire, 6);
