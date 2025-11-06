@@ -301,6 +301,7 @@ namespace ReikaKalseki.AqueousEngineering {
 			BaseRoomSpecializationSystem.instance.registerModdedObject(acuCleanerBlock, 0, BaseRoomSpecializationSystem.RoomTypes.ACU);
 			BaseRoomSpecializationSystem.instance.registerModdedObject(acuMonitorBlock, 0, BaseRoomSpecializationSystem.RoomTypes.ACU);
 			BaseRoomSpecializationSystem.instance.registerModdedObject(batteryBlock, 0, BaseRoomSpecializationSystem.RoomTypes.POWER);
+			BaseRoomSpecializationSystem.instance.registerModdedObject(wirelessChargerBlock, 0, BaseRoomSpecializationSystem.RoomTypes.MECHANICAL);
 
 			ConsoleCommandsHandler.Main.RegisterConsoleCommand<Action>("debugACU", ACUCallbackSystem.instance.debugACU);
 			ConsoleCommandsHandler.Main.RegisterConsoleCommand<Action>("sunbeamModel", createSunbeamModel);
