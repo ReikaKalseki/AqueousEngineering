@@ -362,7 +362,7 @@
 			Item Collector
 		</name>
 		<desc>
-			Expands upon the gravtrap technology to automatically collect the items it catches as well. Is constructed to be highly heat-resistant.
+			Expands upon the gravtrap technology to automatically collect the items it catches as well. Is constructed to be highly heat-resistant. May have unintended consequences on nearby ACUs.
 		</desc>
 		<pda>
 			
