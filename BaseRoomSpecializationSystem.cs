@@ -181,9 +181,9 @@ namespace ReikaKalseki.AqueousEngineering {
 			decoRatings["FCSStove"] = 0.1F;
 			decoRatings["FCSShower"] = 0.33F;
 			decoRatings["FCSSink"] = 0.1F;
-			decoRatings["FCSJukebox"] = 1.5F;
-			decoRatings["FCSJukeboxSpeaker"] = 0.25F;
-			decoRatings["FCSJukeBoxSubWoofer"] = 0.5F;
+			decoRatings["FCSJukebox"] = 3F;
+			decoRatings["FCSJukeboxSpeaker"] = 0.5F;
+			decoRatings["FCSJukeBoxSubWoofer"] = 1.0F;
 			decoRatings["HologramPoster"] = 0.25F;
 			decoRatings["tableSmartTV"] = 0.75F;
 			decoRatings["mountSmartTV"] = 0.75F;

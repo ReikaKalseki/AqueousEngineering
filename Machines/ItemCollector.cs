@@ -102,7 +102,7 @@ namespace ReikaKalseki.AqueousEngineering {
 					WorldUtil.getGameObjectsNear(transform.position, 20, go => {
 						this.tryAddTarget(go.FindAncestor<StorageContainer>());
 						SubRoot sub = go.FindAncestor<SubRoot>();
-						if (sub) {
+						if (sub && !sub.isBase) {
 							foreach (StorageContainer sc2 in sub.GetComponentsInChildren<StorageContainer>()) {
 								this.tryAddTarget(sc2);
 							}
