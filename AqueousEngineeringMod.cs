@@ -20,6 +20,7 @@ using SMLHelper.V2.Utility;
 using UnityEngine;  //Needed for most Unity Enginer manipulations: Vectors, GameObjects, Audio, etc.
 
 namespace ReikaKalseki.AqueousEngineering {
+
 	[QModCore]
 	public static class AqueousEngineeringMod {
 
